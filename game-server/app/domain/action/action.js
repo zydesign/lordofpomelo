@@ -2,6 +2,7 @@ var id = 1;
 
 /**
  * Action class, used to excute the action in server
+ *Action类，用于在服务器中执行动作
  */
 var Action = function(opts){
 	this.data = opts.data;
