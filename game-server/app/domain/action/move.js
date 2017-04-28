@@ -6,13 +6,14 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 /**
  * Move action, which is used to preserve and update user position
+ * 移动动作，用于保存和更新用户位置
  */
 var Move = function(opts){
 	opts.type = 'move';
 	opts.id = opts.entity.entityId;
 	opts.singleton = true;
 
-	Action.call(this, opts);  //让move继承了action函数,上面是修改apt参数,先继承action,下面都是自己的函数属性
+	Action.call(this, opts);  //让move继承了action函数,上面是修改apt参数,先继承action,下面都是自己的工厂函数属性
 	this.entity = opts.entity;
 	this.area = this.entity.area;
 	this.path = opts.path;
@@ -27,10 +28,11 @@ util.inherits(Move, Action);
 
 /**
  * Update the move action, it will calculate and set the entity's new position, and update AOI module
+ * 更新移动动作，它将计算并设置实体的新位置，并更新AOI模块
  */
 Move.prototype.update = function(){
 	this.tickNumber++;
-	var time = Date.now()-this.time;
+	var time = Date.now()-this.time;    //从一坐标点到另一坐标点的时间间隔,单位毫秒
 	var speed = this.speed;
 	if(speed > 600) {
 		logger.warn('move speed too fast : %j', speed);
@@ -38,11 +40,11 @@ Move.prototype.update = function(){
 
 	var path = this.path;
 	var index = this.index;
-	var travelDistance = speed*time/1000;
+	var travelDistance = speed*time/1000;   //根据时间速度计算得到需要移动的距离
 	var oldPos = {x : this.pos.x, y : this.pos.y};
 	var pos = oldPos;
-	var dest = path[index];
-	var distance = getDis(this.pos, dest);
+	var dest = path[index];   //移动后的新坐标
+	var distance = getDis(this.pos, dest);  //根据两个坐标计算的距离
 
 	while(travelDistance > 0){
 		if(distance <= travelDistance){
@@ -94,7 +96,9 @@ Move.prototype.update = function(){
 };
 
 function getDis(pos1, pos2) {
+	//Math.sqrt()求平方根,而Math.pow(x,y)返回 x 的 y 次幂的值..这里是求直角三角形对角线长度
 	return Math.sqrt(Math.pow((pos1.x-pos2.x), 2) + Math.pow((pos1.y-pos2.y), 2));
+	
 }
 
 function getPos(start, end, dis) {
