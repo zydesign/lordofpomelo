@@ -6,8 +6,9 @@ var utils = require('../../util/utils');
 var exp = module.exports;
 
 //Add event for aoi
+//为aoi添加事件
 exp.addEvent = function(area, aoi){
-	aoi.on('add', function(params){
+	aoi.on('add', function(params){   //添加事件
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
@@ -19,7 +20,7 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	aoi.on('remove', function(params){
+	aoi.on('remove', function(params){  //离开事件
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
@@ -30,7 +31,7 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	aoi.on('update', function(params){
+	aoi.on('update', function(params){  //更新事件
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
@@ -42,7 +43,7 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	aoi.on('updateWatcher', function(params) {
+	aoi.on('updateWatcher', function(params) {  //更新观察者事件
 		params.area = area;
 		switch(params.type) {
 			case EntityType.PLAYER:
@@ -53,7 +54,7 @@ exp.addEvent = function(area, aoi){
 };
 
 /**
- * Handle player add event
+ * Handle player add event  处理玩家加入事件,要告诉视野范围内的玩家和怪物,自己加入了
  * @param {Object} params Params for add player, the content is : {watchers, id}
  * @return void
  * @api private
@@ -79,7 +80,7 @@ function onPlayerAdd(params) {
 					}
 				}
 				if(uids.length > 0){
-					onAddEntity(uids, player);
+					onAddEntity(uids, player); //广播消息给视野内玩家,玩家加入
 				}
 				break;
 			case EntityType.MOB:
@@ -95,7 +96,7 @@ function onPlayerAdd(params) {
 }
 
 /**
- * Handle mob add event
+ * Handle mob add event 处理怪物加入事件,告诉视野范围的玩家,有怪物进入视野
  * @param {Object} params Params for add mob, the content is : {watchers, id}
  * @return void
  * @api private
@@ -119,9 +120,9 @@ function onMobAdd(params){
 	}
 
 	if(uids.length > 0) {
-		onAddEntity(uids, mob);
+		onAddEntity(uids, mob);  //广播消息给玩家(玩家视野),怪物加入
 	}
-
+            //获取怪物视野内的玩家
 	var ids = area.aoi.getIdsByRange({x:mob.x, y:mob.y}, mob.range, [EntityType.PLAYER])[EntityType.PLAYER];
 	if(!!ids && ids.length > 0 && !mob.target){
 		for(var key in ids){
@@ -131,7 +132,7 @@ function onMobAdd(params){
 }
 
 /**
- * Handle player remove event
+ * Handle player remove event   处理玩家离开事件
  * @param {Object} params Params for remove player, the content is : {watchers, id}
  * @return void
  * @api private
@@ -154,14 +155,17 @@ function onPlayerRemove(params) {
 					}
 				}
 
-				onRemoveEntity(uids, entityId);
+				onRemoveEntity(uids, entityId); //广播消息给观察者,玩家离开
 				break;
 		}
 	}
 }
 
 /**
- * Handle object update event
+ * Handle object update event 
+ * 处理对象更新事件.
+ * 如果离开玩家视野告诉这部分玩家,玩家离开;如果进入新玩家视野,告诉这部分玩家,玩家加入
+ * 进入新怪物视野或离开旧怪物视野,告诉这部分怪物进入与离开
  * @param {Object} params Params for add object, the content is : {oldWatchers, newWatchers, id}
  * @return void
  * @api private
@@ -212,10 +216,12 @@ function onObjectUpdate(params) {
 
 	switch(params.type) {
 		case EntityType.PLAYER:
+			//自己角色移动，广播消息给周围玩家，更新周围玩家对自己角色的可见不可见视野
 			onPlayerAdd({area:area, id:params.id, watchers:addWatchers});
 			onPlayerRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
 		case EntityType.MOB:
+			//怪物移动，广播消息给周围玩家，更新周围玩家对该怪物的可见不可见视野
 			onMobAdd({area:area, id:params.id, watchers:addWatchers});
 			onMobRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
@@ -223,7 +229,7 @@ function onObjectUpdate(params) {
 }
 
 /**
- * Handle player update event
+ * Handle player update event  处理玩家更新事件
  * @param {Object} params Params for player update, the content is : {watchers, id}
  * @return void
  * @api private
@@ -250,7 +256,7 @@ function onPlayerUpdate(params) {
 }
 
 /**
- * Handle mob remove event
+ * Handle mob remove event  处理怪物的离开事件
  * @param {Object} params Params for remove mob, the content is : {watchers, id}
  * @return void
  * @api private
@@ -277,7 +283,7 @@ function onMobRemove(params) {
 }
 
 /**
- * Push message for add entities
+ * Push message for add entities 推送消息给视野范围内的其他玩家,自己或怪物加入视野(uids为被推送的对象,entity为行为对象)
  * @param {Array} uids The users to notify
  * @param {Number} entityId The entityId to add
  * @api private
