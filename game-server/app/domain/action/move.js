@@ -32,7 +32,7 @@ util.inherits(Move, Action);
  */
 Move.prototype.update = function(){
 	this.tickNumber++;
-	var time = Date.now()-this.time;    //从一坐标点到另一坐标点的时间间隔,单位毫秒
+	var time = Date.now()-this.time;    //刷新的时间间隔,单位毫秒
 	var speed = this.speed;
 	if(speed > 600) {
 		logger.warn('move speed too fast : %j', speed);
@@ -40,19 +40,20 @@ Move.prototype.update = function(){
 
 	var path = this.path;
 	var index = this.index;
-	var travelDistance = speed*time/1000;   //根据时间速度计算得到需要移动的距离
+	var travelDistance = speed*time/1000;   //单次刷新能移动的距离
 	var oldPos = {x : this.pos.x, y : this.pos.y};
-	var pos = oldPos;
-	var dest = path[index];   //移动后的新坐标
+	var pos = oldPos;         //旧坐标
+	var dest = path[index];   //新坐标
 	var distance = getDis(this.pos, dest);  //根据两个坐标计算的距离
 
 	while(travelDistance > 0){
-		if(distance <= travelDistance){
+		if(distance <= travelDistance){   //如果单次刷新能够完成移动距离,去运算下一个点
 			travelDistance = travelDistance - distance;
 			pos = path[index];
 			index++;
 
 			//If the index exceed the last point, means the move is finished
+			//如果索引超过了最后一点，则意味着该移动完成了
 			if(index >= path.length){
 				this.finished = true;
 				this.entity.isMoving = false;
@@ -62,8 +63,8 @@ Move.prototype.update = function(){
 			dest = path[index];
 			distance = getDis(pos, dest);
 		}else{
-			distance = distance - travelDistance;
-			pos = getPos(pos, dest, distance);
+			distance = distance - travelDistance; //点击新坐标后,单个tick内剩余未完成的距离
+			pos = getPos(pos, dest, distance); //计算出单次刷新移动到的坐标
 			travelDistance = 0;
 		}
 	}
@@ -75,6 +76,7 @@ Move.prototype.update = function(){
 	this.entity.y = Math.floor(pos.y);
 
 	//Update the aoi module
+        //更新aoi模块
 	var watcher = {id : this.entity.entityId, type : this.entity.type};
   this.area.timer.updateObject(watcher, oldPos, pos);
   this.area.timer.updateWatcher(watcher, oldPos, pos, this.entity.range, this.entity.range);
