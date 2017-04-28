@@ -12,7 +12,7 @@ var Move = function(opts){
 	opts.id = opts.entity.entityId;
 	opts.singleton = true;
 
-	Action.call(this, opts);  //让move继承了action函数
+	Action.call(this, opts);  //让move继承了action函数,上面是修改apt参数,先继承action,下面都是自己的函数属性
 	this.entity = opts.entity;
 	this.area = this.entity.area;
 	this.path = opts.path;
