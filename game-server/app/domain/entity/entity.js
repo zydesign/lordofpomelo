@@ -16,8 +16,9 @@ var id = 1;
  */
 
 var Entity = function(opts) {
+  //让实体继承事件派发器，可以使用EventEmitter的属性和方法了
   EventEmitter.call(this);
-  this.entityId = id++;
+  this.entityId = id++;//让每new一次的实例id递增不相同
   this.kindId = Number(opts.kindId);
   this.kindName = opts.kindName;
   this.englishName = opts.englishName;
@@ -29,6 +30,7 @@ var Entity = function(opts) {
   this.area = opts.area;
 };
 
+//让实体继承事件派发器
 util.inherits(Entity, EventEmitter);
 
 /**
