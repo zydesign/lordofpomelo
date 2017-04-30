@@ -13,7 +13,7 @@ var Move = function(opts){
 	opts.id = opts.entity.entityId;
 	opts.singleton = true;
 
-	 //让move继承action函数。需要结合util.inherits()继承,上面是修改apt参数,先继承action,下面都是自己的工厂函数属性
+	 //上面是修改apt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型,
 	Action.call(this, opts); 
 	this.entity = opts.entity;
 	this.area = this.entity.area;
@@ -25,7 +25,7 @@ var Move = function(opts){
 	this.tickNumber = 0;
 };
 
-util.inherits(Move, Action);//让move继承action函数
+util.inherits(Move, Action);//让move继承action函数的原型链
 
 /**
  * Update the move action, it will calculate and set the entity's new position, and update AOI module
