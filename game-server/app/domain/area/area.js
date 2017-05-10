@@ -34,7 +34,7 @@ var Instance = function(opts){
 
   this.playerNum = 0;
   this.emptyTime = Date.now();
-  //Init AOI
+  //Init AOI 通过opts参数配置，建立地图灯塔阵为aoi,aoi就是对对象id及观察者id的管理
   this.aoi = aoiManager.getService(opts);
 
   this.aiManager = ai.createManager({area:this});
@@ -55,6 +55,7 @@ module.exports = Instance;
  * @api public
  */
 Instance.prototype.start = function() {
+  //监听aoi事件,包括对象的add/remove/updat,观察者的updateWatcher
   aoiEventManager.addEvent(this, this.aoi.aoi);
 
   //Init mob zones
