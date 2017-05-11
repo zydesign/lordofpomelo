@@ -53,6 +53,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type) {
 			case EntityType.PLAYER:
+	//广播消息给玩家自己，观察的实体的变动
 				onPlayerUpdate(params);
 				break;
 		}
