@@ -10,13 +10,15 @@ var exp = module.exports;
 //aoi就是对象ids和观察者ids的管理，对象ids会在updateWatcher被调用
 //当触发事件时，获取观察者uids，并广播消息。观察者时怪物的话，就激化这些怪物仇恨
 exp.addEvent = function(area, aoi){
-	aoi.on('add', function(params){   //添加事件
+	aoi.on('add', function(params){   //加入事件
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
+	//广播消息给玩家观察者们，并给MOB观察者们添加仇恨，对该玩家id
 				onPlayerAdd(params);
 				break;
 			case EntityType.MOB:
+	//广播消息给玩家观察者们，并获取实体MOB所在灯塔的实体ids（类型为player），对ids都添加MOB仇恨
 				onMobAdd(params);
 				break;
 		}
@@ -26,6 +28,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
+	//广播消息给玩家观察者们
 				onPlayerRemove(params);
 				break;
 			case EntityType.MOB:
@@ -37,6 +40,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
+	//广播消息给玩家观察者们（移除的观察者removeWatchers和新加的观察者addWatchers）
 				onObjectUpdate(params);
 				break;
 			case EntityType.MOB:
@@ -124,7 +128,7 @@ function onMobAdd(params){
 	if(uids.length > 0) {
 		onAddEntity(uids, mob);  //广播消息给玩家(玩家视野),怪物加入
 	}
-            //获取怪物视野内的玩家
+            //获取怪物视野内的玩家ids，并添加仇恨
 	var ids = area.aoi.getIdsByRange({x:mob.x, y:mob.y}, mob.range, [EntityType.PLAYER])[EntityType.PLAYER];
 	if(!!ids && ids.length > 0 && !mob.target){
 		for(var key in ids){
@@ -218,12 +222,12 @@ function onObjectUpdate(params) {
 
 	switch(params.type) {
 		case EntityType.PLAYER:
-			//自己角色移动，广播消息给周围玩家，更新周围玩家对自己角色的可见不可见视野
+			//如果实体为玩家，广播消息给周围玩家，更新周围玩家对自己角色的可见不可见视野
 			onPlayerAdd({area:area, id:params.id, watchers:addWatchers});
 			onPlayerRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
 		case EntityType.MOB:
-			//怪物移动，广播消息给周围玩家，更新周围玩家对该怪物的可见不可见视野
+			//如果实体为怪物，广播消息给周围玩家，更新周围玩家对该怪物的可见不可见视野
 			onMobAdd({area:area, id:params.id, watchers:addWatchers});
 			onMobRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
