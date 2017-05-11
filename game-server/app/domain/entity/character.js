@@ -26,29 +26,29 @@ var Character = function(opts) {
   this.haters = {};
 
   this.died = false;
-  this.hp = opts.hp;
-  this.mp = opts.mp;
-  this.maxHp = opts.maxHp;
-  this.maxMp = opts.maxMp;
-  this.level = opts.level;
-  this.experience = opts.experience;
-  this.attackValue = opts.attackValue;
-  this.defenceValue = opts.defenceValue;
-  this.totalAttackValue = opts.totalAttackValue || 0;
-  this.totalDefenceValue = opts.totalDefenceValue || 0;
-  this.hitRate = opts.hitRate;
-  this.dodgeRate = opts.dodgeRate;
-  this.walkSpeed = opts.walkSpeed;
-  this.attackSpeed = opts.attackSpeed;
-  this.isMoving = false;
+  this.hp = opts.hp;           //血量值
+  this.mp = opts.mp;           //魔法值
+  this.maxHp = opts.maxHp;    //血量最大值
+  this.maxMp = opts.maxMp;    //魔法最大值    
+  this.level = opts.level;      //等级
+  this.experience = opts.experience;    //经验值
+  this.attackValue = opts.attackValue;  //攻击值
+  this.defenceValue = opts.defenceValue;  //防御值
+  this.totalAttackValue = opts.totalAttackValue || 0;     //总攻击值
+  this.totalDefenceValue = opts.totalDefenceValue || 0;   //总防御值
+  this.hitRate = opts.hitRate;      //攻击率（命中率）
+  this.dodgeRate = opts.dodgeRate;  //闪避率
+  this.walkSpeed = opts.walkSpeed;  //移动速度
+  this.attackSpeed = opts.attackSpeed;  //攻击速度
+  this.isMoving = false;  
 
   this.attackParam = 1;
   this.defenceParam = 1;
   this.equipmentParam = 1;
-  this.buffs = [];
-  this.curSkill = 1;  //default normal attack
-  this.characterData = dataApi.character.findById(this.kindId);
-  this.fightSkills = {};
+  this.buffs = [];     //拥有的buff
+  this.curSkill = 1;  //default normal attack  //当前技能
+  this.characterData = dataApi.character.findById(this.kindId);  //角色数据
+  this.fightSkills = {};   //战斗技能
 };
 
 util.inherits(Character, Entity);
@@ -61,7 +61,7 @@ module.exports = Character;
 
 /**
  * Add skills to the fightSkills.
- *
+ * 增加技能到技能数组
  * @param {Array} fightSkills
  * @api public
  */
@@ -74,7 +74,7 @@ Character.prototype.addFightSkills = function(fightSkills) {
 
 /**
  * Get fight skill data
- *
+ * 获取技能数据
  * @api public
  */
 Character.prototype.getFightSkillData = function(){
@@ -93,7 +93,7 @@ Character.prototype.getFightSkillData = function(){
 
 /**
  * Set target of this Character.
- *
+ * 添加角色选中的目标
  * @param {Number} targetId entityId of the target
  * @api public
  */
@@ -103,7 +103,7 @@ Character.prototype.setTarget = function(targetId) {
 
 /**
  * Check the target.
- *
+ * 判断是否已有选中目标
  * @api public
  */
 Character.prototype.hasTarget = function() {
@@ -112,7 +112,7 @@ Character.prototype.hasTarget = function() {
 
 /**
  * Clear the target.
- *
+ * 取消选中目标
  * @api public
  */
 Character.prototype.clearTarget = function() {
@@ -121,7 +121,7 @@ Character.prototype.clearTarget = function() {
 
 /**
  * Reset the hp.
- *
+ * 重置血量，比如升级了，最多血量增加了，就要重置血量
  * @param {Number} maxHp
  * @api public
  */
@@ -135,7 +135,7 @@ Character.prototype.resetHp = function(maxHp) {
 
 /**
  * Recover the hp.
- *
+ * 加血
  * @param {Number} hpValue
  * @api public
  */
@@ -154,7 +154,7 @@ Character.prototype.recoverHp = function(hpValue) {
 
 /**
  * Reset the mp.
- *
+ * 重置魔法值，比如升级了，最多魔法值增加了，就要重置魔法值
  * @param {Number} maxMp
  * @api public
  */
@@ -165,7 +165,7 @@ Character.prototype.resetMp = function(maxMp) {
 
 /**
  * Recover the mp.
- *
+ * 加蓝
  * @param {Number} mpValue
  * @api public
  */
@@ -186,7 +186,7 @@ Character.prototype.recoverMp = function(mpValue) {
  * Move to the destination of (x, y).
  * the map will calculate path by startPosition(startX, startY), endPosition(endX, endY) and cache
  * if the path exist, it will emit the event 'move', or return false and loggerWarn
- *
+ * 角色移动
  * @param {Number} targetX
  * @param {Number} targetY
  * @param {Boolean} useCache
