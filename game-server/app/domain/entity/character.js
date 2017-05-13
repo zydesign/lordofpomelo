@@ -121,7 +121,7 @@ Character.prototype.clearTarget = function() {
 
 /**
  * Reset the hp.
- * 重置血量，比如升级了，最多血量增加了，就要重置血量
+ * 重置血量，比如升级了，血量最大值增加了，就要重置血量
  * @param {Number} maxHp
  * @api public
  */
@@ -154,7 +154,7 @@ Character.prototype.recoverHp = function(hpValue) {
 
 /**
  * Reset the mp.
- * 重置魔法值，比如升级了，最多魔法值增加了，就要重置魔法值
+ * 重置魔法值，比如升级了，魔法最大值增加了，就要重置魔法值
  * @param {Number} maxMp
  * @api public
  */
@@ -187,6 +187,7 @@ Character.prototype.recoverMp = function(mpValue) {
  * the map will calculate path by startPosition(startX, startY), endPosition(endX, endY) and cache
  * if the path exist, it will emit the event 'move', or return false and loggerWarn
  * 角色移动
+ *地图计算路径起点、终点及缓存，如果路径存在，则发射'move'事件
  * @param {Number} targetX
  * @param {Number} targetY
  * @param {Boolean} useCache
