@@ -43,7 +43,7 @@ module.exports = Equipment;
 
 /**
  * Equipment refresh every 'lifetime' millisecond
- *
+ *更新装备掉落的倒计时，
  * @api public
  */
 Equipment.prototype.update = function(){
@@ -56,6 +56,7 @@ Equipment.prototype.update = function(){
   }
 };
 
+//装备掉落数据，位置，玩家保护等
 Equipment.prototype.toJSON = function() {
   return {
     entityId: this.entityId,
