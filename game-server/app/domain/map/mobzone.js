@@ -50,7 +50,8 @@ MobZone.prototype.update = function() {
 
 	for(var i = 0; i < this.genCount; i++) {
 		if(this.count < this.limit && nextTime <= time) {
-			this.generateMobs();  //生成一个怪物
+			//生成一个怪物，这个怪物会被加入MobZone的怪物对象集，并生成怪物巡逻的坐标
+			this.generateMobs();  
 			this.lastGenTime = time;
 		}
 	}
