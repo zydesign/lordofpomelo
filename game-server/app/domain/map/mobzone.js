@@ -15,9 +15,10 @@ var MobZone = function(opts) {
 	this.area = opts.area;
 	this.map = opts.area.map;
 	this.mobId = opts.mobId;
-	//通过指定的怪物id复制一份这个怪物的数据
+	//通过指定的怪物id复制一份这个怪物的数据对象（单份数据的属性名为英文项目名）
 	this.mobData = utils.clone(dataApi.character.findById(this.mobId));
-
+	
+        //给这个怪物数据，添加数据和修改部分数据值
 	this.mobData.zoneId = this.zoneId;
 	this.mobData.areaId = this.area.id;
 	this.mobData.area = this.area;
@@ -40,6 +41,8 @@ util.inherits(MobZone, Zone);
 
 /**
  * Every tick the update will be called to generate new mobs
+ * 每一次更新都会被调用来生成新的mobs
+ * 每隔5秒生成一个怪物，如果怪物达到限定数则不再生成
  */
 MobZone.prototype.update = function() {
 	var time = Date.now();
@@ -59,8 +62,10 @@ MobZone.prototype.update = function() {
 
 /**
  * The nenerate mob funtion, will generate mob, update aoi and push the message to all interest clients
+ * 生成怪物，更新aoi并且推送消息给观察者
  */
 MobZone.prototype.generateMobs = function() {
+	//生成一份怪物数据
 	var mobData = this.mobData;
 	if(!mobData) {
 		logger.error('load mobData failed! mobId : ' + this.mobId);
@@ -69,6 +74,7 @@ MobZone.prototype.generateMobs = function() {
 
 	var count = 0, limit = 20;
 	do{
+		//在怪物空间范围内随机生成怪物坐标
 		mobData.x = Math.floor(Math.random()*this.width) + this.x;
 		mobData.y = Math.floor(Math.random()*this.height) + this.y;
 	} while(!this.map.isReachable(mobData.x, mobData.y) && count++ < limit);
@@ -77,13 +83,16 @@ MobZone.prototype.generateMobs = function() {
 		logger.error('generate mob failed! mob data : %j, area : %j, retry %j times', mobData, this.area.id, count);
 		return;
 	}
-
+            
+	//生成怪物  怪物坐标  怪物巡逻路径
 	var mob = new Mob(mobData);
 	mob.spawnX = mob.x;
 	mob.spawnY = mob.y;
 	genPatrolPath(mob);
+	//将怪物加入到怪物空间
 	this.add(mob);
-
+        
+	//将怪物加入场景
 	this.area.addEntity(mob);
 	this.count++;
 };
