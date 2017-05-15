@@ -5,6 +5,7 @@ var id = 0;
 
 /**
  * The origint zone object
+ * 空间对象的父类
  */
 var Zone = function(opts) {
 	this.zoneId = id++;
@@ -19,6 +20,7 @@ util.inherits(Zone, EventEmitter);
 
 /**
  * Update the zone, the funciton is time driven
+ * 会使用定时器调用这个函数
  */
 Zone.prototype.update = function() {
 };
