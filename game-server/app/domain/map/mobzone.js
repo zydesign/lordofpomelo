@@ -71,7 +71,8 @@ MobZone.prototype.generateMobs = function() {
 		logger.error('load mobData failed! mobId : ' + this.mobId);
 		return;
 	}
-        //do...while循环，如果生成的怪物数据坐标不在map地图内，就从新生成，限制20次内，得到的是一个坐标
+        //do...while循环，如果生成的怪物数据坐标map地图内无效（不在地图内或在障碍物上），
+	//就从新生成，限制20次内，得到的是一个坐标
 	var count = 0, limit = 20;
 	do{
 		//在怪物空间范围内随机生成怪物坐标
@@ -194,11 +195,13 @@ var genPoint = function(map, originX, originY, count) {
  * @param dx, dy {Number} End point
  */
 var checkPoint = function(map, ox, oy, dx, dy) {
+	//检测坐标是否合法
 	if(!map.isReachable(dx, dy)) {
 		return false;
 	}
-
+        //生成寻路路径
 	var res = map.findPath(ox, oy, dx, dy);
+	//检测生成的路径是否合法
 	if(!res || !res.path || res.cost > MAX_PATH_COST) {
 		return false;
 	}
