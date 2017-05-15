@@ -28,13 +28,13 @@ var MobZone = function(opts) {
 	this.mobData.weaponLevel = opts.weaponLevel || 1;
 	this.mobData.armorLevel = opts.armorLevel || 1;
 
-	this.limit = opts.mobNum||defaultLimit;
-	this.count = 0;
-	this.mobs = {};
+	this.limit = opts.mobNum||defaultLimit;  //怪物数量限制
+	this.count = 0;  //当前怪物数量
+	this.mobs = {};  //怪物对象集合
 
-	this.lastGenTime = 0;
-	this.genCount = 3;
-	this.interval = 5000;
+	this.lastGenTime = 0;   //上一次生成怪物时间
+	this.genCount = 3;      //一次update最多可以生成3个怪物
+	this.interval = 5000;   //生成时间间隔
 };
 
 util.inherits(MobZone, Zone);
@@ -45,12 +45,12 @@ util.inherits(MobZone, Zone);
  * 每隔5秒生成一个怪物，如果怪物达到限定数则不再生成
  */
 MobZone.prototype.update = function() {
-	var time = Date.now();
-	var nextTime = this.lastGenTime + this.interval;
+	var time = Date.now();   //当前时间
+	var nextTime = this.lastGenTime + this.interval;  //下一次生成怪物时间
 
 	for(var i = 0; i < this.genCount; i++) {
 		if(this.count < this.limit && nextTime <= time) {
-			this.generateMobs();
+			this.generateMobs();  //生成一个怪物
 			this.lastGenTime = time;
 		}
 	}
@@ -71,7 +71,7 @@ MobZone.prototype.generateMobs = function() {
 		logger.error('load mobData failed! mobId : ' + this.mobId);
 		return;
 	}
-
+        //do...while循环，如果生成的怪物数据坐标不在map地图内，就从新生成，限制20次内，得到的是一个坐标
 	var count = 0, limit = 20;
 	do{
 		//在怪物空间范围内随机生成怪物坐标
@@ -86,19 +86,20 @@ MobZone.prototype.generateMobs = function() {
             
 	//生成怪物  怪物坐标  怪物巡逻路径
 	var mob = new Mob(mobData);
-	mob.spawnX = mob.x;
-	mob.spawnY = mob.y;
-	genPatrolPath(mob);
+	mob.spawnX = mob.x;   //其实也是mobData.x
+	mob.spawnY = mob.y;   //其实也是mobData.y
+	genPatrolPath(mob);  //生成怪物巡逻路径
 	//将怪物加入到怪物空间
 	this.add(mob);
         
 	//将怪物加入场景
 	this.area.addEntity(mob);
-	this.count++;
+	this.count++;  //生成一个怪物后，怪物空间的怪物数量加1
 };
 
 /**
  * Add a mob to the mobzones
+ * 增加怪物到怪物空间
  */
 MobZone.prototype.add = function(mob) {
 	this.mobs[mob.entityId] = mob;
@@ -106,6 +107,7 @@ MobZone.prototype.add = function(mob) {
 
 /**
  * Remove a mob from the mob zone
+ * 从怪物空间中删除怪物
  * @param {Number} id The entity id of the mob to remove.
  */
 MobZone.prototype.remove = function(id) {
@@ -116,18 +118,19 @@ MobZone.prototype.remove = function(id) {
 	return true;
 };
 
-var PATH_LENGTH = 3;
-var MAX_PATH_COST = 300;
+var PATH_LENGTH = 3;   //路径长度，坐标数量
+var MAX_PATH_COST = 300;  //
 
 /**
  * Generate patrol path for mob
+ * 生成怪物巡逻路径，返回坐标数组（4个坐标）
  */
 var genPatrolPath = function(mob) {
 	var map = mob.area.map;
-	var path = [];
+	var path = []; //创建一个路径坐标数组
 	var x = mob.x, y = mob.y, p;
 	for(var i=0; i<PATH_LENGTH; i++) {
-		p = genPoint(map, x, y);
+		p = genPoint(map, x, y);  //通过地图和怪物坐标，生成3个路径的坐标
 		if(!p) {
 			// logger.warn("Find path for mob faild! mobId : %j", mob.entityId);
 			break;
@@ -136,12 +139,13 @@ var genPatrolPath = function(mob) {
 		x = p.x;
 		y = p.y;
 	}
-	path.push({x: mob.x, y: mob.y});
+	path.push({x: mob.x, y: mob.y}); //路径3个坐标，再加入怪物本身的坐标，共4个坐标
 	mob.path = path;
 };
 
 /**
  * Generate point for given point, the radius is form 100 to 200.
+ * 在怪物坐标为圆心，半径为100~200内，并保证在地图范围内，随机生成坐标点
  * @param originX, originY {Number} The oright point
  * @param count {Number} The retry count before give up
  * @api private
@@ -185,6 +189,7 @@ var genPoint = function(map, originX, originY, count) {
 
 /**
  * Check if the path is valid, there are two limit, 1, Is the path valid? 2, Is the cost exceed the max cost?
+ * 检查路径是否有效，有两个极限，1，路径有效吗?2、费用超过最大成本吗?
  * @param ox, oy {Number} Start point
  * @param dx, dy {Number} End point
  */
