@@ -15,6 +15,7 @@ var MobZone = function(opts) {
 	this.area = opts.area;
 	this.map = opts.area.map;
 	this.mobId = opts.mobId;
+	//通过指定的怪物id复制一份这个怪物的数据
 	this.mobData = utils.clone(dataApi.character.findById(this.mobId));
 
 	this.mobData.zoneId = this.zoneId;
