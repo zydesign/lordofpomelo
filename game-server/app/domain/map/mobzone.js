@@ -177,7 +177,7 @@ var genPoint = function(map, originX, originY, count) {
 	} else if(y > map.height) {
 		y = originY - disy;
 	}
-
+        //检测生成的坐标是否合法，如果不合法则从新生成，机会10次
 	if(checkPoint(map, originX, originY, x, y)) {
 		return {x: x, y: y};
 	} else {
