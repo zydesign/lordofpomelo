@@ -13,17 +13,19 @@ var team = require('../../config/data/team');
 
 /**
  * Data model `new Data()`
- *
+ * 通过参数数据json脚本，实例化一个数据对象集合。对象集的key为物品id，对应的value为子物品
  * @param {Array}
  *
  */
 var Data = function(data) {
+//英文标签项单独存为一个对象	
   var fields = {};
   data[1].forEach(function(i, k) {
     fields[i] = k;
   });
+//数据数组单独分离为一个数组
   data.splice(0, 2);
-
+//之后创建一个数据对象存储上面的数据，子对象为一份key为英文项目名的数据
   var result = {}, item;
   data.forEach(function(k) {
     item = mapData(fields, k);
@@ -35,7 +37,7 @@ var Data = function(data) {
 
 /**
  * map the array data to object
- *
+ * 将数组数据item映射到对象
  * @param {Object}
  * @param {Array}
  * @return {Object} result
@@ -51,7 +53,7 @@ var mapData = function(fields, item) {
 
 /**
  * find items by attribute
- *
+ * 通过子物品key及对应的值查找物品，返回物品数组，数组值为子物品对象
  * @param {String} attribute name
  * @param {String|Number} the value of the attribute
  * @return {Array} result
@@ -68,7 +70,7 @@ Data.prototype.findBy = function(attr, value) {
   }
   return result;
 };
-
+  //求大于等于某个属性值的物品数组
 Data.prototype.findBigger = function(attr, value) {
   var result = [];
   value = Number(value);
@@ -81,7 +83,7 @@ Data.prototype.findBigger = function(attr, value) {
   }
   return result;
 };
-
+  //求小于等于某个属性值的物品数组
 Data.prototype.findSmaller = function(attr, value) {
   var result = [];
   value = Number(value);
@@ -97,7 +99,7 @@ Data.prototype.findSmaller = function(attr, value) {
 
 /**
  * find item by id
- *
+ * 通过物品id查找物品，返回物品对象
  * @param id
  * @return {Obj}
  * @api public
@@ -108,7 +110,7 @@ Data.prototype.findById = function(id) {
 
 /**
  * find all item
- *
+ * 返回全部物品对象
  * @return {array}
  * @api public
  */
