@@ -6,6 +6,7 @@ var isPrintFlag = false;
 
 /**
  * Check and invoke callback function
+ * 检查是否为函数类型，并调用回调函数
  */
 utils.invokeCallback = function(cb) {
   if(!!cb && typeof cb === 'function') {
@@ -15,6 +16,7 @@ utils.invokeCallback = function(cb) {
 
 /**
  * clone an object
+ * 复制一个对象，参数为对象，返回一个新的对象
  */
 utils.clone = function(origin) {
   if(!origin) {
@@ -30,6 +32,7 @@ utils.clone = function(origin) {
   return obj;
 };
 
+  //返回对象属性数量
 utils.size = function(obj) {
   if(!obj) {
     return 0;
@@ -46,6 +49,7 @@ utils.size = function(obj) {
 };
 
 // print the file name and the line number ~ begin
+// 打印文件名和行号~开始
 function getStack(){
   var orig = Error.prepareStackTrace;
   Error.prepareStackTrace = function(_, stack) {
