@@ -62,6 +62,7 @@ app.configure('production|development', function () {
     app.route('area', routeUtil.area);
     app.route('connector', routeUtil.connector);
 
+    //mysql数据库连接配置，将被dao-pool对象池调用去连接数据库
     app.loadConfig('mysql', app.getBase() + '/../shared/config/mysql.json');
     app.filter(pomelo.filters.timeout());
 
@@ -111,6 +112,7 @@ app.configure('production|development', 'manager', function () {
 
 // Configure database
 app.configure('production|development', 'area|auth|connector|master', function () {
+    //用于执行mql语句的连接数据库模块
     var dbclient = require('./app/dao/mysql/mysql').init(app);
     app.set('dbclient', dbclient);
     // app.load(pomelo.sync, {path:__dirname + '/app/dao/mapping', dbclient: dbclient});
