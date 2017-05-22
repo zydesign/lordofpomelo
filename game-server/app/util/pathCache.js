@@ -1,8 +1,10 @@
+//优先队列
 var PriorityQueue = require('pomelo-collection').priorityQueue;
 var id = 0;
 
 /**
  * The cache for pathfinding
+ * 寻路的缓存
  */
 var PathCache = function(opts) {
 	this.id = id++;
