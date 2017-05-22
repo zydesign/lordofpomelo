@@ -4,7 +4,7 @@ var id = 0;
 
 /**
  * The cache for pathfinding
- * 寻路的缓存
+ * 寻路的缓存类
  */
 var PathCache = function(opts) {
 	this.id = id++;
