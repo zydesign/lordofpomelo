@@ -94,6 +94,7 @@ app.configure('production|development', 'area', function () {
         instancePool.init(require('./config/instance.json'));
         app.areaManager = instancePool;
     } else {
+        //场景配置的读取入口。(/config/data/area.json--场景数据，包含了对应地图路径，是地图读取入口）
         scene.init(dataApi.area.findById(server.area));
         app.areaManager = scene;
     }
