@@ -17,6 +17,7 @@ var Map = function(opts) {
 	this.weightMap = null;
 	this.name = opts.name;
 
+	//给工厂函数添加更多属性
 	this.init(opts);
 };
 
