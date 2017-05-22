@@ -17,7 +17,7 @@ NND.init = function(app){
 
 /**
  * Excute sql statement
- * 执行sql语句
+ * 执行sql语句，返回的结构是执行sql语句的数据库返回值
  * @param {String} sql Statement The sql need to excute.
  * @param {Object} args The args for the sql.
  * @param {fuction} cb Callback function.
