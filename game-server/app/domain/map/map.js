@@ -8,7 +8,8 @@ var fs = require('fs');
 
 /**
  * The data structure for map in the area
- * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的子对象area[id]
+ * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的指定id的子对象area[id]
+ * map类将会被场景类调用（/domain/area/scene.js）
  */
 var Map = function(opts) {
 	//area.json场景配置的子对象的path属性为地图配置文件路径
@@ -52,6 +53,7 @@ Map.prototype.init = function(opts) {
 
 		if(weightMap) {
 			//Use cache map first
+			//优先使用缓存地图
 			var path = process.cwd() + '/tmp/map.json';
 			var maps = fs.existsSync(path)?require(path) : {};
 
