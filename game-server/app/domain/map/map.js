@@ -24,7 +24,7 @@ var pro = Map.prototype;
 
 /**
  * Init game map
- * 游戏地图初始化
+ * 游戏地图初始化，opts参数入口为场景配置文件（/config/data/area.json）的子对象area[id]
  * @param {Object} opts
  * @api private
  */
