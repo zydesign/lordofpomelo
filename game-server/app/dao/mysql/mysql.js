@@ -1,4 +1,5 @@
 // mysql CRUD
+//数据库连接模块将会被放到app上下文中，方便app.get（）
 var sqlclient = module.exports;
 
 var _pool;
