@@ -7,6 +7,7 @@ var NND = {};
 
 /*
  * Init sql connection pool
+ *上面声明了对象池变量，在初始化里面给变量赋值
  * @param {Object} app The app for the server.
  */
 NND.init = function(app){
@@ -15,6 +16,7 @@ NND.init = function(app){
 
 /**
  * Excute sql statement
+ * 执行sql语句
  * @param {String} sql Statement The sql need to excute.
  * @param {Object} args The args for the sql.
  * @param {fuction} cb Callback function.
@@ -46,6 +48,7 @@ NND.shutdown = function(){
 
 /**
  * init database
+ *模块调用上面的函数，执行sql语句到数据库
  */
 sqlclient.init = function(app) {
 	if (!!_pool){
@@ -62,6 +65,7 @@ sqlclient.init = function(app) {
 
 /**
  * shutdown database
+ * 模块关闭数据库
  */
 sqlclient.shutdown = function(app) {
 	NND.shutdown(app);
