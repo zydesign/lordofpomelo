@@ -8,8 +8,10 @@ var fs = require('fs');
 
 /**
  * The data structure for map in the area
+ * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的子对象area[id]
  */
 var Map = function(opts) {
+	//area.json场景配置的子对象的path属性为地图配置文件路径
 	this.mapPath = process.cwd() + opts.path;
 	this.map = null;
 	this.weightMap = null;
@@ -22,16 +24,20 @@ var pro = Map.prototype;
 
 /**
  * Init game map
+ * 游戏地图初始化
  * @param {Object} opts
  * @api private
  */
 Map.prototype.init = function(opts) {
 	var weightMap = opts.weightMap || false;
+	//地图配置文件（/config/map/xxx.json）
 	var map = require(this.mapPath);
 	if(!map) {
 		logger.error('Load map failed! ');
 	} else {
+		//给this.map赋值，this.map={layers：[{layer}，{layer}...]}
 		this.configMap(map);
+		
 		this.id = opts.id;
 		this.width = opts.width;
 		this.height = opts.height;
@@ -62,23 +68,27 @@ Map.prototype.init = function(opts) {
 	}
 };
 
+//读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
 Map.prototype.configMap = function(map){
 	this.map = {};
 	var layers = map.layers;
 	for(var i = 0; i < layers.length; i++){
 		var layer = layers[i];
 		if(layer.type === 'objectgroup'){
+			//图层为对象层时，读取对象数组做一些修改，返回对象数组objs
 			this.map[layer.name] = configObjectGroup(layer.objects);
 		}
 	}
 };
 
+//遍历图层的单个obj对象的properties对象的属性作为obj的属性
 function configProps(obj){
 	if(!!obj && !!obj.properties){
 		for(var key in obj.properties){
 			obj[key] = obj.properties[key];
 		}
 
+		//删除一个属性名
 		delete obj.properties;
 	}
 
@@ -87,6 +97,7 @@ function configProps(obj){
 
 function configObjectGroup(objs){
 	for(var i = 0; i < objs.length; i++){
+		//每一个对象执行提取属性函数，返回对象obj本身
 		objs[i] = configProps(objs[i]);
 	}
 
