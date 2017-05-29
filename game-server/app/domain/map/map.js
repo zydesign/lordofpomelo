@@ -8,13 +8,15 @@ var fs = require('fs');
 
 /**
  * The data structure for map in the area
- * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的指定id的子对象area[id]
+ * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的指定id的子地图对象area[id]
  * map类将会被场景类调用（/domain/area/scene.js）
  */
 var Map = function(opts) {
 	//area.json场景配置的子对象的path属性为地图配置文件路径
 	this.mapPath = process.cwd() + opts.path;
+	//this.map为地图数据对象
 	this.map = null;
+	//默认关闭权重地图
 	this.weightMap = null;
 	this.name = opts.name;
 
@@ -26,7 +28,7 @@ var pro = Map.prototype;
 
 /**
  * Init game map
- * 游戏地图初始化，opts参数入口为场景配置文件（/config/data/area.json）的子对象area[id]
+ * 游戏地图初始化，opts参数入口为场景配置文件（/config/data/area.json）的子地图对象area[id]
  * @param {Object} opts
  * @api private
  */
@@ -205,6 +207,7 @@ Map.prototype.initWeightMap = function() {
 	}
 };
 
+//初始化地图障碍物
 Map.prototype.initCollisons = function(){
 	var map = [];
 	var flag = false;
@@ -267,6 +270,7 @@ Map.prototype.getWeightMap = function(collisions){
 
 /**
  * Get all mob zones in the map
+ * 获取怪物
  * @return {Array} All mobzones in the map
  * @api public
  */
@@ -280,6 +284,7 @@ Map.prototype.getMobZones = function() {
 
 /**
  * Get all npcs from map
+ * 获取NPCs
  * @return {Array} All npcs in the map
  * @api public
  */
@@ -289,6 +294,7 @@ Map.prototype.getNPCs = function() {
 
 /**
  * Get all collisions form the map
+ * 获取地图障碍物
  * @return {Array} All collisions
  * @api public
  */
@@ -298,6 +304,7 @@ Map.prototype.getCollision = function() {
 
 /**
  * Get born place for this map
+ * 获取地图出生地
  * @return {Object} Born place for this map
  * @api public
  */
@@ -331,6 +338,7 @@ Map.prototype.getBornPlace = function() {
 
 /**
  * Get born point for this map, the point is random generate in born place
+ * 随机生成出生点
  * @return {Object} A random generated born point for this map.
  * @api public
  */
@@ -347,6 +355,7 @@ Map.prototype.getBornPoint = function() {
 
 /**
  * Random generate a position for give pos and range
+ * 指定坐标范围内，随机生成怪物出生点
  * @param pos {Object} The center position
  * @param range {Number} The max distance form the pos
  * @return {Object} A random generate postion in the range of given pos
@@ -373,6 +382,7 @@ Map.prototype.genPos = function(pos, range) {
 /**
  * Get all reachable pos for given x and y
  * This interface is used for pathfinding
+ * 获取所有地图内可走的点(瓦片)，用于寻路函数
  * @param x {Number} x position.
  * @param y {Number} y position.
  * @param processReachable {function} Call back function, for all reachable x and y, the function will bu called and use the position as param
@@ -403,6 +413,7 @@ Map.prototype.forAllReachable = function(x, y, processReachable) {
 
 /**
  * Get weicht for given pos
+ * 通过位置获取对应的权重
  */
 Map.prototype.getWeight = function(x, y) {
 	return this.weightMap[x][y];
@@ -410,6 +421,7 @@ Map.prototype.getWeight = function(x, y) {
 
 /**
  * Return is reachable for given pos
+ * 通过权重值判断可走不可走，1为可走
  */
 Map.prototype.isReachable = function(x, y) {
 	if(x < 0 || y < 0 || x >= this.width || y >= this.height) {
@@ -432,6 +444,7 @@ Map.prototype.isReachable = function(x, y) {
 
 /**
  * Find path for given pos
+ * 通过坐标获取路径，返回坐标集，及寻路费用
  * @param x, y {Number} Start point
  * @param x1, y1 {Number} End point
  * @param useCache {Boolean} If pathfinding cache is used
@@ -498,6 +511,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 
 /**
  * Compute cost for given path
+ * 计算路径费用
  * @api public
  */
 function computeCost(path) {
