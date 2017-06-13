@@ -166,7 +166,7 @@ Map.prototype.initWeightMap = function() {
 				continue;
 			}
 
-			//算出该像素点的最大瓦片坐标，最小瓦片坐标，两坐标为对角线
+			//算出该像素点的最大瓦片坐标，最小瓦片坐标，两坐标为对角线端点
 			x1 = Math.floor(minx/this.tileW);
 			y1 = Math.floor(miny/this.tileH);
 			x2 = Math.ceil(maxx/this.tileW);
@@ -180,10 +180,13 @@ Map.prototype.initWeightMap = function() {
 			y2 = y2>this.rectH?this.rectH:y2;
 
 			//For all the tile in the polygon's externally rect, check if the tile is in the collision
+			//遍历多边形外部的矩形框内的所有瓦片，检测瓦片是否包含了障碍物
 			for(x = x1; x < x2; x++) {
 				for(y = y1; y < y2; y++) {
+					//像素坐标，为该瓦片的中心点
 					p = {x: x*this.tileW + this.tileW/2, y : y*this.tileH + this.tileH/2};
 					l = this.tileW/4;
+					//每个点所在瓦片的4个端点
 					p1 = { x: p.x - l, y: p.y - l};
 					p2 = { x: p.x + l, y: p.y - l};
 					p3 = { x: p.x - l, y: p.y + l};
