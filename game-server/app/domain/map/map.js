@@ -43,12 +43,12 @@ Map.prototype.init = function(opts) {
 		this.configMap(map);
 		
 		this.id = opts.id;
-		this.width = opts.width;
-		this.height = opts.height;
-		this.tileW = 20;
-		this.tileH = 20;
-		this.rectW = Math.ceil(this.width/this.tileW);
-		this.rectH = Math.ceil(this.height/this.tileH);
+		this.width = opts.width;   //像素宽
+		this.height = opts.height; //像素高
+		this.tileW = 20;           //瓦片图块宽
+		this.tileH = 20;           //瓦片图块高
+		this.rectW = Math.ceil(this.width/this.tileW);  //tiledMap宽
+		this.rectH = Math.ceil(this.height/this.tileH); //tiledMap高
 
 		this.pathCache = new PathCache({limit:1000});
 		this.pfinder = buildFinder(this);
@@ -56,9 +56,12 @@ Map.prototype.init = function(opts) {
 		if(weightMap) {
 			//Use cache map first
 			//优先使用缓存地图
+			//其中'/tmp/map.json'的配置文件的数据是通过fsfs.writeFileSync（）生成的，用到新项目先清空数据
 			var path = process.cwd() + '/tmp/map.json';
+			//先判断这个配置文件是否存在，不存在就赋值为空对象
 			var maps = fs.existsSync(path)?require(path) : {};
 
+			//判断地图数据是否存在，没有就生成并入该地图数据
 			if(!!maps[this.id]){
 				this.collisions = maps[this.id].collisions;
 				this.weightMap = this.getWeightMap(this.collisions);
@@ -111,12 +114,14 @@ function configObjectGroup(objs){
 
 /**
  * Init weight map, which is used to record the collisions info, used for pathfinding
+ * 初始化权重映射，用来记录碰撞信息，用于寻路
  * @api private
  */
 Map.prototype.initWeightMap = function() {
 	var collisions = this.getCollision();
 	var i, j, x, y, x1, y1, x2, y2, p, l, p1, p2, p3, p4;
 	this.weightMap =  [];
+	//遍历每一块瓦片，添加权重映射数据，初始值设置为1
 	for(i = 0; i < this.rectW; i++) {
 		this.weightMap[i] = [];
 		for(j = 0; j < this.rectH; j++) {
@@ -125,6 +130,7 @@ Map.prototype.initWeightMap = function() {
 	}
 
 	//Use all collsions to construct the weight map
+	//使用所有的障碍物构成权重映射
 	for(i = 0; i < collisions.length; i++) {
 		var collision = collisions[i];
 		var polygon = [];
@@ -137,13 +143,16 @@ Map.prototype.initWeightMap = function() {
 			}
 
 			//Get the rect limit for polygonal collision
+			//通过多边形障碍物获取矩形极限
 			var minx = Infinity, miny = Infinity, maxx = 0, maxy = 0;
 
 			for(j = 0; j < points.length; j++) {
 				var point = points[j];
 
+				//point是相对collision的坐标点，转换为大地图坐标点
 				x = Number(point.x) + Number(collision.x);
 				y = Number(point.y) + Number(collision.y);
+				//限制x,y的值在0~Infinity之间
 				minx = minx>x?x:minx;
 				miny = miny>y?y:miny;
 				maxx = maxx<x?x:maxx;
@@ -157,12 +166,14 @@ Map.prototype.initWeightMap = function() {
 				continue;
 			}
 
+			//算出该像素点的最大瓦片坐标，最小瓦片坐标，两坐标为对角线
 			x1 = Math.floor(minx/this.tileW);
 			y1 = Math.floor(miny/this.tileH);
 			x2 = Math.ceil(maxx/this.tileW);
 			y2 = Math.ceil(maxy/this.tileH);
 
 			//regular the poinit to not exceed the map
+			//限制瓦片坐标不超过地图
 			x1 = x1<0?0:x1;
 			y1 = y1<0?0:y1;
 			x2 = x2>this.rectW?this.rectW:x2;
