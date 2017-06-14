@@ -136,6 +136,7 @@ Map.prototype.initWeightMap = function() {
 		var polygon = [];
 		var points = collision.polygon;
 
+		//如果多边形上有点
 		if(!!points && points.length > 0) {
 			if(points.length < 3) {
 				logger.warn('The polygon data is invalid! points: %j', points);
@@ -152,7 +153,7 @@ Map.prototype.initWeightMap = function() {
 				//point是相对collision的坐标点，转换为大地图坐标点
 				x = Number(point.x) + Number(collision.x);
 				y = Number(point.y) + Number(collision.y);
-				//限制x,y的值在0~Infinity之间
+				//限制x,y的值在Infinity~0之间
 				minx = minx>x?x:minx;
 				miny = miny>y?y:miny;
 				maxx = maxx<x?x:maxx;
@@ -166,7 +167,7 @@ Map.prototype.initWeightMap = function() {
 				continue;
 			}
 
-			//算出该像素点的最大瓦片坐标，最小瓦片坐标，两坐标为对角线端点
+			//算出该像素点的（最大瓦片，最小瓦片），两瓦片为对角线端点
 			x1 = Math.floor(minx/this.tileW);
 			y1 = Math.floor(miny/this.tileH);
 			x2 = Math.ceil(maxx/this.tileW);
@@ -180,17 +181,18 @@ Map.prototype.initWeightMap = function() {
 			y2 = y2>this.rectH?this.rectH:y2;
 
 			//For all the tile in the polygon's externally rect, check if the tile is in the collision
-			//遍历多边形外部的矩形框内的所有瓦片，检测瓦片是否包含了障碍物
+			//遍历多边形外部的矩形框内的所有点的最大瓦片和最小瓦片，检测瓦片是否包含了障碍物
 			for(x = x1; x < x2; x++) {
 				for(y = y1; y < y2; y++) {
-					//像素坐标，为该瓦片的中心点
+					//瓦片所在的像素坐标，为该瓦片的中心点
 					p = {x: x*this.tileW + this.tileW/2, y : y*this.tileH + this.tileH/2};
 					l = this.tileW/4;
-					//每个点所在瓦片的4个端点
+					//在（最大瓦片，最小瓦片）内取4个点
 					p1 = { x: p.x - l, y: p.y - l};
 					p2 = { x: p.x + l, y: p.y - l};
 					p3 = { x: p.x - l, y: p.y + l};
 					p4 = { x: p.x + l, y: p.y + l};
+					//瓦片内取的4个像素点，如果有一个在多边形内，则该瓦片值为无穷大
 					if(geometry.isInPolygon(p1, polygon) ||
 						 geometry.isInPolygon(p2, polygon) ||
 						 geometry.isInPolygon(p3, polygon) ||
