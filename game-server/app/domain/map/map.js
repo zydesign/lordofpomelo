@@ -77,6 +77,7 @@ Map.prototype.init = function(opts) {
 };
 
 //读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
+//tiled用法，图层用于地图背景、道具、障碍物；对象层用于玩家、出生地、怪物
 Map.prototype.configMap = function(map){
 	this.map = {};
 	var layers = map.layers;
@@ -226,25 +227,28 @@ Map.prototype.initWeightMap = function() {
 //初始化地图障碍物
 Map.prototype.initCollisons = function(){
 	var map = [];
-	var flag = false;
+	var flag = false;//（是否标记了障碍物）
 	var collision;
 
 	for(var x = 0; x < this.weightMap.length; x++){
 		var array = this.weightMap[x];
 		var length = array.length;
-		var collisions = [];
+		var collisions = [];//障碍物数组的子对象为x列的障碍物瓦片
 		for(var y = 0; y < length; y++){
 			//conllisions start
+			//，如果flag为fasle（未标记障碍物）而且瓦片位置为不可走，设置障碍物的第x列的起点为y
 			if(!flag && (array[y] === Infinity)){
 				collision = {};
 				collision.start = y;
 				flag = true;
 			}
 
+			//如果flag为标记状态，第x列第y位置为1可走时，标记停止，该x列的障碍物加入数组
 			if(flag && array[y] === 1){
 				flag = false;
 				collision.length = y - collision.start;
 				collisions.push(collision);
+			//如果flag为标记状态，而且第x列遍历到了尽头，标记停止，该x列的障碍物加入数组
 			}else if(flag && (y === length - 1)){
 				flag = false;
 				collision.length = y - collision.start + 1;
@@ -252,9 +256,11 @@ Map.prototype.initCollisons = function(){
 			}
 		}
 
+		//将每x一列的障碍物作为map数组的一个对象
 		map[x] = {collisions: collisions};
 	}
 
+	//保存 列障碍物 数组到脚本的this.collisions
 	this.collisions = map;
 };
 
