@@ -77,7 +77,8 @@ Map.prototype.init = function(opts) {
 };
 
 //读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
-//tiled用法，图层用于地图背景、道具、障碍物；对象层用于玩家、出生地、怪物
+//地图配置文件由tiledmap生成，tiled用法，图层用于地图背景；对象层用于玩家、出生地、怪物、道具、障碍物
+//tiledmap的障碍物图层命名必须为collision，这样this.map[layer.name]就得到this.map.collision
 Map.prototype.configMap = function(map){
 	this.map = {};
 	var layers = map.layers;
@@ -115,7 +116,7 @@ function configObjectGroup(objs){
 
 /**
  * Init weight map, which is used to record the collisions info, used for pathfinding
- * 初始化权重映射，用来记录碰撞信息，用于寻路
+ * 初始化权重映射，用来记录障碍物信息，用于寻路，1为可走，Infinity为不可走
  * @api private
  */
 Map.prototype.initWeightMap = function() {
@@ -224,7 +225,7 @@ Map.prototype.initWeightMap = function() {
 	}
 };
 
-//初始化地图障碍物
+//初始化地图障碍物，通过this.weightMap生成this.collisions
 Map.prototype.initCollisons = function(){
 	var map = [];
 	var flag = false;//（是否标记了障碍物）
@@ -238,7 +239,7 @@ Map.prototype.initCollisons = function(){
 			//conllisions start
 			//，如果flag为fasle（未标记障碍物）而且瓦片位置为不可走，设置障碍物的第x列的起点为y
 			if(!flag && (array[y] === Infinity)){
-				collision = {};
+				collision = {}; //第x列，第y块瓦片设置一个障碍物对象
 				collision.start = y;
 				flag = true;
 			}
