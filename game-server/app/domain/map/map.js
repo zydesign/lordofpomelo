@@ -119,7 +119,7 @@ function configObjectGroup(objs){
 /**
  * Init weight map, which is used to record the collisions info, used for pathfinding
  * 初始化权重映射，用来记录障碍物信息，用于寻路，1为可走，Infinity为不可走
- * 通过地图配置的Collision对象层，算出每一个瓦片坐标的权重映射值
+ * 通过地图配置的Collision对象层的objs数组，算出每一个瓦片坐标的权重映射值
  * @api private
  */
 Map.prototype.initWeightMap = function() {
@@ -273,6 +273,7 @@ Map.prototype.initCollisons = function(){
 	this.collisions = map;
 };
 
+//通过this.collisions作为参数，获取权重映射
 Map.prototype.getWeightMap = function(collisions){
 	var map = [];
 	var x, y;
@@ -301,7 +302,7 @@ Map.prototype.getWeightMap = function(collisions){
 
 /**
  * Get all mob zones in the map
- * 获取怪物对象层
+ * 获取怪物对象层的objs
  * @return {Array} All mobzones in the map
  * @api public
  */
@@ -315,7 +316,7 @@ Map.prototype.getMobZones = function() {
 
 /**
  * Get all npcs from map
- * 获取NPCs对象层
+ * 获取NPCs对象层的objs
  * @return {Array} All npcs in the map
  * @api public
  */
@@ -325,7 +326,7 @@ Map.prototype.getNPCs = function() {
 
 /**
  * Get all collisions form the map
- * 获取地图障碍物对象层
+ * 获取障碍物对象层的objs
  * @return {Array} All collisions
  * @api public
  */
@@ -335,7 +336,7 @@ Map.prototype.getCollision = function() {
 
 /**
  * Get born place for this map
- * 获取地图出生地
+ * 获取出生地的objs
  * @return {Object} Born place for this map
  * @api public
  */
