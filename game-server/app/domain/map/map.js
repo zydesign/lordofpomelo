@@ -78,20 +78,22 @@ Map.prototype.init = function(opts) {
 
 //读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
 //地图配置文件由tiledmap生成，tiled用法，图层用于地图背景；对象层用于玩家、出生地、怪物、道具、障碍物
-//tiledmap的障碍物图层命名必须为collision，这样this.map[layer.name]就得到this.map.collision
+//tiledmap的障碍物对象层命名必须为collision，这样this.map[layer.name]就得到this.map.collision为objs数组
+//障碍物可以用多边形和矩形来画，不能用圆形
 Map.prototype.configMap = function(map){
 	this.map = {};
 	var layers = map.layers;
 	for(var i = 0; i < layers.length; i++){
 		var layer = layers[i];
 		if(layer.type === 'objectgroup'){
-			//图层为对象层时，读取对象数组做一些修改，返回对象数组objs
+			//图层的属性类型为对象层时，读取对象层，并配置对象层objects属性的每一个object的属性
+			//this.map[layer.name]的值为objs数组
 			this.map[layer.name] = configObjectGroup(layer.objects);
 		}
 	}
 };
 
-//遍历图层的单个obj对象的properties对象的属性作为obj的属性
+//遍历图层的单个obj对象的properties的属性提取作为obj的属性，并删除properties项
 function configProps(obj){
 	if(!!obj && !!obj.properties){
 		for(var key in obj.properties){
@@ -117,10 +119,11 @@ function configObjectGroup(objs){
 /**
  * Init weight map, which is used to record the collisions info, used for pathfinding
  * 初始化权重映射，用来记录障碍物信息，用于寻路，1为可走，Infinity为不可走
+ * 通过地图配置的Collision对象层，算出每一个瓦片坐标的权重映射值
  * @api private
  */
 Map.prototype.initWeightMap = function() {
-	var collisions = this.getCollision();
+	var collisions = this.getCollision();//值为障碍物对象成的objs数组
 	var i, j, x, y, x1, y1, x2, y2, p, l, p1, p2, p3, p4;
 	this.weightMap =  [];
 	//遍历每一块瓦片，添加权重映射数据，初始值设置为1
@@ -138,7 +141,7 @@ Map.prototype.initWeightMap = function() {
 		var polygon = [];
 		var points = collision.polygon;
 
-		//如果多边形上有点
+		//如果障碍物是用多边形画的时候
 		if(!!points && points.length > 0) {
 			if(points.length < 3) {
 				logger.warn('The polygon data is invalid! points: %j', points);
@@ -204,6 +207,7 @@ Map.prototype.initWeightMap = function() {
 				}
 			}
 		} else {
+			//障碍物是用矩形画的时候，取对角线端点瓦片坐标
 			x1 = Math.floor(collision.x/this.tileW);
 			y1 = Math.floor(collision.y/this.tileH);
 
@@ -211,11 +215,13 @@ Map.prototype.initWeightMap = function() {
 			y2 = Math.ceil((collision.y+collision.height)/this.tileH);
 
 			//regular the poinit to not exceed the map
+			//保证点不超过地图边界
 			x1 = x1<0?0:x1;
 			y1 = y1<0?0:y1;
 			x2 = x2>this.rectW?this.rectW:x2;
 			y2 = y2>this.rectH?this.rectH:y2;
 
+			//遍历两对角线点内的矩形内的所有瓦片坐标，给这些瓦片坐标权重映射值为Infinity
 			for(x = x1; x < x2; x++) {
 				for(y = y1; y < y2; y++) {
 					this.weightMap[x][y] = Infinity;
@@ -234,7 +240,9 @@ Map.prototype.initCollisons = function(){
 	for(var x = 0; x < this.weightMap.length; x++){
 		var array = this.weightMap[x];
 		var length = array.length;
-		var collisions = [];//障碍物数组的子对象为x列的障碍物瓦片
+		//障碍物数组的子对象为x列的障碍物瓦片
+		//障碍物数量为x个[]，每个[]可以有0~N个对象作为障碍物
+		var collisions = [];
 		for(var y = 0; y < length; y++){
 			//conllisions start
 			//，如果flag为fasle（未标记障碍物）而且瓦片位置为不可走，设置障碍物的第x列的起点为y
@@ -293,7 +301,7 @@ Map.prototype.getWeightMap = function(collisions){
 
 /**
  * Get all mob zones in the map
- * 获取怪物
+ * 获取怪物对象层
  * @return {Array} All mobzones in the map
  * @api public
  */
@@ -307,7 +315,7 @@ Map.prototype.getMobZones = function() {
 
 /**
  * Get all npcs from map
- * 获取NPCs
+ * 获取NPCs对象层
  * @return {Array} All npcs in the map
  * @api public
  */
@@ -317,7 +325,7 @@ Map.prototype.getNPCs = function() {
 
 /**
  * Get all collisions form the map
- * 获取地图障碍物
+ * 获取地图障碍物对象层
  * @return {Array} All collisions
  * @api public
  */
