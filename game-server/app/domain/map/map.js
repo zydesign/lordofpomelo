@@ -79,6 +79,8 @@ Map.prototype.init = function(opts) {
 //读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
 //地图配置文件由tiledmap生成，tiled用法，图层用于地图背景；对象层用于玩家、出生地、怪物、道具、障碍物
 //tiledmap的障碍物对象层命名必须为collision，这样this.map[layer.name]就得到this.map.collision为objs数组
+//tiledmap坐标原点在左上角，y轴朝下；画出的矩形、多边形原点也是左上角
+//tiledmap对象层约定命名规则：出生地（birth）、障碍物（collision）、npc（npc）、怪物（mob）
 //障碍物可以用多边形和矩形来画，不能用圆形
 Map.prototype.configMap = function(map){
 	this.map = {};
@@ -316,7 +318,7 @@ Map.prototype.getMobZones = function() {
 
 /**
  * Get all npcs from map
- * 获取NPCs对象层的objs
+ * 获取NPCs对象层的objs数组
  * @return {Array} All npcs in the map
  * @api public
  */
@@ -326,7 +328,7 @@ Map.prototype.getNPCs = function() {
 
 /**
  * Get all collisions form the map
- * 获取障碍物对象层的objs
+ * 获取障碍物对象层的objs数组
  * @return {Array} All collisions
  * @api public
  */
@@ -336,7 +338,7 @@ Map.prototype.getCollision = function() {
 
 /**
  * Get born place for this map
- * 获取出生地的objs
+ * 获取出生地的objs数组
  * @return {Object} Born place for this map
  * @api public
  */
