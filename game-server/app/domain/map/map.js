@@ -372,7 +372,7 @@ Map.prototype.getBornPlace = function() {
 
 /**
  * Get born point for this map, the point is random generate in born place
- * 随机生成出生点
+ * 出生地内，随机生成出生点
  * @return {Object} A random generated born point for this map.
  * @api public
  */
@@ -389,7 +389,7 @@ Map.prototype.getBornPoint = function() {
 
 /**
  * Random generate a position for give pos and range
- * 指定坐标范围内，随机生成怪物出生点
+ * 指定坐标及范围，随机生成怪物出生点
  * @param pos {Object} The center position
  * @param range {Number} The max distance form the pos
  * @return {Object} A random generate postion in the range of given pos
