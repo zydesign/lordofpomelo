@@ -13,6 +13,7 @@ exp.pushMessageToPlayer = function (uid, route, msg) {
 };
 
 exp.pushMessageByAOI = function (area, msg, pos, ignoreList) {
+	//获取区域内观察者uids，并给该uids推送消息
   var uids = area.timer.getWatcherUids(pos, [EntityType.PLAYER], ignoreList);
 
   if (uids.length > 0) {
