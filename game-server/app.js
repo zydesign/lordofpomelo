@@ -38,6 +38,7 @@ app.configure('production|development', function () {
     //Set areasIdMap, a map from area id to serverId.
     if (app.serverType !== 'master') {
         var areas = app.get('servers').area;
+        //将服务器areas的id存到areaIdMap里面，客户端指定一个值即得服务器id
         var areaIdMap = {};
         for (var id in areas) {
             areaIdMap[areas[id].area] = areas[id].id;
