@@ -58,6 +58,7 @@ pro.entry = function(msg, session, next) {
 		},
         function(res, cb) {
 			// generate session and register chat status
+		        //生成session和注册聊天状态
 			players = res;
 			self.app.get('sessionService').kick(uid, cb);
 		},
@@ -72,6 +73,7 @@ pro.entry = function(msg, session, next) {
 
 			player = players[0];
 
+		        // 将客户端发来的areaId，存入session，方便后面的每次访问路由到这个areaId的服务器
 			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);
 			session.set('playername', player.name);
 			session.set('playerId', player.id);
@@ -79,6 +81,7 @@ pro.entry = function(msg, session, next) {
 			session.pushAll(cb);
 		},
         function(cb) {
+		        //加入聊天服务器
 			self.app.rpc.chat.chatRemote.add(session, player.userId, player.name, channelUtil.getGlobalChannelName(), cb);
 		}
 	], function(err) {
