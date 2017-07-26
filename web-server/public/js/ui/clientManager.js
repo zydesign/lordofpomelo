@@ -3,7 +3,7 @@ __resources__["/clientManager.js"] = {
     mimetype: "application/javascript"
   },
   data: function(exports, require, module, __filename, __dirname) {
-    var heroSelectView = require('heroSelectView');  // role manager
+    var heroSelectView = require('heroSelectView');  // role manager 角色管理器
 
     var pomelo = window.pomelo;
     var app = require('app');
@@ -29,11 +29,11 @@ __resources__["/clientManager.js"] = {
     });
 
     function init() {
-      //bind events
+      //bind events  按钮事件监听
       $('#loginBtn').on('click', login);
       $('#registerBtn').on('click', register);
       $('#heroSelectBtn').on('click', createPlayer);
-      //oauth button
+      //oauth button 授权按钮
       $('#authBtn li a').on('click', function () {
         var $a = $(this);
         var url = $a.attr('href');
@@ -43,14 +43,14 @@ __resources__["/clientManager.js"] = {
         return false;
       });
 
-      // go to register
+      // go to register 注册
       $('#id_toRegisterBnt').on('click', function() {
         $('#id_loginFrame').addClass('f-dn');
         $('#id_registerFrame').removeClass('f-dn');
         return false;
       });
 
-      // back button
+      // back button 返回按钮
       $('#id_registerFrame .bg3').on('click', function() {
         $('#id_loginFrame').removeClass('f-dn');
         $('#id_registerFrame').addClass('f-dn');
@@ -59,7 +59,8 @@ __resources__["/clientManager.js"] = {
     }
 
     /**
-     * login
+     * login 登录按钮的回调函数
+     * 输入用户名、密码，并验证
      */
     function login() {
       if (loading) {
@@ -81,6 +82,7 @@ __resources__["/clientManager.js"] = {
         return;
       }
 
+      //验证用户名和密码
       $.post(httpHost + 'login', {username: username, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username or password is invalid!');
@@ -93,6 +95,7 @@ __resources__["/clientManager.js"] = {
           return;
         }
 
+        //登录游戏，关闭登录按钮的回调，读取用户信息
         authEntry(data.uid, data.token, function() {
           loading = false;
         });
@@ -100,7 +103,9 @@ __resources__["/clientManager.js"] = {
       });
     }
 
+    //连接gate服务器
     function queryEntry(uid, callback) {
+      //链接配件文件的gate端口，访问gate服务器，得到data数据(得到分配的connector的IP和port，然后断开与gate的链接)
       pomelo.init({host: config.GATE_HOST, port: config.GATE_PORT, log: true}, function() {
         pomelo.request('gate.gateHandler.queryEntry', { uid: uid}, function(data) {
           pomelo.disconnect();
@@ -124,12 +129,14 @@ __resources__["/clientManager.js"] = {
      *   player: [Object]
      * }
      */
+    //连接connector服务器
     function entry(host, port, token, callback) {
       // init socketClient
       // TODO for development
       if(host === '127.0.0.1') {
         host = config.GATE_HOST;
       }
+      //连接connector，获取用户信息并绑定session到服务器上
       pomelo.init({host: host, port: port, log: true}, function() {
         pomelo.request('connector.entryHandler.entry', {token: token}, function(data) {
           var player = data.player;
@@ -152,18 +159,23 @@ __resources__["/clientManager.js"] = {
           }
 
           // init handler
+          //初始化登录信息管理和游戏信息UI管理
           loginMsgHandler.init();
           gameMsgHandler.init();
 
+          //角色进入验证
           if (!player || player.id <= 0) {
+            //如果没有角色，进入角色选择界面指向1号框
             switchManager.selectView("heroSelectPanel");
           } else {
+            //如果有角色，通过角色信息登录游戏
             afterLogin(data);
           }
         });
       });
     }
 
+    //验证登录函数。先连接gate，然后连接分配的connector，得到角色信息后登录游戏
     function authEntry(uid, token, callback) {
       queryEntry(uid, function(host, port) {
         entry(host, port, token, callback);
@@ -172,7 +184,7 @@ __resources__["/clientManager.js"] = {
 
     pomelo.authEntry = authEntry;
 
-    //register
+    //register 注册按钮的回调函数
     function register() {
       if (loading) {
         return;
@@ -198,6 +210,7 @@ __resources__["/clientManager.js"] = {
         loading = false;
         return;
       }
+      //用户输入注册信息后，返回验证信息
       $.post(httpHost + 'register', {name: name, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username already exists！');
