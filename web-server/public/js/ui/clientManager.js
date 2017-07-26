@@ -82,7 +82,7 @@ __resources__["/clientManager.js"] = {
         return;
       }
 
-      //验证用户名和密码
+      //点击登录按钮时，通过用户名和密码，请求登录，返回data进行操作
       $.post(httpHost + 'login', {username: username, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username or password is invalid!');
@@ -129,7 +129,7 @@ __resources__["/clientManager.js"] = {
      *   player: [Object]
      * }
      */
-    //连接connector服务器
+    //连接connector服务器，返回data数据，初始化登录信息和游戏信息
     function entry(host, port, token, callback) {
       // init socketClient
       // TODO for development
@@ -159,7 +159,7 @@ __resources__["/clientManager.js"] = {
           }
 
           // init handler
-          //初始化登录信息管理和游戏信息UI管理
+          //初始化登录信息和游戏信息
           loginMsgHandler.init();
           gameMsgHandler.init();
 
@@ -210,7 +210,7 @@ __resources__["/clientManager.js"] = {
         loading = false;
         return;
       }
-      //用户输入注册信息后，返回验证信息
+      //点击注册按钮时，请求注册，返回data进行操作
       $.post(httpHost + 'register', {name: name, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username already exists！');
@@ -227,6 +227,7 @@ __resources__["/clientManager.js"] = {
     }
 
     // createPlayer
+    // 创建角色
     function createPlayer() {
       if (loading) {
         return;
