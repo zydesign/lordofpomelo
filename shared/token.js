@@ -2,6 +2,7 @@ var crypto = require('crypto');
 
 /**
  * Create token by uid. Encrypt uid and timestamp to get a token.
+ * 通过uid创建token，uid+时间戳加密为token
  * 
  * @param  {String} uid user id
  * @param  {String|Number} timestamp
