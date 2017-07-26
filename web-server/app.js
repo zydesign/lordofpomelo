@@ -41,6 +41,7 @@ app.get('/auth_success', function(req, res) {
   }
 });
 
+//登录按钮监听
 app.post('/login', function(req, res) {
   var msg = req.body;
 
@@ -52,6 +53,7 @@ app.post('/login', function(req, res) {
     return;
   }
 
+//通过用户名请求数据库获取用户信息，并验证输入的密码是否跟数据库用户密码一致
   userDao.getUserByName(username, function(err, user) {
     if (err || !user) {
       console.log('username not exist!');
@@ -67,10 +69,12 @@ app.post('/login', function(req, res) {
     }
 
     console.log(username + ' login!');
+	  //登录用户名和密码跟数据库匹配后，返回data数据
     res.send({code: 200, token: Token.create(user.id, Date.now(), secret), uid: user.id});
   });
 });
 
+//注册按钮监听
 app.post('/register', function(req, res) {
   //console.log('req.params');
   var msg = req.body;
@@ -78,7 +82,7 @@ app.post('/register', function(req, res) {
     res.send({code: 500});
     return;
   }
-
+//数据库创建用户，并返回该用户信息
   userDao.createUser(msg.name, msg.password, '', function(err, user) {
     if (err || !user) {
       console.error(err);
