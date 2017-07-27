@@ -99,6 +99,7 @@ app.post('/register', function(req, res) {
 });
 
 //Init mysql
+//开启对象池链接数据库
 mysql.init();
 
 app.listen(3001);
