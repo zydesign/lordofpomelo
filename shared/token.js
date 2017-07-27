@@ -19,7 +19,7 @@ module.exports.create = function(uid, timestamp, pwd) {
 
 /**
  * Parse token to validate it and get the uid and timestamp.
- * 
+ * 解析token来验证它，并获得uid和时间戳。
  * @param  {String} token token string
  * @param  {String} pwd   decrypt password
  * @return {Object}  uid and timestamp that exported from token. null for illegal token.     
