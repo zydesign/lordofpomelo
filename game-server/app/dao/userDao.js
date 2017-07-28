@@ -16,6 +16,7 @@ var userDao = module.exports;
 
 /**
  * Get user data by username.
+ * 通过用户名获取用户信息
  * @param {String} username
  * @param {String} passwd
  * @param {function} cb
@@ -43,6 +44,7 @@ userDao.getUserInfo = function (username, passwd, cb) {
 
 /**
  * Get an user's all players by userId
+ * 通过uid获取所有角色信息
  * @param {Number} uid User Id.
  * @param {function} cb Callback function.
  */
@@ -66,7 +68,8 @@ userDao.getPlayersByUid = function(uid, cb){
 };
 
 /**
- * Get an user's all players by userId
+ * Get an user's all players by playerId
+ * 通过playerId获取所有角色
  * @param {Number} playerId
  * @param {function} cb Callback function.
  */
@@ -88,6 +91,7 @@ userDao.getPlayer = function(playerId, cb){
 
 /**
  * get by Name
+ * 通过角色名字获取角色
  * @param {String} name Player name
  * @param {function} cb Callback function
  */
@@ -108,6 +112,7 @@ userDao.getPlayerByName = function(name, cb){
 
 /**
  * Get all the information of a player, include equipments, bag, skills, tasks.
+ * 通过角色id获取该角色的信息，包括装备、背包、技能、任务。
  * @param {String} playerId
  * @param {function} cb
  */
@@ -175,6 +180,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 
 /**
  * Get userInfo by username
+ * 通过用户名获取单条user信息
  * @param {String} username
  * @param {function} cb
  */
@@ -198,6 +204,7 @@ userDao.getUserByName = function (username, cb){
 
 /**
  * get user infomation by userId
+ * 通过uid获取单条user用户信息
  * @param {String} uid UserId
  * @param {function} cb Callback function
  */
@@ -220,6 +227,7 @@ userDao.getUserById = function (uid, cb){
 
 /**
  * delete user by username
+ * 通过用户名删除用户信息
  * @param {String} username
  * @param {function} cb Call back function.
  */
@@ -241,6 +249,7 @@ userDao.deleteByName = function (username, cb){
 
 /**
  * Create a new user
+ * 通过用户名和密码创建新user
  * @param (String) username
  * @param {String} password
  * @param {String} from Register source
@@ -262,6 +271,7 @@ userDao.createUser = function (username, password, from, cb){
 
 /**
  * Create a new player
+ * 通过uid、玩家角色名、角色id（roleId）创建新角色
  * @param {String} uid User id.
  * @param {String} name Player's name in the game.
  * @param {Number} roleId Player's roleId, decide which kind of player to create.
