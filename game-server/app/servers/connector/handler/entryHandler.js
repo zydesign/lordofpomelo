@@ -20,7 +20,7 @@ var pro = Handler.prototype;
 
 /**
  * New client entry game server. Check token and bind user info into session.
- *
+ * 新客户端进入游戏服务器。检查token并将用户信息绑定到session。
  * @param  {Object}   msg     request message
  * @param  {Object}   session current session object
  * @param  {Function} next    next stemp callback
@@ -35,14 +35,16 @@ pro.entry = function(msg, session, next) {
 		return;
 	}
 
+	//先声明要获取的变量
 	var uid, players, player;
 	async.waterfall([
 		function(cb) {
-			// auth token
+			// auth token   解析token后，并获取code、user信息
 			self.app.rpc.auth.authRemote.auth(session, token, cb);
 		},
         function(code, user, cb) {
 			// query player info by user id
+		        // 通过uid查询角色信息
 			if(code !== Code.OK) {
 				next(null, {code: code});
 				return;
@@ -58,7 +60,7 @@ pro.entry = function(msg, session, next) {
 		},
         function(res, cb) {
 			// generate session and register chat status
-		        //生成session和注册聊天状态
+		        //登录就要先踢掉之前的session链接，并从新生成session和注册聊天状态
 			players = res;
 			self.app.get('sessionService').kick(uid, cb);
 		},
@@ -91,10 +93,12 @@ pro.entry = function(msg, session, next) {
 		}
 		console.log('entry success!!!!');
 
+		//返回单条player信息给客户端
 		next(null, {code: Code.OK, player: players ? players[0] : null});
 	});
 };
 
+//玩家掉线，退出游戏功能
 var onUserLeave = function (app, session, reason) {
     console.log('onUserLeave-reason: ', reason);
 	if(!session || !session.uid) {
@@ -102,10 +106,12 @@ var onUserLeave = function (app, session, reason) {
 	}
 
 	utils.myPrint('1 ~ OnUserLeave is running ...');
+	//让玩家退出场景服务器 ，（instanceId是个无用的属性，多余的）
 	app.rpc.area.playerRemote.playerLeave(session, {playerId: session.get('playerId'), instanceId: session.get('instanceId')}, function(err){
 		if(!!err){
 			logger.error('user leave error! %j', err);
 		}
 	});
+	//让玩家退出聊天服务器
 	app.rpc.chat.chatRemote.kick(session, session.uid, null);
 };
