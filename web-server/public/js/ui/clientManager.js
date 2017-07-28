@@ -29,7 +29,7 @@ __resources__["/clientManager.js"] = {
     });
 
     function init() {
-      //bind events  按钮事件监听
+      //bind events  按钮事件监听  ，登陆按钮、注册按钮、创建角色按钮
       $('#loginBtn').on('click', login);
       $('#registerBtn').on('click', register);
       $('#heroSelectBtn').on('click', createPlayer);
@@ -43,7 +43,7 @@ __resources__["/clientManager.js"] = {
         return false;
       });
 
-      // go to register 注册
+      // go to register 跳转到注册界面按钮
       $('#id_toRegisterBnt').on('click', function() {
         $('#id_loginFrame').addClass('f-dn');
         $('#id_registerFrame').removeClass('f-dn');
@@ -66,18 +66,21 @@ __resources__["/clientManager.js"] = {
       if (loading) {
         return;
       }
+      ////点击按钮后。先切换到正在请求状态，关闭请求接口，避免重复请求
       loading = true;
       var username = $('#loginUser').val().trim();
       var pwd = $('#loginPwd').val().trim();
       $('#loginPwd').val('');
       if (!username) {
         alert("Username is required!");
+        //请求错误，切换回可请求状态
         loading = false;
         return;
       }
 
       if (!pwd) {
         alert("Password is required!");
+        //请求错误，切换回可请求状态
         loading = false;
         return;
       }
@@ -95,7 +98,7 @@ __resources__["/clientManager.js"] = {
           return;
         }
 
-        //登录游戏，关闭登录按钮的回调，读取用户信息
+        //登录游戏，读取用户信息
         authEntry(data.uid, data.token, function() {
           loading = false;
         });
@@ -121,7 +124,7 @@ __resources__["/clientManager.js"] = {
     }
 
     /**
-     * enter game server
+     * enter game server  登录游戏是用token登录的
      * route: connector.entryHandler.entry
      * response：
      * {
@@ -129,14 +132,14 @@ __resources__["/clientManager.js"] = {
      *   player: [Object]
      * }
      */
-    //连接connector服务器，返回data数据，初始化登录信息和游戏信息
+    //连接connector服务器，绑定session到服务器,返回data数据，初始化登录信息和游戏信息
     function entry(host, port, token, callback) {
       // init socketClient
       // TODO for development
       if(host === '127.0.0.1') {
         host = config.GATE_HOST;
       }
-      //连接connector，获取用户信息并绑定session到服务器上
+      //连接connector，获取用户信息并绑定session到服务器上，返回data包含：code、player
       pomelo.init({host: host, port: port, log: true}, function() {
         pomelo.request('connector.entryHandler.entry', {token: token}, function(data) {
           var player = data.player;
@@ -189,6 +192,7 @@ __resources__["/clientManager.js"] = {
       if (loading) {
         return;
       }
+      //点击按钮后。先切换到正在请求状态，关闭请求接口，避免重复请求
       loading = true;
       var name = $('#reg-name').val().trim();
       var pwd = $('#reg-pwd').val().trim();
@@ -197,6 +201,7 @@ __resources__["/clientManager.js"] = {
       $('#reg-cpwd').val('');
       if (name === '') {
         alert('Username is required!');
+        //请求错误，切换回可请求状态
         loading = false;
         return;
       }
@@ -243,6 +248,7 @@ __resources__["/clientManager.js"] = {
         alert("Role name's length is too long!");
         loading = false;
       } else {
+        //如果角色名字合法，连接前端服务器创建角色
         pomelo.request("connector.roleHandler.createPlayer", {name: name, roleId: roleId}, function(data) {
           loading = false;
           if (data.code == 500) {
