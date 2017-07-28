@@ -20,12 +20,13 @@ var pro = Remote.prototype;
 
 /**
  * Auth token and check whether expire.
- *
+ * 验证token，并检查是否过期。
  * @param  {String}   token token string
  * @param  {Function} cb
  * @return {Void}
  */
 pro.auth = function(token, cb) {
+	// 解析token来验证它，并获得uid和时间戳。
 	var res = tokenService.parse(token, this.secret);
 	if(!res) {
 		cb(null, Code.ENTRY.FA_TOKEN_ILLEGAL);
@@ -37,6 +38,7 @@ pro.auth = function(token, cb) {
 		return;
 	}
 
+	//通过解析token得到的uid获取user
 	userDao.getUserById(res.uid, function(err, user) {
 		if(err) {
 			cb(err);
@@ -49,7 +51,7 @@ pro.auth = function(token, cb) {
 
 /**
  * Check the token whether expire.
- *
+ *检查token是否过期
  * @param  {Object} token  token info
  * @param  {Number} expire expire time
  * @return {Boolean}        true for not expire and false for expire
@@ -57,6 +59,7 @@ pro.auth = function(token, cb) {
 var checkExpire = function(token, expire) {
 	if(expire < 0) {
 		// negative expire means never expire
+		// 负到期意味着永远不到期
 		return true;
 	}
 
