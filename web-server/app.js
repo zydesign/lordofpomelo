@@ -41,7 +41,7 @@ app.get('/auth_success', function(req, res) {
   }
 });
 
-//登录按钮监听
+//登录按钮监听（收到请求后会连接数据库获取user，通过Token模块创建Token，返回Token、uid）
 app.post('/login', function(req, res) {
   var msg = req.body;
 
