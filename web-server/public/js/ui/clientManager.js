@@ -1,4 +1,4 @@
-__resources__["/clientManager.js"] = {
+https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/clientManager.js"] = {
   meta: {
     mimetype: "application/javascript"
   },
@@ -124,7 +124,7 @@ __resources__["/clientManager.js"] = {
     }
 
     /**
-     * enter game server  登录游戏是用token登录的
+     * enter game server  登录游戏是用token登录的,在connector服务器解析成uid+时间戳
      * route: connector.entryHandler.entry
      * response：
      * {
