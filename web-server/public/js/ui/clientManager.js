@@ -22,6 +22,8 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     var self = this;
 
     var loading = false;
+    //location为全局变量，是javascript里边管理地址栏的内置对象
+    //location.href	完整的 URL;  location.hash为标签页
     var httpHost = location.href.replace(location.hash, '');
 
     pomelo.on('websocket-error', function(){
