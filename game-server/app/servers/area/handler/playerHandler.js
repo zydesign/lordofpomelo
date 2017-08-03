@@ -1,5 +1,6 @@
 /**
  * Module dependencies
+ * 依赖的模块
  */
 var messageService = require('../../../domain/messageService');
 var areaService = require('../../../services/areaService');
@@ -21,12 +22,15 @@ var handler = module.exports;
 /**
  * Player enter scene, and response the related information such as
  * playerInfo, areaInfo and mapData to client.
+ *玩家进入场景，并响应相关信息：playerInfo,areaInfo和mapData到客户端。
  *
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
  * @api public
  */
+
+//进入场景  （msg不需要）
 handler.enterScene = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -39,6 +43,7 @@ handler.enterScene = function(msg, session, next) {
 	utils.myPrint("1 ~ EnterScene: playerId = ", playerId);
 	utils.myPrint("1 ~ EnterScene: teamId = ", teamId);
 
+	//得到角色信息全部信息
   userDao.getPlayerAllInfo(playerId, function(err, player) {
     if (err || !player) {
       logger.error('Get user for userDao failed! ' + err.stack);
@@ -49,7 +54,7 @@ handler.enterScene = function(msg, session, next) {
 
       return;
     }
-
+                //修改部分角色信息
     player.serverId = session.frontendId;
 		player.teamId = teamId;
 		player.isCaptain = isCaptain;
@@ -64,6 +69,7 @@ handler.enterScene = function(msg, session, next) {
 
     // temporary code
     //Reset the player's position if current pos is unreachable
+	  //如果玩家位置无效，重置玩家坐标
 		if(!map.isReachable(player.x, player.y)) {
     // {
 			var pos = map.getBornPoint();
@@ -112,7 +118,7 @@ handler.enterScene = function(msg, session, next) {
 
 /**
  * Change player's view.
- *
+ * 改变玩家视野（观察者信息）
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
@@ -146,7 +152,7 @@ handler.changeView = function(msg, session, next){
 /**
  * Player moves. Player requests move with the given movePath.
  * Handle the request from client, and response result to client
- *
+ * 玩家移动，通过寻路路径发起请求
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
