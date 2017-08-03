@@ -76,6 +76,7 @@ pro.entry = function(msg, session, next) {
 			player = players[0];
 
 		        // 将客户端发来的areaId，存入session，方便后面的每次访问路由到这个areaId的服务器
+		        // areaIdMap存的是area服务器配置的尾部的id值
 			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);
 			session.set('playername', player.name);
 			session.set('playerId', player.id);
