@@ -286,6 +286,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       });
     }
 
+    //游戏预加载
     function gamePrelude() {
       switchManager.selectView("gamePrelude");
       var entered = false;
@@ -304,6 +305,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     }
 
 
+    //加载资源
     function loadResource(opt, callback) {
       switchManager.selectView("loadingPanel");
       var loader = new ResourceLoader(opt);
@@ -325,6 +327,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       loader.loadAreaResource();
     }
 
+    //进入场景
     function enterScene(){
       pomelo.request("area.playerHandler.enterScene", null, function(data){
         app.init(data);
