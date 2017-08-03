@@ -69,7 +69,7 @@ userDao.getPlayersByUid = function(uid, cb){
 
 /**
  * Get an user's all players by playerId
- * 通过playerId获取所有角色
+ * 通过playerId获取单条角色信息
  * @param {Number} playerId
  * @param {function} cb Callback function.
  */
@@ -91,7 +91,7 @@ userDao.getPlayer = function(playerId, cb){
 
 /**
  * get by Name
- * 通过角色名字获取角色
+ * 通过角色名字获取单条角色信息
  * @param {String} name Player name
  * @param {function} cb Callback function
  */
@@ -112,7 +112,7 @@ userDao.getPlayerByName = function(name, cb){
 
 /**
  * Get all the information of a player, include equipments, bag, skills, tasks.
- * 通过角色id获取该角色的信息，包括装备、背包、技能、任务。
+ * 通过角色id获取该角色的信息，包括角色信息、装备、背包、技能、任务。
  * @param {String} playerId
  * @param {function} cb
  */
@@ -227,7 +227,7 @@ userDao.getUserById = function (uid, cb){
 
 /**
  * delete user by username
- * 通过用户名删除用户信息
+ * 通过用户名删除用户信息，返回true或fasle
  * @param {String} username
  * @param {function} cb Call back function.
  */
@@ -249,7 +249,7 @@ userDao.deleteByName = function (username, cb){
 
 /**
  * Create a new user
- * 通过用户名和密码创建新user
+ * 通过用户名和密码创建新user到数据库，并返回该user
  * @param (String) username
  * @param {String} password
  * @param {String} from Register source
@@ -263,6 +263,7 @@ userDao.createUser = function (username, password, from, cb){
 		if(err !== null){
 			utils.invokeCallback(cb, {code: err.number, msg: err.message}, null);
 		} else {
+			//用户信息全部属性
 			var user = new User({id: res.insertId, name: username, password: password, loginCount: 1, lastLoginTime:loginTime});
 			utils.invokeCallback(cb, null, user);
 		}
@@ -271,7 +272,7 @@ userDao.createUser = function (username, password, from, cb){
 
 /**
  * Create a new player
- * 通过uid、玩家角色名、角色id（roleId）创建新角色
+ * 通过uid、玩家角色名、角色id（roleId）创建新角色到数据库，并返回该角色信息
  * @param {String} uid User id.
  * @param {String} name Player's name in the game.
  * @param {Number} roleId Player's roleId, decide which kind of player to create.
@@ -295,6 +296,7 @@ userDao.createPlayer = function (uid, name, roleId,cb){
 			logger.error(err);
 			utils.invokeCallback(cb,err.message, null);
 		} else {
+			//玩家信息全部属性
 			var player = new Player({
 				id: res.insertId,
 				userId: uid,
@@ -322,6 +324,7 @@ userDao.createPlayer = function (uid, name, roleId,cb){
 
 /**
  * Update a player
+ * 更新玩家信息（坐标、血量、阵营、攻击、防御、攻速等），并返回true或fasle
  * @param {Object} player The player need to update, all the propties will be update.
  * @param {function} cb Callback function.
  */
@@ -345,6 +348,7 @@ userDao.updatePlayer = function (player, cb){
 
 /**
  * Delete player
+ * 删除角色，返回true或fasle
  * @param {Number} playerId
  * @param {function} cb Callback function.
  */
