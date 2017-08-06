@@ -62,6 +62,7 @@ var mapData = function(fields, item) {
 Data.prototype.findBy = function(attr, value) {
   var result = [];
   var i, item;
+  //遍历所以物品，并通过自定的属性和值匹配自定的物品
   for (i in this.data) {
     item = this.data[i];
     if (item[attr] == value) {
