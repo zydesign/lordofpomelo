@@ -25,32 +25,32 @@ var underscore = require('underscore');
  * @api public
  */
 var Player = function(opts) {
-  Character.call(this, opts);
-  this.id = Number(opts.id);
-  this.type = EntityType.PLAYER;
-  this.userId = opts.userId;
-  this.name = opts.name;
-  this.equipments = opts.equipments;
-  this.bag = opts.bag;
-  this.skillPoint = opts.skillPoint || 0;
-  var _exp = dataApi.experience.findById(this.level+1);
+  Character.call(this, opts);  //player继承character
+  this.id = Number(opts.id);   //playerId
+  this.type = EntityType.PLAYER;  //角色类型
+  this.userId = opts.userId;   //uid
+  this.name = opts.name;       //角色名
+  this.equipments = opts.equipments;   //角色装备
+  this.bag = opts.bag;     //角色背包
+  this.skillPoint = opts.skillPoint || 0;    //角色技能点
+  var _exp = dataApi.experience.findById(this.level+1);    //角色经验值
   if (!!_exp) {
-    this.nextLevelExp = dataApi.experience.findById(this.level+1).exp;
+    this.nextLevelExp = dataApi.experience.findById(this.level+1).exp;   //下一级所需经验
   } else {
-    this.nextLevelExp = 999999999;
+    this.nextLevelExp = 999999999;   //如果拿不到角色经验值，下一级所需为极大
   }
-  this.roleData = dataApi.role.findById(this.kindId);
-  this.curTasks = opts.curTasks;
-  this.range = opts.range || 2;
+  this.roleData = dataApi.role.findById(this.kindId);   //角色数据
+  this.curTasks = opts.curTasks;   //角色当前任务
+  this.range = opts.range || 2;     //角色范围
   // player's team id, default 0(not in any team).
-  this.teamId = consts.TEAM.TEAM_ID_NONE;
+  this.teamId = consts.TEAM.TEAM_ID_NONE;    //团队ID
   // is the team captain, default false
-  this.isCaptain = consts.TEAM.NO;
+  this.isCaptain = consts.TEAM.NO;      //是否团队队长
   // game copy flag
-  this.isInTeamInstance = false;
-  this.instanceId = 0;
+  this.isInTeamInstance = false;   //是否在团队里
+  this.instanceId = 0;   //实例ID
 
-  this.setTotalAttackAndDefence();
+  this.setTotalAttackAndDefence();    //设置总攻击和防御
 };
 
 util.inherits(Player, Character);
@@ -61,11 +61,13 @@ util.inherits(Player, Character);
 module.exports = Player;
 
 //emit the event 'died' after it is died
+// 反射死亡事件
 Player.prototype.afterDied = function() {
   this.emit('died', this);
 };
 
 //Add experience add Drop out items after it kills mob
+// 杀死怪物后，增加经验和掉落物品
 Player.prototype.afterKill = function(target) {
   var items = null;
   if (target.type === EntityType.MOB) {
