@@ -19,27 +19,28 @@ var channelUtil = require('../../util/channelUtil');
  * @param {Object} opts
  * @api public
  */
+//场景初始化工厂函数
 var Instance = function(opts){
   this.areaId = opts.id;
   this.type = opts.type;
   this.map = opts.map;
 
   //The map from player to entity
-  this.players = {};
-  this.users = {};
-  this.entities = {};
-  this.zones = {};
-  this.items = {};
-  this.channel = null;
+  this.players = {};   //玩家
+  this.users = {};     //用户
+  this.entities = {};  //实体
+  this.zones = {};     //怪物区
+  this.items = {};     //道具
+  this.channel = null; //该场景频道
 
-  this.playerNum = 0;
+  this.playerNum = 0;  //玩家数量
   this.emptyTime = Date.now();
   //Init AOI
-  this.aoi = aoiManager.getService(opts);
+  this.aoi = aoiManager.getService(opts);   //初始化aoi
 
-  this.aiManager = ai.createManager({area:this});
-  this.patrolManager = patrol.createManager({area:this});
-  this.actionManager = new ActionManager();
+  this.aiManager = ai.createManager({area:this});   //初始化ai
+  this.patrolManager = patrol.createManager({area:this});  //初始化巡逻
+  this.actionManager = new ActionManager(); //动作工厂方法
 
   this.timer = new Timer({
     area : this,
@@ -54,15 +55,17 @@ module.exports = Instance;
 /**
  * @api public
  */
+//启动场景服务
 Instance.prototype.start = function() {
+  //aoi监听事件
   aoiEventManager.addEvent(this, this.aoi.aoi);
 
-  //Init mob zones
+  //Init mob zones  初始化怪物空间
   this.initMobZones(this.map.getMobZones());
-  this.initNPCs();
+  this.initNPCs();  //初始化NPC
 
-  this.aiManager.start();
-  this.timer.run();
+  this.aiManager.start(); //AI管理服务启动
+  this.timer.run();  //地图计时器启动，定时执行地图内的处理信息任务
 };
 
 Instance.prototype.close = function(){
