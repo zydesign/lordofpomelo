@@ -359,6 +359,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       sprite.movePath(paths.path);
     }
 
+    //发射ai
     function launchAi(args) {
       var areaId = pomelo.areaId;
       var playerId = pomelo.playerId;
@@ -373,17 +374,21 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
         if (entity.died) {
           return;
         }
+        //如果是玩家，弹出选项，组队或者交易等
         if (entity.type === EntityType.PLAYER) {
           var curPlayer = app.getCurPlayer();
           pomelo.emit('onPlayerDialog', {targetId: targetId, targetPlayerId: entity.id,
             targetTeamId: entity.teamId, targetIsCaptain: entity.isCaptain,
             myTeamId: curPlayer.teamId, myIsCaptain: curPlayer.isCaptain});
         } else if (entity.type === EntityType.MOB) {
+          //如果是怪物，请求服务器处理攻击事件
           pomelo.request('area.fightHandler.attack',{targetId: targetId}, function() {});
         }
       } else if (entity.type === EntityType.NPC) {
+        //如果是NPC，通知服务器npc对话，不用回调
         pomelo.notify('area.playerHandler.npcTalk',{areaId :areaId, playerId: playerId, targetId: targetId});
       } else if (entity.type === EntityType.ITEM || entity.type === EntityType.EQUIPMENT) {
+        //如果是道具或装备，通知服务器拾取，不用回调
         var curPlayer = app.getCurPlayer();
         var bag = curPlayer.bag;
         if (bag.isFull()) {
