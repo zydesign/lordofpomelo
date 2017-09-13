@@ -71,6 +71,7 @@ ActionManager.prototype.update = function(){
 	var length = this.actionQueue.length;
 	
 	for(var i = 0; i < length; i++){
+		//pop()为移除最后一个对象
 		var action = this.actionQueue.pop();
 	
 		if(action.aborted){
