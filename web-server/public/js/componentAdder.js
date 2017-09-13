@@ -88,7 +88,7 @@ __resources__["/componentAdder.js"] = {meta: {mimetype: "application/javascript"
 	};
 
 	/**
-	 * Mouse click handlerFunction
+	 * Mouse click handlerFunction 鼠标点击，发射ai
 	 */
 	var launchAi = function (event, node) {
 		var id = node.id;
