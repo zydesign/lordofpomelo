@@ -7,11 +7,11 @@ var id = 1;
 var Action = function(opts){
 	this.data = opts.data;
 	this.id = opts.id || id++;
-	this.type = opts.type || 'defaultAction';
+	this.type = opts.type || 'defaultAction';  //动作类型
 	
-	this.finished = false;
-	this.aborted = false;
-	this.singleton = false || opts.singleton;
+	this.finished = false; //完成
+	this.aborted = false;  //停止
+	this.singleton = false || opts.singleton;  //单个动作
 };
 
 /**
