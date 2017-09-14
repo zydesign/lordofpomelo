@@ -19,10 +19,11 @@ var channelUtil = require('../../util/channelUtil');
  * @param {Object} opts
  * @api public
  */
+//场景类，主要把一些小类实例到属性中，为之提供参数opt，并调用这些小类的原型函数进行各种操作。
 var Instance = function(opts){
   this.areaId = opts.id;
   this.type = opts.type;
-  this.map = opts.map;
+  this.map = opts.map;  //参数提供的地图实例
 
   //The map from player to entity
   this.players = {};
@@ -35,12 +36,13 @@ var Instance = function(opts){
   this.playerNum = 0;
   this.emptyTime = Date.now();
   //Init AOI 通过opts参数配置，建立地图灯塔阵为aoi,aoi就是对对象id及观察者id的管理
-  this.aoi = aoiManager.getService(opts);
+  this.aoi = aoiManager.getService(opts);  //aoi工厂实例
 
-  this.aiManager = ai.createManager({area:this});
-  this.patrolManager = patrol.createManager({area:this});
-  this.actionManager = new ActionManager();
+  this.aiManager = ai.createManager({area:this});  //ai工厂实例
+  this.patrolManager = patrol.createManager({area:this});  //patrol巡逻工厂实例
+  this.actionManager = new ActionManager();  //动作工厂实例
 
+  //定时器工厂实例
   this.timer = new Timer({
     area : this,
     interval : 100
@@ -54,18 +56,21 @@ module.exports = Instance;
 /**
  * @api public
  */
+// 启动场景
 Instance.prototype.start = function() {
   //监听aoi事件,包括对象的add/remove/updat,观察者的updateWatcher
-  aoiEventManager.addEvent(this, this.aoi.aoi);
+  aoiEventManager.addEvent(this, this.aoi.aoi);  //开启aoi事件监听服务
 
   //Init mob zones
-  this.initMobZones(this.map.getMobZones());
-  this.initNPCs();
+  this.initMobZones(this.map.getMobZones());  //初始化化怪物区块
+  this.initNPCs();  //初始化NPC
 
-  this.aiManager.start();
-  this.timer.run();
+  this.aiManager.start(); //开启ai服务
+  this.timer.run(); //开启定时器
 };
 
+
+// 关闭定时器
 Instance.prototype.close = function(){
   this.timer.close();
 };
@@ -74,6 +79,7 @@ Instance.prototype.close = function(){
  * Init npcs
  * @api private
  */
+// 初始化NPC
 Instance.prototype.initNPCs = function() {
   var npcs = this.map.getNPCs();
 
