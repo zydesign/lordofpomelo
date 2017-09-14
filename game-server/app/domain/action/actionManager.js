@@ -5,6 +5,8 @@ var logger = require('pomelo-logger').getLogger(__filename);
  * Action Manager, which is used to contrll all action
  *动作管理器，用来控制所有动作
  */
+
+//在area类引入actionManager作为属性，提供opt参数
 var ActionManager = function(opts){
 	opts = opts||{};
 	
@@ -39,7 +41,7 @@ ActionManager.prototype.addAction = function(action){
  * abort an action, the action will be canceled and not excute
  * @param {String} type Given type of the action
  * @param {String} id The action id
- *中止一个动作，该动作将被取消，而不被执行
+ *中止一个动作，该动作将被取消，并删除
  */
 ActionManager.prototype.abortAction = function(type, id){
 	if(!this.actionMap[type] || !this.actionMap[type][id]){
@@ -71,7 +73,7 @@ ActionManager.prototype.update = function(){
 	var length = this.actionQueue.length;
 	
 	for(var i = 0; i < length; i++){
-		//pop()为移除最后一个对象
+		//pop() 方法用于删除并返回数组的最后一个元素
 		var action = this.actionQueue.pop();
 	
 		if(action.aborted){
