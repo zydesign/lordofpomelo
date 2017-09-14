@@ -13,7 +13,7 @@ var Move = function(opts){
 	opts.id = opts.entity.entityId;
 	opts.singleton = true;
 
-	 //上面是修改apt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型,
+	 //上面是修改opt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型,
 	Action.call(this, opts); 
 	this.entity = opts.entity;
 	this.area = this.entity.area;
@@ -29,7 +29,7 @@ util.inherits(Move, Action);//让move继承action函数的原型链
 
 /**
  * Update the move action, it will calculate and set the entity's new position, and update AOI module
- * 更新移动动作，它将计算并设置实体的新位置，并更新AOI模块
+ * 【重要】更新移动动作，它将计算并设置实体的新位置，并更新AOI模块
  */
 Move.prototype.update = function(){
 	this.tickNumber++;
