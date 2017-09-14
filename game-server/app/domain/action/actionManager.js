@@ -13,6 +13,7 @@ var ActionManager = function(opts){
 	this.limit = opts.limit||10000;
 	
 	//The map used to abort or cancel action, it's a two level map, first leven key is type, second leven is id
+	//动作图阵
 	this.actionMap = {};
 	
 	//The action queue, default size is 10000, all action in the action queue will excute in the FIFO order
@@ -23,7 +24,7 @@ var ActionManager = function(opts){
 /**
  * Add action 
  * @param {Object} action  The action to add, the order will be preserved
- *添加的操作，顺序将被保留
+ * 先把动作添加都动作图阵里面，并返回排列过的数组
  */
 ActionManager.prototype.addAction = function(action){
 	if(action.singleton) {
