@@ -2,6 +2,8 @@ var Action = require('./action');
 var messageService = require('../messageService');
 var util = require('util');
 
+
+//复活
 var Revive = function(opts){
 	opts.type = 'revive';
 	opts.id = opts.entity.entityId;
