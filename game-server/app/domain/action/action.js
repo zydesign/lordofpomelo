@@ -4,6 +4,8 @@ var id = 1;
  * Action class, used to excute the action in server
  *Action类，用于在服务器中执行动作
  */
+
+//move、Revive动作继承这个action的时候，提供opt参数
 var Action = function(opts){
 	this.data = opts.data;
 	this.id = opts.id || id++;
