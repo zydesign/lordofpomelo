@@ -13,8 +13,9 @@ var maps = {};
 
 var exp = module.exports;
 
+//入口为app，服务器开启即调用
 exp.init = function(){
-  var areas = dataApi.area.all();
+  var areas = dataApi.area.all(); //dataApi由app提供
 
   //Init areas
   for(var key in areas){
@@ -48,6 +49,7 @@ exp.getBornPoint = function(sceneId){
  * @param cb {funciton} Call back funciton
  * @api public
  */
+//切换地图，更新session
 exp.changeArea = function(args, session, cb) {
   var app = pomelo.app;
   var area = session.area;
