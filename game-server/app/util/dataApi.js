@@ -119,6 +119,7 @@ Data.prototype.all = function() {
   return this.data;
 };
 
+//直接代入了参数，直接调用就获取了数据。比如：dataApi.area就是场景地图数据
 module.exports = {
   area: new Data(area),
   character: new Data(character),
