@@ -26,12 +26,16 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     //location.href	完整的 URL;  location.hash为标签页
     var httpHost = location.href.replace(location.hash, '');
 
+    
+    //clientManager为客户端主要入口函数，游戏运行时被app调用运行
+    
     pomelo.on('websocket-error', function(){
       loading = false;
     });
 
+    //主监听入口，所有函数的调用始于监听事件，（在哪里调用这个函数？）
     function init() {
-      //bind events  按钮事件监听  ，登陆按钮、注册按钮、创建角色按钮
+      //bind events  按钮事件监听  ，登陆按钮、注册按钮、创建角色按钮，注册相应的函数
       $('#loginBtn').on('click', login);
       $('#registerBtn').on('click', register);
       $('#heroSelectBtn').on('click', createPlayer);
