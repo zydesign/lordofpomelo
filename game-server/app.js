@@ -31,41 +31,41 @@ app.configure('production|development', function () {
     }
 });
 
-// configure for global
+// configure for global  全局配置
 app.configure('production|development', function () {
-    require('./app/util/httpServer');
+    require('./app/util/httpServer');  //启动httpServer服务
 
     //Set areasIdMap, a map from area id to serverId.
     if (app.serverType !== 'master') {
         var areas = app.get('servers').area;
-        //将服务器areas的id存到areaIdMap里面，客户端指定一个值即得服务器id
+        //将服务器areas的id存到areaIdMap里面，客户端指定一个值key为服务器数据的area属性（如：1），即得服务器id（如：area-server-1）
         var areaIdMap = {};
         for (var id in areas) {
             areaIdMap[areas[id].area] = areas[id].id;
         }
         app.set('areaIdMap', areaIdMap);
     }
-    // proxy configures
+    // proxy configures  代理配置
     app.set('proxyConfig', {
-        cacheMsg: true,
+        cacheMsg: true,   //是否缓存
         interval: 30,
         lazyConnection: true,
         enableRpcLog: true
     });
 
-    // remote configures
+    // remote configures 远程配置
     app.set('remoteConfig', {
-        cacheMsg: true,
+        cacheMsg: true,  //是否缓存
         interval: 30
     });
 
-    // route configures
+    // route configures  路由配置，RPC时，会先执行路由配置，路由到对应的子服务器
     app.route('area', routeUtil.area);
     app.route('connector', routeUtil.connector);
 
     //mysql数据库连接配置，将被dao-pool对象池调用去连接数据库
     app.loadConfig('mysql', app.getBase() + '/../shared/config/mysql.json');
-    app.filter(pomelo.filters.timeout());
+    app.filter(pomelo.filters.timeout());  //全局启用超时过滤，意思是所有服务器都启用超时服务
 
     /*高可用插件
      // master high availability
@@ -78,18 +78,24 @@ app.configure('production|development', function () {
      */
 });
 
-// Configure for auth server
+// Configure for auth server  验证服务器配置
 app.configure('production|development', 'auth', function () {
     // load session congfigures
     app.set('session', require('./config/session.json'));
 });
 
-// Configure for area server
+// Configure for area server  场景服务器配置
 app.configure('production|development', 'area', function () {
+    
+    //全局调用pomelo内置过滤器
     app.filter(pomelo.filters.serial());
-    app.before(playerFilter());
+    
+    //app.before（）只调用参数工厂函数里面的before； app.filter（）调用参数的filter、before、after；同理app.after（）只调用after
+    //PS：过滤器执行顺序，先filter，然后before，然后服务器处理，再然后after，再然后把处理数据返回客户端
+    app.before(playerFilter());  
 
     //Load scene server and instance server
+    //这里当前服务器app.curServer即为area路由到的area子服务器
     var server = app.curServer;
     if (server.instance) {
         instancePool.init(require('./config/instance.json'));
