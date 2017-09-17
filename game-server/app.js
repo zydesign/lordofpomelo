@@ -59,7 +59,7 @@ app.configure('production|development', function () {
         interval: 30
     });
 
-    // route configures  路由配置，RPC时，会先执行路由配置，路由到对应的子服务器
+    // route configures  路由配置，RPC时，会先执行路由配置，路由到对应的子服务器，再执行hander处理
     app.route('area', routeUtil.area);
     app.route('connector', routeUtil.connector);
 
@@ -110,15 +110,17 @@ app.configure('production|development', 'area', function () {
     areaService.init();
 });
 
+//管理服务器配置
 app.configure('production|development', 'manager', function () {
+    
+    //监听增加，删除服务事件
     var events = pomelo.events;
-
     app.event.on(events.ADD_SERVERS, instanceManager.addServers);
-
     app.event.on(events.REMOVE_SERVERS, instanceManager.removeServers);
 });
 
-// Configure database
+
+// Configure database 数据库连接配置
 app.configure('production|development', 'area|auth|connector|master', function () {
     //用于执行mql语句的连接数据库模块
     var dbclient = require('./app/dao/mysql/mysql').init(app);
@@ -127,6 +129,8 @@ app.configure('production|development', 'area|auth|connector|master', function (
     app.use(sync, {sync: {path: __dirname + '/app/dao/mapping', dbclient: dbclient}});
 });
 
+
+//前端服务器配置
 app.configure('production|development', 'connector', function () {
     var dictionary = app.components['__dictionary__'];
     var dict = null;
@@ -134,6 +138,7 @@ app.configure('production|development', 'connector', function () {
         dict = dictionary.getDict();
     }
 
+    //前端配置
     app.set('connectorConfig',
         {
             connector: pomelo.connectors.hybridconnector,
@@ -146,6 +151,8 @@ app.configure('production|development', 'connector', function () {
         });
 });
 
+
+//gate服务器配置
 app.configure('production|development', 'gate', function () {
     app.set('connectorConfig',
         {
@@ -153,6 +160,9 @@ app.configure('production|development', 'gate', function () {
             useProtobuf: true
         });
 });
+
+
+//聊天服务器配置
 // Configure for chat server
 app.configure('production|development', 'chat', function () {
     app.set('chatService', new ChatService(app));
