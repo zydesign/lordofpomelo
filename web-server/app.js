@@ -8,6 +8,8 @@ var everyauth = require('./lib/oauth');
 
 var publicPath = __dirname +  '/public';
 
+
+//app是开启web服务器的总接口，主要运行clientManager的主入口函数，和配置服务器环境
 app.configure(function() {
   app.use(express.methodOverride());
   app.use(express.bodyParser());
