@@ -20,10 +20,12 @@ var channelUtil = require('../../util/channelUtil');
  * @api public
  */
 //场景类，主要把一些小类实例到属性中，为之提供参数opt，并调用这些小类的原型函数进行各种操作。
+//场景入口为scene，参数opt为一份场景数据
+
 var Instance = function(opts){
   this.areaId = opts.id;
   this.type = opts.type;
-  this.map = opts.map;  //参数提供的地图实例
+  this.map = opts.map;  //参数提供的地图实例。opt.map这个属性是scene另外添加的
 
   //The map from player to entity
   this.players = {};
