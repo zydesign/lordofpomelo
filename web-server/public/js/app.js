@@ -23,6 +23,8 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 * Init client ara
 	 * @param data {Object} The data for init area
 	 */
+	
+	//根据data数据初始化场景数据，切换场景
 	function init(data) {
 		var map = data.map;
 		pomelo.player = data.curPlayer;
@@ -62,6 +64,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 		});
 	}
 
+	//获取场景
 	function getArea() {
 		return area;
 	}
@@ -69,10 +72,12 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	/**
 	 * Get current player
 	 */
+	//获取当前玩家
 	function getCurPlayer() {
 		return getArea().getCurPlayer();
 	}
 
+	//
 	function getResMgr(){
 		if(!resMgr){
 			resMgr = new ResMgr();
@@ -81,6 +86,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 		return resMgr;
 	}
 
+	//获取对象池管理
 	function getObjectPoolManager() {
 		if (!poolManager) {
 			poolManager = new ObjectPoolManager();
@@ -89,10 +95,12 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 
 	}
 
+	//设置延迟时间
 	function setDelayTime(time) {
 		delayTime = time;
 	}
 
+	//获取延迟时间
 	function getDelayTime() {
 		return delayTime;
 	}
@@ -102,6 +110,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 * @param data {Object} The init data for area
 	 * @api private
 	 */
+	//配置数据信息
 	function configData(data){
 		data.skch = skch;
 		data.gd = gd;
