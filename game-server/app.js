@@ -65,7 +65,7 @@ app.configure('production|development', function () {
 
     //mysql数据库连接配置，将被dao-pool对象池调用去连接数据库
     app.loadConfig('mysql', app.getBase() + '/../shared/config/mysql.json');
-    app.filter(pomelo.filters.timeout());  //全局启用超时过滤，意思是所有服务器都启用超时服务
+    app.filter(pomelo.filters.timeout());  //全局启用超时过滤，意思是所有后端服务器都启用超时服务
 
     /*高可用插件
      // master high availability
