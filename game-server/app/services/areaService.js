@@ -13,7 +13,7 @@ var maps = {};
 
 var exp = module.exports;
 
-//入口为app，服务器开启即调用
+//入口为app，服务器开启即执行了这里的init，设置场景权重，为每个场景配置tiled maps地图，Key为场景id
 exp.init = function(){
   var areas = dataApi.area.all(); //dataApi由app提供
 
@@ -31,6 +31,7 @@ exp.init = function(){
  * Proxy for map, get born place for given map
  * @api public
  */
+//加入tiled maps地图后，就可以通过场景id，获取tiled maps地图的  出生地
 exp.getBornPlace = function(sceneId){
   return maps[sceneId].getBornPlace();
 };
@@ -39,6 +40,7 @@ exp.getBornPlace = function(sceneId){
  * Proxy for map, get born point for given map
  * @api public
  */
+//通过场景id获取  tiled maps地图的 出生点
 exp.getBornPoint = function(sceneId){
   return maps[sceneId].getBornPoint();
 };
@@ -49,7 +51,7 @@ exp.getBornPoint = function(sceneId){
  * @param cb {funciton} Call back funciton
  * @api public
  */
-//切换地图，更新session
+//切换场景，更新session
 exp.changeArea = function(args, session, cb) {
   var app = pomelo.app;
   var area = session.area;
@@ -59,20 +61,21 @@ exp.changeArea = function(args, session, cb) {
   var player = area.getPlayer(playerId);
   var frontendId = args.frontendId;
 
+  //要切换的场景 对应的场景数据
   var targetInfo = dataApi.area.findById(target);
 
   if(targetInfo.type === AreaType.SCENE){
     area.removePlayer(playerId);
 
-    var pos = this.getBornPoint(target);
+    var pos = this.getBornPoint(target); //获取目标场景出生点
 
-    player.areaId = target;
+    player.areaId = target;  //修改角色场景id为目标场景id
     player.isInTeamInstance = false;
     player.instanceId = 0;
     player.x = pos.x;
     player.y = pos.y;
     utils.myPrint("1 ~ player.teamId = ", player.teamId);
-    userDao.updatePlayer(player, function(err, success) {
+    userDao.updatePlayer(player, function(err, success) {   //将更新的角色信息同步到数据库
       if(err || !success) {
         err = err || 'update player failed!';
         utils.invokeCallback(cb, err);
