@@ -17,7 +17,7 @@ var app = pomelo.createApp();
 app.set('name', 'lord of pomelo');
 
 app.configure('production|development', function () {
-    app.before(pomelo.filters.toobusy());
+    app.before(pomelo.filters.toobusy());  //接口访问限制。超时过滤处理
     app.enable('systemMonitor');
 
     app.filter(pomelo.filters.time()); //开启conn日志，对应pomelo-admin模块下conn request
@@ -87,7 +87,7 @@ app.configure('production|development', 'auth', function () {
 // Configure for area server  场景服务器配置
 app.configure('production|development', 'area', function () {
     
-    //全局调用pomelo内置过滤器
+    //发送area服务器的msg采用做序列化请求
     app.filter(pomelo.filters.serial());
     
     //app.before（）只调用参数工厂函数里面的before； app.filter（）调用参数的filter、before、after；同理app.after（）只调用after
@@ -101,12 +101,13 @@ app.configure('production|development', 'area', function () {
         instancePool.init(require('./config/instance.json'));
         app.areaManager = instancePool;
     } else {
-        //场景配置的读取入口。(/config/data/area.json--场景数据，包含了对应地图路径，是地图读取入口）
+        //场景配置的读取入口。[执行场景初始化代入场景数据]   (/config/data/area.json--场景数据，包含了对应地图路径，是地图读取入口）
         scene.init(dataApi.area.findById(server.area));
+        //然后将初始化过的场景加入app上下文
         app.areaManager = scene;
     }
 
-    //Init areaService
+    //Init areaService 执行场景服务初始化
     areaService.init();
 });
 
