@@ -91,7 +91,7 @@ app.configure('production|development', 'area', function () {
     app.filter(pomelo.filters.serial());
     
     //app.before（）只调用参数工厂函数里面的before； app.filter（）调用参数的filter、before、after；同理app.after（）只调用after
-    //PS：过滤器执行顺序，先filter，然后before，然后服务器处理，再然后after，再然后把处理数据返回客户端
+    //PS：过滤器执行顺序，globalBeforeFilter -> 前端服务器 -> beforeFilter -> 后端服务器 -> afterFilter -> globalAfterFilter，再然后把处理数据返回客户端
     app.before(playerFilter());  
 
     //Load scene server and instance server
