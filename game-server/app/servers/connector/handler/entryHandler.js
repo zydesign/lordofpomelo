@@ -31,6 +31,7 @@ pro.entry = function(msg, session, next) {
 	var token = msg.token, self = this;
 
 	if(!token) {
+		//如果token不存在，默认的error handler处理error，并返回客户端的响应
 		next(new Error('invalid entry request: empty token'), {code: Code.FAIL});
 		return;
 	}
@@ -51,6 +52,7 @@ pro.entry = function(msg, session, next) {
 			}
 
 			if(!user) {
+				//如果user不存在，不处理错误，返回客户端的响应
 				next(null, {code: Code.ENTRY.FA_USER_NOT_EXIST});
 				return;
 			}
