@@ -111,7 +111,7 @@ app.configure('production|development', 'area', function () {
     areaService.init();
 });
 
-//管理服务器配置
+//管理服务器配置，主要是增加，删除副本area服务器
 app.configure('production|development', 'manager', function () {
     
     //监听增加，删除服务事件
