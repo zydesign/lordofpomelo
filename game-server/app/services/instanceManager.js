@@ -6,13 +6,17 @@ var logger = require('pomelo-logger').getLogger(__filename);
 var INSTANCE_SERVER = 'area';
 
 //The instance map, key is instanceId, value is serverId
+//储存area场景的instance服务器id
 var instances = {};
 
 //All the instance servers
+//储存instance服务器信息
 var instanceServers = [];
 
 var exp = module.exports;
 
+//app开启了服务器事件监听，如果manager.remote.instanceRemote.create执行，这里的addServers也会被执行
+//ps:参数是固定的，就是服务器列表
 exp.addServers = function(servers){
   for(var i = 0; i < servers.length; i++){
     var server = servers[i];
@@ -23,6 +27,7 @@ exp.addServers = function(servers){
   }
 };
 
+//解析同上
 exp.removeServers = function(servers){
   for(var i = 0; i < servers.length; i++){
     var server = servers[i];
@@ -35,6 +40,7 @@ exp.removeServers = function(servers){
   logger.info('remove servers : %j', servers);
 };
 
+//
 exp.getInstance = function(args, cb){
   //The key of instance
   var instanceId = args.areaId + '_' + args.id;
@@ -47,7 +53,7 @@ exp.getInstance = function(args, cb){
 
   var app = pomelo.app;
 
-  //Allocate a server id
+  //Allocate a server id  获取当前的逻辑服务器id
   var serverId = getServerId();
 
   //rpc invoke
@@ -61,6 +67,7 @@ exp.getInstance = function(args, cb){
     }]
   };
 
+  //相当于pomelo.app.rpc.area.remote.areaRemote.create（）
   app.rpcInvoke(serverId, params, function(err, result){
     if(!!err) {
       console.error('create instance error!');
