@@ -21,7 +21,7 @@ var Handler = function(app) {
 
 /**
  * Player create a team, and response the result information : success(1)/failed(0)
- *
+ * 玩家创建队伍，并返回成功与否，成功1  失败0
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
@@ -40,14 +40,18 @@ Handler.prototype.createTeam = function(msg, session, next) {
   }
 
   // if the player is already in a team, can't create team
+  // 玩家已在队伍中，不能创建
   if(player.teamId !== consts.TEAM.TEAM_ID_NONE) {
     logger.warn('The request(createTeam) is illegal, the player is already in a team : msg = %j.', msg);
     next();
     return;
   }
 
+  //队伍id
   var tmpIdx = Math.floor((Math.random() * this.teamNameArr.length) + 1);
+  //通过队伍id生成队伍
   var teamName = this.teamNameArr[tmpIdx] ? this.teamNameArr[tmpIdx].teamName : consts.TEAM.DEFAULT_NAME;
+  //获取当前服务器id
   var backendServerId = this.app.getServerId();
   var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   var playerInfo = player.toJSON4TeamMember();
