@@ -22,7 +22,7 @@ TeamRemote.prototype.canCreateGameCopy = function(args, cb){
   utils.invokeCallback(cb, null, result);
 };
 
-// create a new team
+// create a new team 由teamHandler.js访问这个函数
 TeamRemote.prototype.createTeam = function(args, cb) {
   utils.myPrint('TeamRemote ~ createTeam is running ...typeof args = ', typeof args);
   utils.myPrint('args = ', args);
