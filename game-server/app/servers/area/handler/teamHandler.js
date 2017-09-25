@@ -33,6 +33,7 @@ Handler.prototype.createTeam = function(msg, session, next) {
   utils.myPrint('Handler ~ createTeam is running ... ~ playerId = ', playerId);
   var player = area.getPlayer(playerId);
 
+  //角色不存在
   if(!player) {
     logger.warn('The request(createTeam) is illegal, the player is null : msg = %j.', msg);
     next();
@@ -47,9 +48,9 @@ Handler.prototype.createTeam = function(msg, session, next) {
     return;
   }
 
-  //队伍id
+  // 队伍id，队伍列表里面任意id
   var tmpIdx = Math.floor((Math.random() * this.teamNameArr.length) + 1);
-  //通过队伍id生成队伍
+  //通过队伍id获取队伍名称
   var teamName = this.teamNameArr[tmpIdx] ? this.teamNameArr[tmpIdx].teamName : consts.TEAM.DEFAULT_NAME;
   //获取当前服务器id
   var backendServerId = this.app.getServerId();
