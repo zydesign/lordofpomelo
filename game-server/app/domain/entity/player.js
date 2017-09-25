@@ -524,7 +524,7 @@ Player.prototype.toJSON = function() {
 
 /**
  * Parse String to json for joining a team.
- *
+ * 玩家加入的队伍信息
  * @return {Object}
  * @api public
  */
@@ -539,7 +539,7 @@ Player.prototype.toJSON4Team = function() {
 
 /**
  * Parse String to json for team member.
- *
+ * 该玩家作为队员的信息
  * @return {Object}
  * @api public
  */
@@ -557,7 +557,7 @@ Player.prototype.toJSON4TeamMember = function() {
       level: this.level,
       teamId: this.teamId,
       isCaptain: this.isCaptain,
-      instanceId: this.instanceId // game copy id
+      instanceId: this.instanceId // game copy id 副本id
     }
   };
 };
