@@ -8,6 +8,7 @@ var channelUtil = require('../../util/channelUtil');
 var Event = require('../../consts/consts').Event;
 
 // max member num in a team
+// 队伍成员最大数
 var MAX_MEMBER_NUM = 3;
 ///////////////////////////////////////////////////////
 function Team(teamId){
@@ -15,15 +16,17 @@ function Team(teamId){
   this.teamName = consts.TEAM.DEFAULT_NAME;
   this.playerNum = 0;
   this.captainId = 0;
-  this.playerDataArray = new Array(MAX_MEMBER_NUM);
+  this.playerDataArray = new Array(MAX_MEMBER_NUM); //元素个数为3的数组
   // team channel, push msg within the team
   this.channel = null;
 
   var _this = this;
   // constructor
   var init = function()	{
+    //将团队id写入属性this.teamId
     _this.teamId = teamId;
     var arr = _this.playerDataArray;
+    //给玩家数据数组每一个元素配置一个初始玩家队员信息，都是0或null，而0就表示还没有玩家
     for(var i = 0; i < arr.length; ++i) {
       arr[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
         userId: consts.TEAM.USER_ID_NONE, serverId: consts.TEAM.SERVER_ID_NONE,
@@ -35,6 +38,7 @@ function Team(teamId){
   init();
 }
 
+//创建队伍频道
 Team.prototype.createChannel = function() {
   if(this.channel) {
     return this.channel;
@@ -47,6 +51,7 @@ Team.prototype.createChannel = function() {
   return null;
 };
 
+//添加玩家到队伍频道中，返回true或false
 Team.prototype.addPlayer2Channel = function(data) {
   if(!this.channel) {
     return false;
@@ -58,6 +63,7 @@ Team.prototype.addPlayer2Channel = function(data) {
   return false;
 };
 
+//从队伍频道中移除玩家， 返回true或false
 Team.prototype.removePlayerFromChannel = function(data) {
   if(!this.channel) {
     return false;
@@ -70,17 +76,24 @@ Team.prototype.removePlayerFromChannel = function(data) {
   return false;
 };
 
+//队伍对象添加玩家，返回true或false
 function doAddPlayer(teamObj, data, isCaptain) {
   isCaptain = isCaptain || false;
+  //玩家数据数组
   var arr = teamObj.playerDataArray;
+  //遍历玩家数据组，如果数据对象没有玩家，则赋值，并返回ture，不会继续遍历下去；也就是只能赋值一份玩家数据。如果遍历完数组都没有true，那么返回false
   for(var i in arr) {
     if(arr[i].playerId === consts.TEAM.PLAYER_ID_NONE && arr[i].areaId === consts.TEAM.AREA_ID_NONE) {
+      //参数的玩家数据playerData的teamObj赋值
       data.playerInfo.playerData.teamId = teamObj.teamId;
       if (isCaptain) {
+        //队伍名
         teamObj.teamName = data.teamName;
+        //玩家数据的isCaptain
         data.playerInfo.playerData.isCaptain = consts.TEAM.YES;
       }
       utils.myPrint('data.playerInfo = ', JSON.stringify(data.playerInfo));
+      //队伍的玩家数据，（数组的单个元素）
       arr[i] = {playerId: data.playerId, areaId: data.areaId, userId: data.userId,
         serverId: data.serverId, backendServerId: data.backendServerId,
         playerData: data.playerInfo.playerData};
