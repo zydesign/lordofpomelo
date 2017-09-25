@@ -8,12 +8,13 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 var exp = module.exports;
 
-// global team container(teamId:teamObj)
+// global team container(teamId:teamObj)   全局队伍容器
 var gTeamObjDict = {};
-// global team id
+// global team id    全局队伍id
 var gTeamId = 0;
 
 // create new team, add the player(captain) to the team
+// 新建一个队伍，增加玩家队长到队伍中
 exp.createTeam = function(data) {
   var teamObj = new Team(++gTeamId);
   var result = teamObj.addPlayer(data, true);
