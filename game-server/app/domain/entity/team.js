@@ -11,19 +11,22 @@ var Event = require('../../consts/consts').Event;
 // 队伍成员最大数
 var MAX_MEMBER_NUM = 3;
 ///////////////////////////////////////////////////////
+//通过队伍id来实例化这个工厂函数
 function Team(teamId){
   this.teamId = 0;
-  this.teamName = consts.TEAM.DEFAULT_NAME;
-  this.playerNum = 0;
-  this.captainId = 0;
-  this.playerDataArray = new Array(MAX_MEMBER_NUM); //元素个数为3的数组
+  this.teamName = consts.TEAM.DEFAULT_NAME; //默认队伍名为空
+  this.playerNum = 0;  //玩家数量
+  this.captainId = 0;  //队长id
+  this.playerDataArray = new Array(MAX_MEMBER_NUM); //元素个数为3的数组，可以存3个玩家数据
   // team channel, push msg within the team
-  this.channel = null;
+  this.channel = null;  //该队伍频道
 
   var _this = this;
+  
   // constructor
+  //初始化就是给工厂函数属性填数值
   var init = function()	{
-    //将团队id写入属性this.teamId
+    //参数写入this.teamId
     _this.teamId = teamId;
     var arr = _this.playerDataArray;
     //给玩家数据数组每一个元素配置一个初始玩家队员信息，都是0或null，而0就表示还没有玩家
@@ -51,7 +54,7 @@ Team.prototype.createChannel = function() {
   return null;
 };
 
-//添加玩家到队伍频道中，返回true或false
+//添加玩家to队伍频道中，返回true或false
 Team.prototype.addPlayer2Channel = function(data) {
   if(!this.channel) {
     return false;
@@ -76,7 +79,7 @@ Team.prototype.removePlayerFromChannel = function(data) {
   return false;
 };
 
-//队伍对象添加玩家，返回true或false
+//声明一个添加玩家的函数，返回true或false
 function doAddPlayer(teamObj, data, isCaptain) {
   isCaptain = isCaptain || false;
   //玩家数据数组
@@ -104,43 +107,54 @@ function doAddPlayer(teamObj, data, isCaptain) {
   return false;
 }
 
+//队伍加入一个玩家，并确定是不是队长（data参数是area服务器teamHandler.js提供）
 Team.prototype.addPlayer = function(data, isCaptain) {
   isCaptain = isCaptain || false;
+  //判断参数data是否为对象
   if (!data || typeof data !== 'object') {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
+  //判断参数data没每一个属性是否有值
   for (var i in data) {
     if(!data[i] || data[i] <= 0) {
       return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
     }
   }
 
+  //判断队伍是否有坐标
   if(!this.isTeamHasPosition()) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.NO_POSITION;
   }
 
+  //判断该玩家是否已经有队伍了
   if(this.isPlayerInTeam(data.playerId)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.ALREADY_IN_TEAM;
   }
 
+  //执行添加玩家函数，并用返回结果作为判断条件
   if(!doAddPlayer(this, data, isCaptain)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
+  //在执行添加玩家操作后，判断玩家是否加入队伍了
   if(!this.isPlayerInTeam(data.playerId)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
+  //执行添加玩家后，是否也加入到队伍频道了
   if(!this.addPlayer2Channel(data)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
+  //队伍最大限制
   if(this.playerNum < MAX_MEMBER_NUM) {
     this.playerNum++;
   }
 
+  //最后更新队伍信息
   this.updateTeamInfo();
 
+  //最后返回成功码
   return consts.TEAM.JOIN_TEAM_RET_CODE.OK;
 };
 
