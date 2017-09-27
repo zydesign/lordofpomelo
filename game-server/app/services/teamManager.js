@@ -14,10 +14,10 @@ var gTeamObjDict = {};
 var gTeamId = 0;
 
 // create new team, add the player(captain) to the team
-// 新建一个队伍，增加玩家队长到队伍中
+// 新建一个队伍，增加玩家队长到队伍中，（manager服务器teamRemote.js使用这个函数，参数是area服务器teamHandler.js提供）
 exp.createTeam = function(data) {
-  var teamObj = new Team(++gTeamId);
-  var result = teamObj.addPlayer(data, true);
+  var teamObj = new Team(++gTeamId);  //队伍对象为一个{新建的队伍实例}
+  var result = teamObj.addPlayer(data, true); //队伍实例通过参数增加一个玩家，true就表示创建的玩家是队长
   if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
     teamObj.setCaptainId(data.playerId);
     gTeamObjDict[teamObj.teamId] = teamObj;
