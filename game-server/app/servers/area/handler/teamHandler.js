@@ -58,11 +58,14 @@ Handler.prototype.createTeam = function(msg, session, next) {
   var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR; //加入队伍的系统错误码
   var playerInfo = player.toJSON4TeamMember();  //通过玩家模块获取玩家队伍信息
   
-  //用于访问manager服务器的参数args
+  
+  //用于访问manager服务器的参数args，其实是队员信息，传递给team实例的addPlayer（）使用
+  //args为{添加队员参数}，包含的playerInfo为{队员信息}，playerInfo又包含有playerData为{玩家信息}
   var args = {teamName: teamName, playerId: playerId, areaId: area.areaId, userId: player.userId,
     serverId: player.serverId, backendServerId: backendServerId, playerInfo: playerInfo};
   
-  //rpc到manager服务器
+  
+  //rpc到manager服务器，创建一支队伍（建队and添加玩家队长）
   this.app.rpc.manager.teamRemote.createTeam(session, args,
     function(err, ret) {
       utils.myPrint("ret.result = ", ret.result);
@@ -71,19 +74,22 @@ Handler.prototype.createTeam = function(msg, session, next) {
       var teamId = ret.teamId;
       utils.myPrint("result = ", result);
       utils.myPrint("teamId = ", teamId);
-    //玩家可以加入队伍，而且队伍存在
+    
+    //判断RPC返回的结果是否建队成功
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && teamId > consts.TEAM.TEAM_ID_NONE) {
+        //判断teamId是否为真，并让player实例执行添加teamId属性
         if(!player.joinTeam(teamId)) {
           result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
         }
       }
       utils.myPrint("player.teamId = ", player.teamId);
-    //玩家可以加入队伍，而且玩家加入了队伍
+    
+    //RPC返回成功，而且player实例也添加了teamId属性
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && player.teamId > consts.TEAM.TEAM_ID_NONE) {
-        //给以队长
+        //player实例添加队长属性
         player.isCaptain = consts.TEAM.YES;
         var ignoreList = {};
-        //广播消息给灯塔内的玩家
+        //广播消息给灯塔内的玩家观察者
         messageService.pushMessageByAOI(area,
           {
             route: 'onTeamCaptainStatusChange',
