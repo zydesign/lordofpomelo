@@ -34,6 +34,7 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
+//对二级域名auth_success的访问，返回响应res渲染显示出网页结果来。【PS:auth是文件名，存在views文件下面】
 app.get('/auth_success', function(req, res) {
   if (req.session.userId) {
     var token = Token.create(req.session.userId, Date.now(), secret);
