@@ -20,10 +20,12 @@ app.configure(function() {
   app.set('view engine', 'ejs');
   app.set('views', __dirname + '/views');
   app.set('view options', {layout: false});
+    //设置基本路径为public
   app.set('basepath', publicPath);
 });
 
 app.configure('development', function(){
+    //pubic文件夹的静态文件的访问
   app.use(express.static(publicPath));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
