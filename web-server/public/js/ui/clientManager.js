@@ -91,7 +91,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
         return;
       }
 
-      //点击登录按钮时，通过用户名和密码，请求登录，返回data进行操作
+      //点击登录按钮时，通过req{用户名和密码}，访问二级域名/login，返回data进行操作
       $.post(httpHost + 'login', {username: username, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username or password is invalid!');
