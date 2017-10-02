@@ -13,7 +13,11 @@ var sync = require('pomelo-sync-plugin');
 /**
  * Init app for client
  */
+
+// 【最主要的服务器启动函数】pomelo.createApp()这里执行了pomelo模块的方法，创建了应用环境app
+// （设置开发环境/产品环境；加载主机；加载所有服务器；加载进程参数；配置log；加载生命周期等等）
 var app = pomelo.createApp();
+
 app.set('name', 'lord of pomelo');
 
 app.configure('production|development', function () {
