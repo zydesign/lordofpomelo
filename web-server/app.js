@@ -25,7 +25,7 @@ app.configure(function() {
 });
 
 app.configure('development', function(){
-    //pubic文件夹的静态文件的访问
+    //配置静态文件根目录public
   app.use(express.static(publicPath));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
@@ -36,7 +36,9 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-//对二级域名auth_success的访问时，立即返回响应res渲染显示出网页结果来。【PS:auth是文件名，存在views文件下面】
+//GET，POST，PUT，DELETE就对应着对这个资源的查，改，增，删4个操作
+
+//对二级域名auth_success的访问时，该网页为客户端，向服务器查询，立即返回响应res渲染显示出网页结果来。【PS:auth是文件名，存在views文件下面】
 app.get('/auth_success', function(req, res) {
   if (req.session.userId) {
     var token = Token.create(req.session.userId, Date.now(), secret);
