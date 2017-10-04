@@ -12,11 +12,13 @@ var publicPath = __dirname +  '/public';
 //app是开启web服务器的总接口，主要运行clientManager的主入口函数，和配置服务器环境
 app.configure(function() {
   app.use(express.methodOverride());
-  app.use(express.bodyParser());
-  app.use(express.cookieParser());
+  app.use(express.bodyParser());                           //解析请求体
+  app.use(express.cookieParser());                         //解析cookie
   app.use(express.session({ secret: "keyboard cat" }));
   app.use(everyauth.middleware());
   app.use(app.router);
+ 
+  //设置一些属性值
   app.set('view engine', 'ejs');
   app.set('views', __dirname + '/views');
   app.set('view options', {layout: false});
@@ -24,12 +26,14 @@ app.configure(function() {
   app.set('basepath', publicPath);
 });
 
+//开发环境
 app.configure('development', function(){
     //配置静态文件根目录public
   app.use(express.static(publicPath));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
+//产品环境
 app.configure('production', function(){
   var oneYear = 31557600000;
   app.use(express.static(publicPath, { maxAge: oneYear }));
@@ -38,7 +42,9 @@ app.configure('production', function(){
 
 //GET，POST，PUT，DELETE就对应着对这个资源的查，改，增，删4个操作
 
-//对二级域名auth_success的访问时，该网页为客户端，向服务器查询，立即返回响应res渲染显示出网页结果来。【PS:auth是文件名，存在views文件下面】
+//get与post的区别在于，get请求直接被嵌入到url网址？号后面；而post必须是外置的body请求体
+
+//对二级域名auth_success的访问时，返回响应res渲染显示出网页结果来。【PS:auth是文件名，存在views文件下面】
 app.get('/auth_success', function(req, res) {
   if (req.session.userId) {
     var token = Token.create(req.session.userId, Date.now(), secret);
