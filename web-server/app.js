@@ -28,7 +28,7 @@ app.configure(function() {
 
 //开发环境
 app.configure('development', function(){
-    //配置静态文件根目录public
+    //配置静态文件根目录public;这个中间件让主页客户端登录首页时【运行index.html客户端总入口】
   app.use(express.static(publicPath));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
