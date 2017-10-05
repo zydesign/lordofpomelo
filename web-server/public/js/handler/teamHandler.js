@@ -27,21 +27,21 @@ __resources__["/teamHandler.js"] = {meta: {mimetype: "application/javascript"}, 
   }
 
   /**
-   * Create team action.
+   * Create team action. 创建队伍
    */
   function createTeam() {
     pomelo.notify("area.teamHandler.createTeam");
   }
 
   /**
-   * Leave team action.
+   * Leave team action. 离开队伍
    */
   function leaveTeam(params) {
     pomelo.notify("area.teamHandler.leaveTeam", params);
   }
 
   /**
-   * Disband team action.
+   * Disband team action. 解散队伍
    */
   function disbandTeam(params) {
     pomelo.notify("area.teamHandler.disbandTeam", params);
