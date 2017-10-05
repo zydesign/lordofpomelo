@@ -1,9 +1,11 @@
 __resources__["/switchManager.js"] = {meta: {mimetype: "application/javascript"}, data: function(exports, require, module, __filename, __dirname) {
     
+//切换面板管理器
+    
 /**
  * Default view
  */
-var curViewNameId = "loginPanel";
+var curViewNameId = "loginPanel";  //默认初始面板为登录面板
 
 exports.selectView = selectView;
 
