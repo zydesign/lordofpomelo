@@ -9,7 +9,7 @@ var Filter = function() {
 };
 
 /**
- * Area filter
+ * Area filter 只要客户端直接访问场景服务器都说明有角色在场景服务器中，因为player进入场景是通过connector.entryHandler.entry完成的
  */
 Filter.prototype.before = function(msg, session, next){
 	var area = pomelo.app.areaManager.getArea(session.get('instanceId'));
