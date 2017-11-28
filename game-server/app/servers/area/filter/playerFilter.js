@@ -19,6 +19,7 @@ Filter.prototype.before = function(msg, session, next){
 	if(!player){
 		var route = msg.__route__;
 
+		//如果玩家不在场景，那么路由就是加载地图，或者进入场景
 		if(route.search(/^area\.resourceHandler/i) == 0 || route.search(/enterScene$/i) >= 0){
 			//这里next传递（null，msg）
 			next();
