@@ -8,12 +8,12 @@ var id = 1;
 //move、Revive动作继承这个action的时候，提供opt参数
 var Action = function(opts){
 	this.data = opts.data;
-	this.id = opts.id || id++;
+	this.id = opts.id || id++;  //复活的实体对象ID
 	this.type = opts.type || 'defaultAction';  //动作类型
 	
 	this.finished = false; //完成
 	this.aborted = false;  //停止
-	this.singleton = false || opts.singleton;  //单个动作
+	this.singleton = false || opts.singleton;  //独立动作
 };
 
 /**
