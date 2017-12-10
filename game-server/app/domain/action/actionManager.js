@@ -17,16 +17,17 @@ var ActionManager = function(opts){
 	this.actionMap = {};
 	
 	//The action queue, default size is 10000, all action in the action queue will excute in the FIFO order
-	//行动队列,默认大小是10000,所有行动的行动队列将执行 FIFO秩序
+	//行动队列,默认大小是10000,所有行动的行动队列将执行 FIFO秩序，新加入的动作放在第一个
 	this.actionQueue = new Queue(this.limit);
 }; 
 
 /**
  * Add action 
  * @param {Object} action  The action to add, the order will be preserved
- * 先把动作添加都动作图阵里面，并返回排列过的数组
+ * 加入一个非独立动作。先把动作添加都动作图阵里面，并返回排列过的数组
  */
 ActionManager.prototype.addAction = function(action){
+	//独立动作是不会被加入到动作图阵的，如果是独立动作就会return
 	if(action.singleton) {
 		this.abortAction(action.type, action.id);
 	}
@@ -42,7 +43,7 @@ ActionManager.prototype.addAction = function(action){
  * abort an action, the action will be canceled and not excute
  * @param {String} type Given type of the action
  * @param {String} id The action id
- *中止一个动作，该动作将被取消，并删除
+ *中止一个动作，该动作将被取消，并删除；（该动作必须是动作图阵中的，独立动作不会加入图阵，直接退出）
  */
 ActionManager.prototype.abortAction = function(type, id){
 	if(!this.actionMap[type] || !this.actionMap[type][id]){
@@ -68,13 +69,13 @@ ActionManager.prototype.abortAllAction = function(id){
 /**
  * Update all action
  * @api public
- *更新所有的动作
+ *更新所有的动作，被更新的动作移出队列和动作图阵
  */
 ActionManager.prototype.update = function(){
 	var length = this.actionQueue.length;
 	
 	for(var i = 0; i < length; i++){
-		//pop() 方法用于删除并返回数组的最后一个元素
+		//pop() 方法用于删除数组最后一个并返回这个元素
 		var action = this.actionQueue.pop();
 	
 		if(action.aborted){
@@ -82,6 +83,8 @@ ActionManager.prototype.update = function(){
 		}
 			
 		action.update();
+		
+		//动作被更新后，移出动作图阵
 		if(!action.finished){
 			this.actionQueue.push(action);
 		}else{
