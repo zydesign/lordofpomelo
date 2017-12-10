@@ -11,9 +11,9 @@ var logger = require('pomelo-logger').getLogger(__filename);
 var Move = function(opts){
 	opts.type = 'move';
 	opts.id = opts.entity.entityId;
-	opts.singleton = true;
+	opts.singleton = true;  //移动动作是独立行为
 
-	 //上面是修改opt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型,
+	 //上面是修改opt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型链,
 	Action.call(this, opts); 
 	this.entity = opts.entity;
 	this.area = this.entity.area;
@@ -33,7 +33,7 @@ util.inherits(Move, Action);//让move继承action函数的原型链
  */
 Move.prototype.update = function(){
 	this.tickNumber++;
-	var time = Date.now()-this.time;    //刷新的时间间隔,单位毫秒
+	var time = Date.now()-this.time;    //单次刷新的时间间隔,单位毫秒
 	var speed = this.speed;
 	if(speed > 600) {
 		logger.warn('move speed too fast : %j', speed);
@@ -43,10 +43,11 @@ Move.prototype.update = function(){
 	var index = this.index;
 	var travelDistance = speed*time/1000;   //单次刷新能移动的距离
 	var oldPos = {x : this.pos.x, y : this.pos.y};
-	var pos = oldPos;         //旧坐标
-	var dest = path[index];   //新坐标
+	var pos = oldPos;         //旧坐标，没移动前的坐标
+	var dest = path[index];   //新坐标，要移动到的坐标
 	var distance = getDis(this.pos, dest);  //根据两个坐标计算的距离
 
+	//使用循环语句，完成一次刷新距离
 	while(travelDistance > 0){
 		if(distance <= travelDistance){   //如果单次刷新能够完成移动距离,去运算下一个点
 			travelDistance = travelDistance - distance;
@@ -61,8 +62,8 @@ Move.prototype.update = function(){
 				break;
 			}
 
-			dest = path[index];
-			distance = getDis(pos, dest);
+			dest = path[index];   //上面的index++，所以这个是下一个坐标
+			distance = getDis(pos, dest);  //下一次坐标要移动的距离
 		}else{
 			distance = distance - travelDistance; //点击新坐标后,单个tick内剩余未完成的距离
 			pos = getPos(pos, dest, distance); //计算出单次刷新移动到的坐标
@@ -73,6 +74,7 @@ Move.prototype.update = function(){
 	this.pos = pos;
 	this.index = index;
 
+	//update一次，实体移动后的坐标
 	this.entity.x = Math.floor(pos.x);
 	this.entity.y = Math.floor(pos.y);
 
