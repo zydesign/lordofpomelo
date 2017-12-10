@@ -19,7 +19,7 @@ var Action = function(opts){
 /**
  * Update interface, default update will do nothing, every tick the update will be invoked
  * @api public
- *更新接口，默认更新不会执行任何操作，每次更新都会被调用
+ *更新接口，默认主类不会执行任何更新操作，而move、Revive有自己的update
  */
 Action.prototype.update = function(){
 };
