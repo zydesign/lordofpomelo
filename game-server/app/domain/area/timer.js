@@ -11,6 +11,7 @@ module.exports = Timer;
 
 //实例area场景，立刻执行该run服务
 Timer.prototype.run = function () {
+  //开启定时器：间隔100毫秒执行一次tick函数
   this.interval = setInterval(this.tick.bind(this), this.interval);
 };
 
@@ -18,30 +19,35 @@ Timer.prototype.close = function () {
   clearInterval(this.interval);
 };
 
+
+//tick函数将会在开启场景时立刻定时执行
 Timer.prototype.tick = function() {
   var area = this.area;
 
-  //Update mob zones
+  //Update mob zones  定时刷新怪物
   for(var key in area.zones){
     area.zones[key].update();
   }
 
-  //Update all the items
+  //Update all the items  定时刷新物品
   for(var id in area.items) {
     var item = area.entities[id];
     item.update();
 
+    //如果物品消失，场景频道广播删除物品消息
     if(item.died) {
       area.channel.pushMessage('onRemoveEntities', {entities: [id]});
       area.removeEntity(id);
     }
   }
 
-  //run all the action
+  //run all the action 定时更新所有动作
   area.actionManager.update();
 
+  //定时更新ai
   area.aiManager.update();
 
+  //定时更新巡逻
   area.patrolManager.update();
 };
 
