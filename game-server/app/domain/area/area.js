@@ -50,6 +50,7 @@ var Instance = function(opts){
     interval : 100
   });
 
+  //一旦实例了工厂函数，里面执行各种服务
   this.start();
 };
 
