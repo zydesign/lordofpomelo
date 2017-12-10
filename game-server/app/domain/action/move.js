@@ -6,7 +6,7 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 /**
  * Move action, which is used to preserve and update user position
- * 移动动作，用于保存和更新用户位置
+ * 移动动作，用于保存和更新用户位置，并把移动位置传递给aoi服务
  */
 var Move = function(opts){
 	opts.type = 'move';
@@ -47,7 +47,7 @@ Move.prototype.update = function(){
 	var dest = path[index];   //新坐标，要移动到的坐标
 	var distance = getDis(this.pos, dest);  //根据两个坐标计算的距离
 
-	//使用循环语句，完成一次刷新距离
+	//使用循环语句，完成一次刷新的移动距离
 	while(travelDistance > 0){
 		if(distance <= travelDistance){   //如果单次刷新能够完成移动距离,去运算下一个点
 			travelDistance = travelDistance - distance;
@@ -74,7 +74,7 @@ Move.prototype.update = function(){
 	this.pos = pos;
 	this.index = index;
 
-	//update一次，实体移动后的坐标
+	//update一次，实体移动后的坐标（给出了最后移动坐标，也要沿着路径坐标走）
 	this.entity.x = Math.floor(pos.x);
 	this.entity.y = Math.floor(pos.y);
 
