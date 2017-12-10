@@ -9,6 +9,7 @@ var Timer = function(opts){
 
 module.exports = Timer;
 
+//实例area场景，立刻执行该run服务
 Timer.prototype.run = function () {
   this.interval = setInterval(this.tick.bind(this), this.interval);
 };
