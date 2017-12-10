@@ -26,6 +26,7 @@ handler.attack = function(msg, session, next) {
 	}
 
 	session.area.timer.abortAction('move', player.entityId);
+	//只需给角色添加目标，ai系统就会获取目标，自动循环攻击
 	player.target = target.entityId;
 
 	// next();
