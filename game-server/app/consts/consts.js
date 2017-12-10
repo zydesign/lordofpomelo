@@ -88,6 +88,7 @@ module.exports = {
 
   /**
    * Traverse npc, the key is the npc id, the value is the taret's area id.
+   * 跳转地图NPC
    */
   TraverseNpc: {
     301 : 2,
