@@ -11,6 +11,7 @@ pro.getBrain = function(type, blackboard) {
 	//TODO: mock data
 	// 如果类型既不是autoFight，也不是player，才会执行type = 'tiger'
 	if(type !== 'autoFight' && type !== 'player') {
+		//这里大脑服务将所有怪物类型都归结为tiger类型
 		type = 'tiger';
 	}
 	var brain = this.brains[type];
