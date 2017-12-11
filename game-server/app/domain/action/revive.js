@@ -15,7 +15,7 @@ var Revive = function(opts){
 	this.area = this.entity.area;
 	this.map = opts.map;
 	this.time = opts.reviveTime;  //复活最小时间间隔
-	this.now = Date.now();   //上一次刷新时间
+	this.now = Date.now();   //上一次复活时间
 };
 
 util.inherits(Revive, Action);
@@ -64,7 +64,7 @@ Revive.prototype.update = function(){
 		this.entity.updateTeamMemberInfo();
 	}
 	
-	//储存当前刷新时间
+	//储存当前刷新时间。？？？应该是是复活后才储存吧
 	this.now = time;
 };
 
