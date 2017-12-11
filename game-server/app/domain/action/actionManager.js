@@ -24,14 +24,14 @@ var ActionManager = function(opts){
 /**
  * Add action 
  * @param {Object} action  The action to add, the order will be preserved
- * 加入一个非独立动作。先把动作添加都动作图阵里面，并返回排列过的数组
+ * 加入一个非独立动作。先把动作添加都动作图阵里面，并返回排列过的数组（对象组）
  */
 ActionManager.prototype.addAction = function(action){
-	//独立动作是不会被加入到动作图阵的，如果是独立动作就会return
+	//独立动作是不会被加入到动作图阵的，如果是独立动作就会return（移动move、复活revive是独立动作）
 	if(action.singleton) {
 		this.abortAction(action.type, action.id);
 	}
-		
+	//判断动作组是否存在，没有就新建一个	
 	this.actionMap[action.type] = this.actionMap[action.type]||{};
 	
 	this.actionMap[action.type][action.id] = action;	
@@ -43,7 +43,7 @@ ActionManager.prototype.addAction = function(action){
  * abort an action, the action will be canceled and not excute
  * @param {String} type Given type of the action
  * @param {String} id The action id
- *中止一个动作，该动作将被取消，并删除；（该动作必须是动作图阵中的，独立动作不会加入图阵，直接退出）
+ *中止一个动作，该动作将被取消，并移出动作组；（该动作必须是动作图阵中的，独立动作不会加入图阵，直接退出）
  */
 ActionManager.prototype.abortAction = function(type, id){
 	if(!this.actionMap[type] || !this.actionMap[type][id]){
