@@ -51,11 +51,13 @@ Timer.prototype.tick = function() {
   area.patrolManager.update();
 };
 
-/**
+/** 动作管理部分---------------------------------------------------
  * Add action for area
  * @param action {Object} The action need to add
  * @return {Boolean}
  */
+
+//增加一个动作到动作管理器
 Timer.prototype.addAction = function(action) {
   return this.area.actionManager.addAction(action);
 };
@@ -65,6 +67,7 @@ Timer.prototype.addAction = function(action) {
  * @param type {Number} The type of the action
  * @param id {Id} The id of the action
  */
+//停止一个动作组中的某个动作
 Timer.prototype.abortAction = function(type, id) {
   return this.area.actionManager.abortAction(type, id);
 };
@@ -73,17 +76,20 @@ Timer.prototype.abortAction = function(type, id) {
  * Abort all action for a given id in area
  * @param id {Number}
  */
+//停止动作组的所有动作
 Timer.prototype.abortAllAction = function(id) {
   this.area.actionManager.abortAllAction(id);
 };
 
-/**
+/** ai管理部分--------------------------------------------------------
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
+//给一个实体增加ai
 Timer.prototype.enterAI = function(entityId) {
   var area = this.area;
 
+  //先从巡逻管理中移除，并停止这个动作，然后ai管理器中增加这个角色
   area.patrolManager.removeCharacter(entityId);
   this.abortAction('move', entityId);
   if(!!area.entities[entityId]) {
@@ -91,10 +97,11 @@ Timer.prototype.enterAI = function(entityId) {
   }
 };
 
-/**
+/** 巡逻管理部分---------------------------------------------------------
  * Enter patrol for given entity
  * @param entityId {Number}
  */
+//给实体加入到巡逻系统（先从ai管理中移除，并判断这个实体必须在场景中）
 Timer.prototype.patrol = function(entityId) {
   var area = this.area;
 
@@ -105,13 +112,14 @@ Timer.prototype.patrol = function(entityId) {
   }
 };
 
-/**
+/** aoi管理部分------------------------------------------------------------
  * Update object for aoi
  * @param obj {Object} Given object need to update.
  * @param oldPos {Object} Old position.
  * @param newPos {Object} New position.
  * @return {Boolean} If the update success.
  */
+// 更新对象位置
 Timer.prototype.updateObject = function(obj, oldPos, newPos) {
   return this.area.aoi.updateObject(obj, oldPos, newPos);
 };
@@ -123,6 +131,7 @@ Timer.prototype.updateObject = function(obj, oldPos, newPos) {
  * @param ignoreList {Array} The ignore watchers' list.
  * @return {Array} The qualified watchers id list.
  */
+// 获取观察者uid（这个主要是给观察者广播自己位置的）
 Timer.prototype.getWatcherUids = function(pos, types, ignoreList) {
   var area = this.area;
 
@@ -147,6 +156,7 @@ Timer.prototype.getWatcherUids = function(pos, types, ignoreList) {
  * @param types {Array} Given watcher types.
  * @return {Array} Watchers find by given parameters.
  */
+//获取观察者
 Timer.prototype.getWatchers = function(pos, types) {
   return this.area.aoi.getWatchers(pos, types);
 };
@@ -160,6 +170,7 @@ Timer.prototype.getWatchers = function(pos, types) {
  * @param newRange {Number} The new range of the watcher.
  * @return Boolean If the update is success.
  */
+//更新观察者
 Timer.prototype.updateWatcher = function(watcher, oldPos, newPos, oldRange, newRange) {
   return this.area.aoi.updateWatcher(watcher, oldPos, newPos, oldRange, newRange);
 };
