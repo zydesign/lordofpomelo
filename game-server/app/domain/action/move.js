@@ -29,7 +29,7 @@ util.inherits(Move, Action);//让move继承action函数的原型链
 
 /**
  * Update the move action, it will calculate and set the entity's new position, and update AOI module
- * 【重要】更新移动动作，它将计算并设置实体的新位置，并更新AOI模块
+ * 【重要】更新移动动作，它将计算并设置实体的新位置，并更新观察者信息，并aoi广播消息
  */
 Move.prototype.update = function(){
 	this.tickNumber++;
