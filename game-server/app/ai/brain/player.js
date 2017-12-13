@@ -9,7 +9,7 @@ var If = bt.If;
 var Select = bt.Select;
 var consts = require('../../consts/consts');
 
-//玩家大脑
+//玩家大脑，是一个选择节点：攻击>拾取>对话npc
 
 /**
  * Auto fight brain.
