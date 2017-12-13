@@ -46,7 +46,7 @@ pro.update = function() {
 var genAttackAction = function(blackboard) {
 	//try attack and move to target action
 	
-	//先创建一个尝试并调整攻击节点（选择节点：tryAction>adjustAction）
+	//先创建一个（尝试攻击或调整再攻击）节点（选择节点：tryAction>adjustAction）
 	var attack = new TryAndAdjust({
 		blackboard: blackboard, 
 		//调整
@@ -56,7 +56,8 @@ var genAttackAction = function(blackboard) {
 		//攻击
 		tryAction: new TryAttack({
 			blackboard: blackboard, 
-			////参数bb被改为blackboard，在loop节点里this.loopCond.call(null, this.blackboard)
+			
+			//技能id这个属性并没有被用到
 			getSkillId: function(bb) {
 				//return current skill or normal attack by default
 				return bb.curCharacter.curSkill || 1;
@@ -65,7 +66,7 @@ var genAttackAction = function(blackboard) {
 	});
 
 	//loop attack action
-	//循环条件
+	//循环条件（因为是循环节点的条件，所以bb会被替换成this.blackboard）
 	var checkTarget = function(bb) {
 		//如果黑板的目标id不匹配角色绑定的目标id，这解除目标，返回false作为条件
 		if(bb.curTarget !== bb.curCharacter.target) {
@@ -74,7 +75,7 @@ var genAttackAction = function(blackboard) {
 			return false;
 		}
 
-		//如果黑板目标匹配角色绑定目标，返回黑板目标作为条件
+		//如果黑板目标匹配角色绑定目标，返回结果为黑板目标，也就是循环条件成立------------------bt.RES_WAIT，可以循环攻击 
 		return !!bb.curTarget;
 	};
          
