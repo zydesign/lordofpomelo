@@ -4,7 +4,7 @@ var util = require('util');
 var formula = require('../../consts/formula');
 var consts = require('../../consts/consts');
 
-//该节点用于拾取道具和与NPC对话，移动角色靠近目标
+//该节点用于拾取道具和与NPC对话，调整攻击距离，移动角色靠近目标
 var Action = function(opts) {
 	BTNode.call(this, opts.blackboard);
 };
@@ -44,7 +44,7 @@ pro.doAction = function() {
 		return bt.RES_FAIL;
 	}
 
-	//计算出角色与目标在限制范围内，执行停止移动，返回成功
+	//计算出角色与目标在限制范围内，执行停止移动，调整距离完成，返回成功...............
 	if(formula.inRange(character, target, distance)) {
 		this.blackboard.area.timer.abortAction('move', character.entityId);
 		this.blackboard.distanceLimit = 0;
