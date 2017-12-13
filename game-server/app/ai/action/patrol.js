@@ -21,7 +21,7 @@ pro.doAction = function() {
 	var character = this.blackboard.curCharacter;
 	var area = this.blackboard.area;
 
-	//场景时间管理器执行巡逻函数
+	//场景时间管理器执行巡逻函数（巡逻函数会先把实体从ai管理器中移除，再在巡逻管理器中加入）
 	area.timer.patrol(character.entityId);
 	return bt.RES_SUCCESS;
 };
