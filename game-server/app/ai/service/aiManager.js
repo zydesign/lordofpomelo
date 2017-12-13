@@ -102,7 +102,7 @@ pro.removeCharacter = function(id) {
  * Stop the tick if there is no ai mobs.
  */
 
-//更新所有大脑实例的update
+//遍历大脑组，执行所有大脑实例的update
 pro.update = function() {
 	if(!this.started || this.closed) {
 		return;
