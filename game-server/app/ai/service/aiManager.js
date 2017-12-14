@@ -59,7 +59,7 @@ pro.addCharacters = function(cs) {
 				continue;
 			}
 
-			//实例一个带参数的大脑，然后添加到角色组
+			//实例一个带参数的大脑，然后添加到角色组，这里给brain创建了黑板参数..............参数Blackboard
 			brain = this.brainService.getBrain('player', Blackboard.create({
 				manager: this,
 				area: this.area,
@@ -72,7 +72,7 @@ pro.addCharacters = function(cs) {
 				continue;
 			}
 
-			//实例一个带参数的大脑，然后添加到怪物组
+			//实例一个带参数的大脑，然后添加到怪物组，这里给brain创建了黑板参数.............参数Blackboard
 			//无论c.characterName取什么名字，大脑服务都将非玩家归结为tiger
 			brain = this.brainService.getBrain(c.characterName, Blackboard.create({
 				manager: this,
