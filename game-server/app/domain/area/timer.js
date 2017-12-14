@@ -93,6 +93,7 @@ Timer.prototype.enterAI = function(entityId) {
   area.patrolManager.removeCharacter(entityId);
   this.abortAction('move', entityId);
   if(!!area.entities[entityId]) {
+    //这里添加角色会实例一个大脑brain，并给该大脑brain创建黑板参数blackboard
     area.aiManager.addCharacters([area.entities[entityId]]);
   }
 };
