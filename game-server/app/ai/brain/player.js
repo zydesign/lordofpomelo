@@ -17,6 +17,8 @@ var consts = require('../../consts/consts');
  * Choose the 1st skill in fight skill list or normal attack by defaul.
  * 如果有目标则，选择第一个技能或默认技能自动攻击
  */
+
+//参数blackboard是来源于brainService.getBrain(type, blackboard)，而这个黑板blackboard又是由aiManager.addCharacters（cs）创建的
 var Brain = function(blackboard) {
 	var attack = genAttackAction(blackboard);      //生成攻击行为
 	var pick = genPickAction(blackboard);          //生成拾取行为
