@@ -30,7 +30,7 @@ var Instance = function(opts){
   //The map from player to entity
   this.players = {};
   this.users = {};
-  this.entities = {};
+  this.entities = {};   //这里储存角色、怪物、道具等实体
   this.zones = {};
   this.items = {};
   this.channel = null;
