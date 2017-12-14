@@ -1,3 +1,5 @@
+
+//大脑服务只有大脑组、添加大脑、获取大脑
 var Service = function() {
 	this.brains = {};
 };
