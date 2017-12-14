@@ -7,6 +7,7 @@ var exp = module.exports;
 //此脚本只要由area脚本引用，并创建AiManager实例，把储存过大脑的brainService添加到参数opt中
 
 //创建一个AiManager实例，主要是给参数添加大脑服务brainService实例属性，注册大脑到brainService中，方便调用
+//参数opts为{{area:area}}，场景类area提供
 exp.createManager = function(opts) {
 	var brainService = new BrainService();  //实例大脑服务
 	
