@@ -5,6 +5,7 @@ var exp = module.exports;
 //该模块作用：1.添加角色大脑   2.删除角色大脑   3.刷新大脑信息（执行所有大脑的udate，顺序执行攻击、拾取、npc对话）
 
 //ai管理器属性有：大脑服务、场景、玩家、怪物
+//opt得到的参数{area：area；brainService：brainService}
 var Manager = function(opts) {
 	this.brainService = opts.brainService;
 	this.area = opts.area;
@@ -32,7 +33,7 @@ pro.stop = function() {
 
 //通过角色参数，创建大脑实例，并储存到玩家大脑组和怪物大脑中
 
-        //参数cs为角色数组
+        //参数cs为角色数组，Blackboard参数就会在这里被创建
 pro.addCharacters = function(cs) {
 	//如果还没开启ai管理器或已经结束ai管理器，则不增加角色大脑
 	if(!this.started || this.closed) {
