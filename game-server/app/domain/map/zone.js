@@ -5,7 +5,7 @@ var id = 0;
 
 /**
  * The origint zone object
- * 空间对象的父类
+ * 怪物空间对象的父类，mobzone将会继承该父类属性及方法
  */
 var Zone = function(opts) {
 	this.zoneId = id++;
