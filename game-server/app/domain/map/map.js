@@ -308,6 +308,7 @@ Map.prototype.getWeightMap = function(collisions){
  * @return {Array} All mobzones in the map
  * @api public
  */
+//这个函数在area场景运行时立刻执行........................................0
 Map.prototype.getMobZones = function() {
 	if(!this.map) {
 		logger.error('map not load');
