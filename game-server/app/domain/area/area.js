@@ -41,7 +41,7 @@ var Instance = function(opts){
   this.aoi = aoiManager.getService(opts);  //aoi工厂实例
 
   this.aiManager = ai.createManager({area:this});  //ai工厂实例
-  this.patrolManager = patrol.createManager({area:this});  //patrol巡逻工厂实例
+  this.patrolManager = patrol.createManager({area:this});  //patrol创建一个巡逻管理器
   this.actionManager = new ActionManager();  //动作工厂实例
 
   //定时器工厂实例
@@ -68,7 +68,7 @@ Instance.prototype.start = function() {
   this.initMobZones(this.map.getMobZones());  //初始化化怪物区块
   this.initNPCs();  //初始化NPC
 
-  this.aiManager.start(); //开启ai服务
+  this.aiManager.start(); //开启ai服务,允许aiManager添加、删除、更新大脑实例
   this.timer.run(); //开启定时器
 };
 
@@ -82,7 +82,7 @@ Instance.prototype.close = function(){
  * Init npcs
  * @api private
  */
-// 初始化NPC
+// 初始化NPC，场景开启立即运行，添加npcs实体组........................................
 Instance.prototype.initNPCs = function() {
   var npcs = this.map.getNPCs();
 
@@ -116,12 +116,14 @@ Instance.prototype.getChannel = function() {
  * Init all zones in area
  * @api private
  */
+//初始化怪物空间，场景开启立即运行，添加怪物空间组..........................................
 Instance.prototype.initMobZones = function(mobZones) {
+  //遍历map的怪物对象组
   for(var i = 0; i < mobZones.length; i++) {
-    var opts = mobZones[i];
+    var opts = mobZones[i]; //单个怪物对象数据
     opts.area = this;
-    var zone = new MobZone(opts);
-    this.zones[zone.zoneId] = zone;
+    var zone = new MobZone(opts);  //生成单个类型的怪物空间
+    this.zones[zone.zoneId] = zone;  //添加到怪物空间组
   }
 };
 
