@@ -26,6 +26,7 @@ Timer.prototype.tick = function() {
 
   //Update mob zones  定时刷新怪物
   for(var key in area.zones){
+    //执行怪物空间的update时，就会间隔5秒生成限制数量的一个怪物实体，调用area.addEntity（e）函数生成实体
     area.zones[key].update();
   }
 
