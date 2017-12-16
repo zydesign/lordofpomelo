@@ -22,6 +22,7 @@ exp.init = function(opts){
 
 
 //创建场景副本，然后启动该场景副本，并加入副本组，如果创建成功返回true-------------------------增
+//玩家创建单人副本，多人副本时调用该函数
 exp.create = function(params){
   var id = params.instanceId;
   var areaId = params.areaId;
@@ -75,7 +76,7 @@ function check(){
   for(var id in instances){
     var instance = instances[id];
 
-    //重启场景副本，如果该场景副本已经开启，关闭该场景副本，并从副本组中删除
+    //重启场景副本，如果该场景被关闭了（玩家退出副本），关闭该场景副本，并从副本组中删除
     if(!instance.isAlive()){
       app.rpc.manager.instanceRemote.remove(null, id, onClose);
     }
