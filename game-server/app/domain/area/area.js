@@ -133,6 +133,7 @@ Instance.prototype.initMobZones = function(mobZones) {
  */
 
 //场景添加实体，加入实体组，加入事件管理器，加入场景频道channel，加入ai大脑，加入aoi观察者等等，添加成功会返回true=========
+//场景启动是，初始化npcs时，timer执行怪物空间update时，角色进入场景切换场景时，掉落物品时，调用该函数，
 Instance.prototype.addEntity = function(e) {
   var entities = this.entities;
   var players = this.players;
