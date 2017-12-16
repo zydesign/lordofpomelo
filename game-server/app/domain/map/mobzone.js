@@ -44,6 +44,8 @@ util.inherits(MobZone, Zone);
  * 每一次更新都会被调用来生成新的mobs
  * 每隔5秒生成一个怪物，如果怪物达到限定数则不再生成
  */
+
+//间隔5秒，在限制数量内在场景area中生成一个怪物实体
 MobZone.prototype.update = function() {
 	var time = Date.now();   //当前时间
 	var nextTime = this.lastGenTime + this.interval;  //下一次生成怪物时间
