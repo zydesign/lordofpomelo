@@ -59,7 +59,7 @@ pro.doAction = function() {
 		return bt.RES_FAIL;
 	}
 
-	//上面条件都避开了，那就允许攻击，执行攻击操作（在条件判断里面执行了）
+	//上面条件都避开了，那就允许攻击，角色执行攻击函数，并发射“attack”事件（在条件判断里面执行了）
 	var res = character.attack(target, this.getSkillId(this.blackboard));
 
 	//攻击返回了结果符合条件，返回成功
