@@ -10,6 +10,7 @@ var util = require('util');
  * @param {Object} opts
  * @api public
  */
+//背包、装备、任务的基类，发射'save'同步数据库储存事件
 var Persistent = function(opts) {
 	this.id = opts.id;
 	this.type = opts.type;
