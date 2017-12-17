@@ -157,7 +157,7 @@ Instance.prototype.addEntity = function(e) {
 
   //加入实体组
   entities[e.entityId] = e;
-  //加入事件
+  //添加事件。所有实体都继承了事件派发器，添加事件也就是都on（Event），只要实体类执行emit（Event）就会触发事件------
   eventManager.addEvent(e);
 
   //如果实体类型为玩家，加入频道channel，加入ai大脑，加入aoi观察者，加入角色id组
