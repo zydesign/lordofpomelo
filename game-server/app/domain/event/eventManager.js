@@ -32,6 +32,8 @@ exp.addEvent = function(entity){
  */
 //实体类型为玩家时，存数据事件。角色、背包、装备三个实体监听了'save'事件.有各自的save（）函数包裹着发射事件。
 //其中背包、装备继承基类Persistent而调用save()函数。
+
+//持久化同步的作用：激活储存事件，会先储存数据到内存队列中，同步模块sync会间隔一定时间将内存数据保存到数据库
 function addSaveEvent(player) {
 	var app = pomelo.app;
 	player.on('save', function() {
