@@ -248,11 +248,13 @@ Player.prototype.upgradeSkill = function(skillId) {
  * @return {Object}
  * @api public
  */
+//ai系统的player大脑生成拾取动作时，执行该函数.........................................
 Player.prototype.pickItem = function(entityId) {
   var item = this.area.getEntity(entityId);
 
   var result = {player : this, item : item};
 
+  //如果道具不存在，增加一个道具消失的属性
   if(!item) {
     result.result = consts.Pick.VANISH;
     this.emit('pickItem', result);
@@ -260,19 +262,23 @@ Player.prototype.pickItem = function(entityId) {
   }
 
   // TODO: remove magic pick distance 200
+  //不在拾取范围200内，返回值加入拾取距离200属性
   if(!formula.inRange(this, item, 200)) {
     result.distance = 200;
     result.result = consts.Pick.NOT_IN_RANGE;
     return result;
   }
 
+  //可以拾取，背包执行添加道具函数（条件判断里面执行），返回背包储存的标签位置
   var index = this.bag.addItem({id: item.kindId, type: item.type});
+  //如果背包标签小于1，说明遍历背包所有道具栏了，背包满没有位置放道具，拾取结果添加背包满属性
   if (index < 1) {
     result.result = consts.Pick.BAG_FULL;
     this.emit('pickItem', result);
     return result;
   }
 
+  //可以拾取，并且道具放回背包，返回结果添加道具存放位置标签，拾取成功属性，发射拾取事件
   result.index = index;
   result.result = consts.Pick.SUCCESS;
   this.emit('pickItem', result);
@@ -280,6 +286,7 @@ Player.prototype.pickItem = function(entityId) {
 };
 
 // Emit the event 'save'.
+//角色发射'save'事件的函数player.save（）.................................................................save
 Player.prototype.save = function() {
   this.emit('save');
 };
