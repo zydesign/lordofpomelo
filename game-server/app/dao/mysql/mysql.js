@@ -11,6 +11,7 @@ var NND = {};
  *上面声明了对象池变量，在初始化里面给变量赋值
  * @param {Object} app The app for the server.
  */
+//创建一个数据库连接
 NND.init = function(app){
 	_pool = require('./dao-pool').createMysqlPool(app);
 };
@@ -23,6 +24,8 @@ NND.init = function(app){
  * @param {fuction} cb Callback function.
  * 
  */
+
+//通过数据库连接提供的函数client.query(sql, args,cb）进行增删改查数据....................................
 NND.query = function(sql, args, callback){
 	const resourcePromise = _pool.acquire();
 	resourcePromise.then(function(client) {
@@ -41,6 +44,7 @@ NND.query = function(sql, args, callback){
 /**
  * Close connection pool.
  */
+//关闭数据库连接
 NND.shutdown = function(){
 	_pool.drain().then(function(){
 		_pool.clear();
@@ -51,6 +55,8 @@ NND.shutdown = function(){
  * init database
  *模块调用上面的函数，执行sql语句到数据库
  */
+
+//生成数据库连接对象sqlclient，对应的增删改查属性
 sqlclient.init = function(app) {
 	if (!!_pool){
 		return sqlclient;
@@ -68,6 +74,7 @@ sqlclient.init = function(app) {
  * shutdown database
  * 模块关闭数据库
  */
+//数据库连接对象sqlclient的关闭连接函数
 sqlclient.shutdown = function(app) {
 	NND.shutdown(app);
 };
