@@ -227,6 +227,7 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
  * @param {Number} skillId
  * @return {Object}
  */
+//攻击函数。player类、mob类继承了character类，能直接调用该函数，ai大脑触发攻击行为时调用-----------------------
 Character.prototype.attack = function(target, skillId) {
   if (this.confused) {
     return {result: consts.AttackResult.ATTACKER_CONFUSED};
