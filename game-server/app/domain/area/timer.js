@@ -58,7 +58,7 @@ Timer.prototype.tick = function() {
  * @return {Boolean}
  */
 
-//增加一个动作到动作管理器
+//增加一个动作到动作管理器（characterEvent注册移动事件时调用了该函数，）
 Timer.prototype.addAction = function(action) {
   return this.area.actionManager.addAction(action);
 };
