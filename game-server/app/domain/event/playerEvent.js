@@ -8,7 +8,7 @@ var exp = module.exports;
 /**
  * Handle player event
  */
-//给角色添加事件监听
+//给玩家角色添加事件监听
 exp.addEventForPlayer = function (player){
 	/**
 	 * Handler upgrade event for player, the message will be pushed only to the one who upgrade
