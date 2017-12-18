@@ -35,6 +35,7 @@ Move.prototype.update = function(){
 	this.tickNumber++;
 	var time = Date.now()-this.time;    //单次刷新的时间间隔,单位毫秒
 	var speed = this.speed;
+	//速度超出范围，发出警告
 	if(speed > 600) {
 		logger.warn('move speed too fast : %j', speed);
 	}
