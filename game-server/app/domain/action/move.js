@@ -19,10 +19,10 @@ var Move = function(opts){
 	this.area = this.entity.area;
 	this.path = opts.path;
 	this.speed = Number(opts.speed);
-	this.time = Date.now();
+	this.time = Date.now();   //上一次刷新时间
 	this.pos = this.path[0];
 	this.index = 1;
-	this.tickNumber = 0;
+	this.tickNumber = 0;  //刷新次数
 };
 
 util.inherits(Move, Action);//让move继承action函数的原型链
@@ -84,8 +84,10 @@ Move.prototype.update = function(){
 	var watcher = {id : this.entity.entityId, type : this.entity.type};
   this.area.timer.updateObject(watcher, oldPos, pos);
   this.area.timer.updateWatcher(watcher, oldPos, pos, this.entity.range, this.entity.range);
+	//如果移动的角色为玩家，则发射save事件，同步到数据库
 	if(this.entity.type === consts.EntityType.PLAYER){
 		this.entity.save();
+		//每刷新10次广播一次消失给玩家自己.........................
 		if (this.tickNumber % 10 === 0) {
 			messageService.pushMessageToPlayer({uid:this.entity.userId, sid : this.entity.serverId}, 'onPathCheckout', {
 				entityId: this.entity.entityId,
