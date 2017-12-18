@@ -52,7 +52,7 @@ Timer.prototype.tick = function() {
   area.patrolManager.update();
 };
 
-/** 动作管理部分---------------------------------------------------
+/** 动作管理部分---------------------------------------------------通常是area场景服务器调用
  * Add action for area
  * @param action {Object} The action need to add
  * @return {Boolean}
@@ -82,7 +82,7 @@ Timer.prototype.abortAllAction = function(id) {
   this.area.actionManager.abortAllAction(id);
 };
 
-/** ai管理部分--------------------------------------------------------
+/** ai管理部分--------------------------------------------------------通常是area场景服务器调用
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
@@ -99,7 +99,7 @@ Timer.prototype.enterAI = function(entityId) {
   }
 };
 
-/** 巡逻管理部分---------------------------------------------------------
+/** 巡逻管理部分---------------------------------------------------------通常是area场景服务器调用
  * Enter patrol for given entity
  * @param entityId {Number}
  */
@@ -114,7 +114,7 @@ Timer.prototype.patrol = function(entityId) {
   }
 };
 
-/** aoi管理部分------------------------------------------------------------
+/** aoi管理部分------------------------------------------------------------通常是area场景服务器调用
  * Update object for aoi
  * @param obj {Object} Given object need to update.
  * @param oldPos {Object} Old position.
