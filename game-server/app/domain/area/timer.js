@@ -86,7 +86,7 @@ Timer.prototype.abortAllAction = function(id) {
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
-//给一个实体增加ai
+//给一个实体增加ai，（characterEvent注册攻击事件，怪物受到攻击时调用了这个函数）---------------------------0
 Timer.prototype.enterAI = function(entityId) {
   var area = this.area;
 
