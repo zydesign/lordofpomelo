@@ -93,10 +93,11 @@ Character.prototype.getFightSkillData = function(){
 
 /**
  * Set target of this Character.
- * 添加角色选中的目标
+ * 
  * @param {Number} targetId entityId of the target
  * @api public
  */
+//添加角色锁定的目标
 Character.prototype.setTarget = function(targetId) {
   this.target = targetId;
 };
@@ -227,7 +228,7 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
  * @param {Number} skillId
  * @return {Object}
  */
-//攻击函数。player类、mob类继承了character类，能直接调用该函数，ai大脑触发攻击行为时调用-----------------------
+//攻击函数。player类、mob类继承了character类，能直接调用该函数，ai大脑触发攻击行为时调用这个函数-------返回技能攻击结果----------------
 Character.prototype.attack = function(target, skillId) {
   if (this.confused) {
     return {result: consts.AttackResult.ATTACKER_CONFUSED};
@@ -239,12 +240,16 @@ Character.prototype.attack = function(target, skillId) {
   }
 
   var skill = this.fightSkills[skillId];
+  //锁定目标到属性里
   this.setTarget(target.entityId);
 
   // set up the relationship between attacker and attackee
+  //先标记敌人到敌人组
   this.addEnemy(target.entityId);
 
+  //使用技能攻击该目标
   var result = skill.use(this, target);
+  //发射攻击事件...................................
   this.emit('attack', {
     attacker : this,
     target: target,
@@ -381,6 +386,7 @@ Character.prototype.forEachEnemy = function(callback) {
  * @param {Number} entityId of enemy
  * @api public
  */
+//增加一个敌人，key为enemyId，值都是1
 Character.prototype.addEnemy = function(enemyId) {
   this.enemies[enemyId] = 1;
 };
