@@ -17,22 +17,24 @@ var team = require('../../config/data/team');
  * @param {Array}
  *
  */
+
+//得到属性data为数据组，子对象为单一数据
 var Data = function(data) {
 //英文标签项单独存为一个对象	
-  var fields = {};
+  var fields = {};   //储存英文标签
   data[1].forEach(function(i, k) {
     fields[i] = k;
   });
 //数据数组单独分离为一个数组
   data.splice(0, 2);
 //之后创建一个数据对象存储上面的数据，子对象为一份key为英文项目名的数据
-  var result = {}, item;
+  var result = {}, item;   
   data.forEach(function(k) {
     item = mapData(fields, k);
     result[item.id] = item;
   });
 
-  this.data = result;
+  this.data = result;   //
 };
 
 /**
