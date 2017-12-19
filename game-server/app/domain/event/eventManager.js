@@ -9,7 +9,7 @@ var exp = module.exports;
 /**
  * Listen event for entity
  */
-//area场景添加实体时，添加事件。（何时添加实体？area初始化NPCs时，timer更新怪物空间时，怪物掉落道具时，玩家进入场景时）
+//area场景添加实体时，给实体注册所有事件。（何时添加实体？area初始化NPCs时，timer更新怪物空间时，怪物掉落道具时，玩家进入场景时）
 exp.addEvent = function(entity){
 	switch(entity.type){
 		case EntityType.PLAYER :
