@@ -19,11 +19,12 @@ var TaskDao = require('../../dao/taskDao');
  * @param {Object} opts
  * @api public
  */
+//NPC实体
 var Npc = function(opts) {
 	Entity.call(this, opts);
 	this.id = opts.id;
 	this.type = EntityType.NPC;
-	this.orientation = opts.orientation;
+	this.orientation = opts.orientation;  //角色朝向
 	this.width = opts.width;
 	this.height = opts.height;
 	this.kindType = opts.kindType;
@@ -50,6 +51,8 @@ var TALK_RANGE = 100;
  * @return {Object}
  * @api public
  */
+
+//ai大脑player对话NPC调用函数，参数为玩家角色。先发射NPC对话事件，然后返回结果给大脑验证对话是否成功
 Npc.prototype.talk = function(player) {
   if(!formula.inRange(player, this, TALK_RANGE)) {
     return {result: consts.NPC.NOT_IN_RANGE, distance: TALK_RANGE};
