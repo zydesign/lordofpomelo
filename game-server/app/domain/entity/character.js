@@ -348,6 +348,7 @@ Character.prototype.getTotalDefence = function() {
  * @param {Buff} buff
  * @api public
  */
+//玩家或怪物开启buff技能时调用.............................
 Character.prototype.addBuff = function(buff) {
   this.buffs[buff.type] = buff;
 };
@@ -358,6 +359,7 @@ Character.prototype.addBuff = function(buff) {
  * @param {Buff} buff
  * @api public
  */
+//玩家或怪物buff技能有效时间过后用............................
 Character.prototype.removeBuff = function(buff) {
   delete this.buffs[buff.type];
 };
