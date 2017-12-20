@@ -11,20 +11,24 @@ var logger = require('pomelo-logger').getLogger(__filename);
  * @param {Object} opts
  * @api public
  */
+
+//背包是存储道具实体的管理器，player执行“拾取”函数的时候，执行背包的addItem函数
 var Bag = function(opts) {
   Persistent.call(this, opts);
   this.itemCount = opts.itemCount || 20;  //背包道具栏数量
-  this.items = opts.items || {};
+  this.items = opts.items || {};  //items储存的是道具intem的id和type，key是从1开始的，不是0,是对应index
 };
 
 util.inherits(Bag, Persistent);
 
 module.exports = Bag;
 
+//从背包获取第index位置的道具
 Bag.prototype.get = function(index) {
   return this.items[index];
 };
 
+//获取背包数据：背包id，道具数量，道具数据组（不是道具实体组）
 Bag.prototype.getData = function() {
   var data = {};
 
@@ -32,6 +36,7 @@ Bag.prototype.getData = function() {
   data.itemCount = this.itemCount;
 
   data.items = [];
+  //key从1开始
   for(var key in this.items){
     var item = {
       key : Number(key),
@@ -51,7 +56,7 @@ Bag.prototype.getData = function() {
  * @return {number}
  * @api public
  */
-//ai大脑player执行拾取函数pickItem（e）时，执行这个背包添加道具函数-商城购买道具也会执行该函数-------------------------------
+//ai大脑player执行拾取函数pickItem（e）时，执行这个背包添加道具函数，商城购买道具也会执行该函数，然后道具储存位置index-------------------增 
 Bag.prototype.addItem = function(item) {
   var index = -1;
 
@@ -86,6 +91,7 @@ Bag.prototype.addItem = function(item) {
  * @return {Boolean}
  * @api public
  */
+//背包删除道具，删除第index栏的道具，如果删除成功，发送数据储存数据库，并返回true-----------------------------------------删
 Bag.prototype.removeItem = function(index) {
   var status = false;
   if (this.items[index]) {
@@ -98,6 +104,7 @@ Bag.prototype.removeItem = function(index) {
 };
 
 //Check out item by id and type
+//背包查找道具，通过道具的id和类型查找，返回的是道具栏的index位置----------------------------------------------------------查
 Bag.prototype.checkItem = function(id, type) {
   var result = null, i, item;
   for (i in this.items) {
@@ -112,6 +119,7 @@ Bag.prototype.checkItem = function(id, type) {
 };
 
 //Get all the items
+//获取背包所有道具信息
 Bag.prototype.all = function() {
   return this.items;
 };
