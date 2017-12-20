@@ -11,15 +11,16 @@ function Buff(opts){
 Buff.prototype.use = function(player) {
 	//如果使用技能函数可用
 	if (!!this.useCallback) {
-		player.addBuff(this);  //角色实体执行addBuff函数
-		this.useCallback(player);
-		//如果设置了有效时间
+		player.addBuff(this);  //角色实体执行addBuff函数，将buff实例加入buff数组
+		this.useCallback(player);  //执行使用技能函数
+		
+		//如果设置了有效时间，并且取消技能函数可用
 		if (this.timeout > 0){
 			//取消技能函数可用
 			if (!!this.unuseCallback) {
 				//定时执行角色实体取消buff，执行buff的取消函数
 				setTimeout(function(){
-					player.removeBuff(this);  //角色实体执行.removeBuff函数
+					player.removeBuff(this);  //角色实体执行.removeBuff函数，将buff实例加从buff数组删除
 					this.unuseCallback(player);
 				}, this.timeout);
 			}
@@ -121,7 +122,7 @@ var KuroujiBuff = (function() {
 				used = true;
 				player.hp -= hp;
 				player.attackParam *= increaseParam;
-				player.updateTeamMemberInfo();  //执行角色实体更新队伍信息
+				player.updateTeamMemberInfo();  //执行角色实体更新队伍信息，前提是玩家加入了队伍
 			},
 			unuseCallback: function(player){
 				if (used) {
