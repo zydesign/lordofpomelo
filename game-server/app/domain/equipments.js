@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+//
 var util = require('util');
 var Entity = require('./entity/entity');
 var EntityType = require('../consts/consts').EntityType;
@@ -15,6 +16,7 @@ var Underscore = require('underscore');
  * @param {Object} opts
  * @api public
  */
+//角色穿戴的装备，这一份看空空西游的
 var Equipments = function(opts) {
 	Persistent.call(this, opts);
   this.playerId = opts.playerId;
@@ -31,6 +33,7 @@ var Equipments = function(opts) {
 
 util.inherits(Equipments, Persistent);
 
+//字典
 var dict = {
   '武器': 'weapon',
   '项链': 'necklace',
@@ -43,6 +46,7 @@ var dict = {
   '戒指': 'ring'
 };
 
+//转换类型
 var convertType = function (type) {
   if (/[\u4e00-\u9fa5]/.test(type)) {
     type = dict[type];
