@@ -14,6 +14,8 @@ var EntityType = require('../../consts/consts').EntityType;
  * @param {Object} opts
  * @api public
  */
+
+//装备实体类
 var Equipment = function(opts) {
   Entity.call(this, opts);
   this.type = EntityType.EQUIPMENT;
