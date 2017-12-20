@@ -355,6 +355,7 @@ Player.prototype.completeTask = function(taskId) {
 };
 
 //Convert player' state to json and return
+//角色状态信息，发射save事件，同步角色数据到数据库时使用
 Player.prototype.strip = function() {
   return {
     id: this.id,
