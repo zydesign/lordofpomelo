@@ -17,7 +17,7 @@ exp.addEventForNPC = function (npc){
 		var npc = data.npc;
 		var player = data.player;
 		var talk = api.talk; //读取talk表，实例一份数据
-		//获取对应npc的对话对象数组，这个数组只有一个对象
+		//通过对话id，获取对应npc的对话数据对象，返回值是数组，但数组里只有一个对象
 		var npcTalks = talk.findBy('npc', npc.kindId);  //kindId是area在初始化initNPCs时，实例npc实体加入的属性，实位NPC对应的值
 		var npcword = 'Welcome to see you!';
 		var myword = 'Me too!';
