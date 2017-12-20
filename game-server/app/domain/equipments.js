@@ -2,7 +2,7 @@
  * Module dependencies
  */
 
-//
+//装备的管理器模块
 var util = require('util');
 var Entity = require('./entity/entity');
 var EntityType = require('../consts/consts').EntityType;
