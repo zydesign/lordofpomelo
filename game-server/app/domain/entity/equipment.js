@@ -15,25 +15,25 @@ var EntityType = require('../../consts/consts').EntityType;
  * @api public
  */
 
-//装备实体类
+//装备实体类（所有属性都可以从表获取）
 var Equipment = function(opts) {
   Entity.call(this, opts);
-  this.type = EntityType.EQUIPMENT;
-  this.name = opts.name;
-  this.desc = opts.desc;
-  this.englishDesc = opts.englishDesc;
-  this.kind = opts.kind;
-  this.attackValue = Number(opts.attackValue);
-  this.defenceValue = Number(opts.defenceValue);
-  this.price = opts.price;
-  this.color = opts.color;
-  this.heroLevel = opts.heroLevel;
-  this.imgId = opts.imgId;
-  this.playerId = opts.playerId;
+  this.type = EntityType.EQUIPMENT;                //实体类型
+  this.name = opts.name;                           //装备名称
+  this.desc = opts.desc;                           //装备描述（攻击力、防御力）
+  this.englishDesc = opts.englishDesc;             //装备英文描述
+  this.kind = opts.kind;                           //装备类型（穿戴部位:武器、护手、护腿等）
+  this.attackValue = Number(opts.attackValue);     //攻击值
+  this.defenceValue = Number(opts.defenceValue);   //防御值
+  this.price = opts.price;                         //出售价格
+  this.color = opts.color;                         //颜色
+  this.heroLevel = opts.heroLevel;                 //穿戴等级
+  this.imgId = opts.imgId;                         //图标id
+  this.playerId = opts.playerId;                   //穿戴的玩家id
 
-  this.lifetime = 30000;
-  this.time = Date.now();
-  this.died = false;
+  this.lifetime = 30000;                           //掉落的生命时间
+  this.time = Date.now();                          //每次刷新的时间
+  this.died = false;                               //掉落是否消失
 };
 
 util.inherits(Equipment, Entity);
