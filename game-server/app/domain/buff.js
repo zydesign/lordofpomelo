@@ -1,19 +1,25 @@
 
+//状态技能的基类buff
 function Buff(opts){
-	this.type = opts.type;
-	this.timeout = opts.timeout;
-	this.useCallback = opts.useCallback;
-	this.unuseCallback = opts.unuseCallback;
+	this.type = opts.type;                       //类型
+	this.timeout = opts.timeout;                 //buff的有效时间
+	this.useCallback = opts.useCallback;         //使用技能函数
+	this.unuseCallback = opts.unuseCallback;     //取消使用技能函数
 }
 
+//使用buff技能
 Buff.prototype.use = function(player) {
+	//如果使用技能函数可用
 	if (!!this.useCallback) {
-		player.addBuff(this);
+		player.addBuff(this);  //角色实体执行addBuff函数
 		this.useCallback(player);
+		//如果设置了有效时间
 		if (this.timeout > 0){
+			//取消技能函数可用
 			if (!!this.unuseCallback) {
+				//定时执行角色实体取消buff，执行buff的取消函数
 				setTimeout(function(){
-					player.removeBuff(this);
+					player.removeBuff(this);  //角色实体执行.removeBuff函数
 					this.unuseCallback(player);
 				}, this.timeout);
 			}
@@ -21,13 +27,16 @@ Buff.prototype.use = function(player) {
 	}
 };
 
+//混乱buff技能，返回新buff实例
 var ConfuseBuff = (function() {
 	return function(timeout) {
 		return new Buff({
 			type: 'confuse',
+			//使用技能函数
 			useCallback: function(player){
 				player.confused = true;
 			},
+			//取消使用技能函数
 			unuseCallback: function(player){
 				player.confused = false;
 			}
@@ -36,6 +45,7 @@ var ConfuseBuff = (function() {
 })();
 
 
+//攻击增强（强攻）
 var AttackStrengthenBuff = (function() {
 	return function(increaseParam, timeout) {
 		return new Buff({
@@ -50,6 +60,7 @@ var AttackStrengthenBuff = (function() {
   };
 })();
 
+//防御增强
 var DefenceStrengthenBuff = (function() {
 	return function(increaseParam, timeout) {
 		return new Buff({
@@ -64,6 +75,7 @@ var DefenceStrengthenBuff = (function() {
   };
 })();
 
+//装备加强
 var EquipmentStrengthenBuff = (function() {
 	return function(increaseParam, timeout) {
 		return new Buff({
@@ -78,7 +90,7 @@ var EquipmentStrengthenBuff = (function() {
   };
 })();
 
-// 背水一战
+// 背水一战，加攻减防
 // increase attack, decrease defence
 var BeishuiyizhanBuff = (function() {
 	return function(increaseParam, decreaseParam, timeout) {
@@ -96,7 +108,7 @@ var BeishuiyizhanBuff = (function() {
   };
 })();
 
-//苦肉计
+//苦肉计，牺牲血量，加强攻击
 var KuroujiBuff = (function() {
 	return function(increaseParam, hp, timeout) {
 		var used = false;
@@ -109,7 +121,7 @@ var KuroujiBuff = (function() {
 				used = true;
 				player.hp -= hp;
 				player.attackParam *= increaseParam;
-				player.updateTeamMemberInfo();
+				player.updateTeamMemberInfo();  //执行角色实体更新队伍信息
 			},
 			unuseCallback: function(player){
 				if (used) {
