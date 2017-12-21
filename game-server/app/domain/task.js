@@ -15,14 +15,15 @@ var taskData = require('../util/dataApi').task;             //从表里获取任
  * @api public
  */
 
-//带事件监听器的任务模块
+//带事件监听器的任务模块。。玩家接受任务时先写入数据库，然后taskDao生成参数opt，通过参数实例task，
+//之后场景服务器调用Player.startTask,提供task属性taskState、startTime、taskData
 var Task = function(opts) {
-	this.id = opts.id;                                    //任务id，作为管理类任务组的key
+	this.id = opts.id;                                    //数据库的任务id，作为管理类任务组的key
 	this.playerId = opts.playerId;                        //拥有该任务的玩家id
-	this.kindId = opts.kindId;                            //任务的类型id
+	this.kindId = opts.kindId;                            //任务表的任务id
 	this.taskState = opts.taskState;                      //任务的完成状态（开始、未完成、完成没发送、完成）
 	this.startTime = opts.startTime;                      //开始执行时间
-	this.taskData = this._parseJson(opts.taskData);       //任务数据
+	this.taskData = this._parseJson(opts.taskData);       //任务数据。实例task时，opt没有提供taskData属性，该函数生成了空对象{}
 
 	this._initTaskInfo();                          //执行初始化任务信息
 };
@@ -69,6 +70,7 @@ Task.prototype._initTaskInfo = function() {
  */
 
 Task.prototype._parseJson = function(data) {
+	//如果没有定义该参数，则参数定义为空对象
 	if (typeof data === 'undefined') {
 		data = {};
 	} else {
