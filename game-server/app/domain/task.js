@@ -54,7 +54,8 @@ Task.prototype._initTaskInfo = function() {
 		this.item = info.item;
 		this.timeLimit = info.timeLimit;
 		this.type = info.type;
-		this.completeCondition = this._parseJson(info.completeCondition);  //任务条件，需要JSON.parse一下，这个不明所以，参考空空西游
+		 //任务条件，需要JSON.parse一下，这个不明所以，参考空空西游的
+		this.completeCondition = this._parseJson(info.completeCondition); 
 	}
 };
 
