@@ -51,7 +51,7 @@ Task.prototype._initTaskInfo = function() {
 		this.workTalk = info.workTalk;
 		this.finishTalk = info.finishTalk;
 		this.exp = info.exp;
-		this.item = info.item;
+		this.item = info.item;  //这里的item不是道具实体，是字符串
 		this.timeLimit = info.timeLimit;
 		this.type = info.type;
 		 //任务条件，需要JSON.parse一下，这个不明所以，参考空空西游的
