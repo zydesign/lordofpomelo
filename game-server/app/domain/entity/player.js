@@ -298,7 +298,7 @@ Player.prototype.save = function() {
  * @param {Task} task, new task to be implement
  * @api public
  */
-//玩家点击接受任务，或任务进阶时，都是调用该函数
+//玩家点击接受任务，或任务进阶时，由场景服务器的taskHandler脚本调用该函数，创建task新的属性，并同步到数据库
 Player.prototype.startTask = function(task) {
   task.taskState = TaskState.NOT_COMPLETED;
   //任务击杀数量清零
