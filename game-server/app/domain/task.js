@@ -5,7 +5,7 @@
 var util = require('util');
 var Persistent = require('./persistent');
 var TaskState = require('../consts/consts').TaskState; 
-var taskData = require('../util/dataApi').task;
+var taskData = require('../util/dataApi').task;             //从表里获取任务组
 
 /**
  * Initialize a new 'Task' with the given 'opts'.
@@ -16,14 +16,14 @@ var taskData = require('../util/dataApi').task;
  */
 
 var Task = function(opts) {
-	this.id = opts.id;
-	this.playerId = opts.playerId;
-	this.kindId = opts.kindId;
-	this.taskState = opts.taskState;
-	this.startTime = opts.startTime;
-	this.taskData = this._parseJson(opts.taskData);
+	this.id = opts.id;                                    //任务id，作为管理类任务组的key
+	this.playerId = opts.playerId;                        //拥有该任务的玩家id
+	this.kindId = opts.kindId;                            //任务的类型id
+	this.taskState = opts.taskState;                      //任务的完成状态（开始、未完成、完成没发送、完成）
+	this.startTime = opts.startTime;                      //开始执行时间
+	this.taskData = this._parseJson(opts.taskData);       //任务数据
 
-	this._initTaskInfo();
+	this._initTaskInfo();                          //执行初始化任务信息
 };
 util.inherits(Task, Persistent);
 
@@ -40,7 +40,9 @@ module.exports = Task;
  */
 
 Task.prototype._initTaskInfo = function() {
-	var info = taskData.findById(this.kindId);
+	var info = taskData.findById(this.kindId);   //获取指定id的任务对象
+	
+	//读取任务的内容为属性
 	if (!!info) {
 		this.name = info.name;
 		this.heroLevel = info.heroLevel;
@@ -52,7 +54,7 @@ Task.prototype._initTaskInfo = function() {
 		this.item = info.item;
 		this.timeLimit = info.timeLimit;
 		this.type = info.type;
-		this.completeCondition = this._parseJson(info.completeCondition);
+		this.completeCondition = this._parseJson(info.completeCondition);  //任务条件，需要JSON.parse一下，这个不明所以，参考空空西游
 	}
 };
 
