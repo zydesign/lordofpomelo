@@ -108,6 +108,7 @@ taskDao.getTaskByIds = function(playerId, kindId, cb) {
  * @param {Number} kindId Task's kindId.
  * @param {Function} cb
  */
+//该函数由场景服务器的taskHandler脚本调用
 taskDao.createTask = function(playerId, kindId, cb) {
 	var sql = 'insert into Task (playerId, kindId) values (?, ?)';
 	var args = [playerId, kindId];
@@ -117,12 +118,12 @@ taskDao.createTask = function(playerId, kindId, cb) {
 			utils.invokeCallback(cb, err);
 		} else {
 			var taskData = {
-				id: res.insertId,
-				playerId: playerId,
-				kindId: kindId
+				id: res.insertId,     //数据库的任务id
+				playerId: playerId,   //玩家id
+				kindId: kindId        //任务表的任务id
 			};
 			var task = createNewTask(taskData);
-			utils.invokeCallback(cb, null, task);
+			utils.invokeCallback(cb, null, task);  //将task返回给场景服务器的taskHandler
 		}
 	});
 };
