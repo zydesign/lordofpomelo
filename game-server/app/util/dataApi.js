@@ -18,7 +18,7 @@ var team = require('../../config/data/team');
  *
  */
 
-//得到属性data为数据组，子对象为单一数据
+//返回结果属性data数据组，去掉了1~2项的描述对象，子对象都是单一数据
 var Data = function(data) {
 //英文标签项单独存为一个对象	
   var fields = {};   //储存英文标签
