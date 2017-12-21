@@ -298,15 +298,20 @@ Player.prototype.save = function() {
  * @param {Task} task, new task to be implement
  * @api public
  */
+//玩家点击接受任务，或任务进阶时，都是调用该函数
 Player.prototype.startTask = function(task) {
   task.taskState = TaskState.NOT_COMPLETED;
+  //任务击杀数量清零
   task.taskData = {
     'mobKilled': 0,
     'playerKilled': 0
   };
+   //任务的开始时间为当前时间
   task.startTime = formula.timeFormat(new Date());
+  //任务进度同步到数据库
   task.save();
-  var id = task.id;
+  var id = task.id; 
+  //player的当前任务更新
   this.curTasks[id] = task;
 };
 
@@ -317,13 +322,16 @@ Player.prototype.startTask = function(task) {
  * @param {Array} taskIds
  * @api public
  */
+
+//玩家提交任务
 Player.prototype.handOverTask = function(taskIds) {
   var length = taskIds.length;
+  //遍历参数提供的任务id组，从player的当前任务组中匹配对应的任务，该任务状态改为“已完成”，同步到数据库
   for (var i = 0; i < length; i++) {
     var id = taskIds[i];
     var task = this.curTasks[id];
     task.taskState = TaskState.COMPLETED;
-    task.save();
+    task.save();  //发射储存数据库事件，其中save注册位置在/app/dao/taskDao.js
     // delete this.curTasks[id];
   }
 };
@@ -348,6 +356,7 @@ Player.prototype.recover = function(lastTick){
 };
 
 //Complete task and tasks' state.
+//单个任务完成，但任务要进阶，状态为完成不发送
 Player.prototype.completeTask = function(taskId) {
   var task = this.curTasks[taskId];
   task.taskState = TaskState.COMPLETED_NOT_DELIVERY;
@@ -392,6 +401,7 @@ Player.prototype.strip = function() {
  *	@return {Object}
  *	@api public
  */
+//玩家登录场景时执行该函数，获取角色信息、背包信息、装备信息、战斗技能、当前任务
 Player.prototype.getInfo = function() {
   var playerData = this.strip();
   playerData.bag = this.bag.getData();
@@ -476,11 +486,13 @@ Player.prototype.setEquipments = function(equipments){
  * @return {Object}
  * @api private
  */
+//获取player当前任务信息组
 Player.prototype._getCurTasksInfo = function() {
   var reTasks = [];
   if (this.curTasks) {
     for(var id in this.curTasks) {
       var task = this.curTasks[id];
+      //下划线模块分析任务完成条件
       var cc = underscore.pairs(task.completeCondition)[0];
       reTasks.push({
         acceptTalk: task.acceptTalk,
