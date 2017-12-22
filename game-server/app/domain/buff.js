@@ -135,6 +135,7 @@ var KuroujiBuff = (function() {
 
 var create = function(skill) {
 	return null;
+	//return new Buff(skill)   //我加的
 };
 
 module.exports.ConfuseBuff = ConfuseBuff;
