@@ -5,7 +5,7 @@ var pomelo = require('pomelo');
 
 var logger = require('pomelo-logger').getLogger(__filename);
 
-//场景副本池
+//场景副本池，就是场景副本的管理类
 var exp = module.exports;
 
 var instances;
@@ -14,10 +14,10 @@ var maps = {};
 
 //服务器运行，立即执行该函数...........................1
 exp.init = function(opts){
-  instances = {};   //副本组
+  instances = {};   //场景副本组
   intervel = opts.intervel||60000;   //时间间隔
 
-  setInterval(check, intervel);   //定时器
+  setInterval(check, intervel);   //启动定时器
 };
 
 
@@ -35,16 +35,17 @@ exp.create = function(params){
   var opts = dataApi.area.findById(areaId);
   //如果地图组没有该地图，生成一个地图实例
   if(!maps[areaId]){
+    //从场景数据读取地图路径的tiledmap表单，生成游戏地图
     maps[areaId] = new Map(opts);
   }
-  //场景副本数据中加入该地图
+  //场景副本数据中加入该游戏地图
   opts.map = maps[areaId];
 
   //Create instance
-  //通过场景副本数据生成副本场景
+  //实例副本场景
   var instance = new Instance(opts);
 
-  //加入副本组中
+  //将副本场景加入副本组中
   instances[id] = instance;
 
   //启动该副本
