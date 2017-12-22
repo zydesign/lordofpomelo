@@ -4,7 +4,7 @@ var Area = require('./area');
 var Instance = function(opts){
   this.id = opts.instanceId;
   this.area = new Area(opts);
-  this.lifeTime = opts.lifeTime || 1800000;  //副本生命周期
+  this.lifeTime = opts.lifeTime || 1800000;  //副本没人后的，生命时间为30分钟
 };
 
 module.exports = Instance;
@@ -26,7 +26,7 @@ Instance.prototype.getArea = function(){
 //判断该副本是否还开着
 Instance.prototype.isAlive = function(){
   if(this.area.isEmpty()){
-    //玩家数量为0开始的时间大于生命周期就是副本超时了，死区，需要关闭
+    //玩家数量为0开始计算的时间超过30分钟，变死区，需要关闭
     if((Date.now() - this.area.emptyTime) > this.lifeTime){
       return false;
     }
