@@ -1,10 +1,13 @@
 var formula = module.exports;
 var logger = require('pomelo-logger').getLogger(__filename);
 
+//公式模块
+
+//技能伤害
 formula.calDamage = function(attacker, target, skill) {
-	var atk = attacker.getTotalAttack();
-	var def = target.getTotalDefence();
-	var mul = Math.sqrt(Math.abs(atk-def))/5 + 1;
+	var atk = attacker.getTotalAttack();                 //攻击者的总攻击力
+	var def = target.getTotalDefence();                  //目标的总防御力
+	var mul = Math.sqrt(Math.abs(atk-def))/5 + 1;        //攻击伤害
 	
 	mul = atk>def?mul:0.8/mul;
 	var defence = 1/Math.pow((target.getTotalDefence()+5)/5, 0.33);
@@ -33,6 +36,7 @@ formula.calMobValue = function(baseValue, level, upgradeParam) {
 /**
  * the experience gained by player when kill some mob
  */
+//杀怪获得经验值
 formula.calMobExp = function(baseExp, playerLevel, mobLevel) {
 	var diff = playerLevel - mobLevel;
 	var mul = Math.pow(Math.abs(diff),1.5)/6 + 1;
@@ -59,6 +63,7 @@ formula.calMobExp = function(baseExp, playerLevel, mobLevel) {
  * @param target {Object} target entity
  * @param range {Number} the range of distance
  */
+//判断角色与目标的距离是否在限制范围
 formula.inRange = function(origin, target, range) {
   var dx = origin.x - target.x;
   var dy = origin.y - target.y;
@@ -72,6 +77,7 @@ formula.distance = function(x1, y1, x2, y2) {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
+//掉落道具等级
 formula.dropItemLv = function(mobLv, heroLv){
 	var lv = Math.min(mobLv, heroLv);
 	
@@ -91,6 +97,7 @@ formula.dropItemLv = function(mobLv, heroLv){
  * @param {String} format
  * @param {String} 
  */
+//获取时间格式（如：2017年12月222日 下午7:27:16）
 formula.timeFormat = function(date) {
 	var n = date.getFullYear(); 
 	var y = date.getMonth() + 1;
