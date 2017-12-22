@@ -395,7 +395,7 @@ Instance.prototype.getEntitiesByPos = function(pos, types, range) {
   return result;
 };
 
-//判断场景是否有玩家
+//判断场景是否有玩家，该函数由场景副本instance调用，没玩家就要关闭副本----------------------------
 Instance.prototype.isEmpty = function(){
   return this.playerNum === 0;
 };
