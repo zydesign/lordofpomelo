@@ -5,15 +5,16 @@ var id = 0;
 
 /**
  * The origint zone object
- * 怪物空间对象的父类，mobzone将会继承该父类属性及方法
+ * 怪物空间的基类，mobzone将会继承该基类属性及方法
  */
+//怪物空间，继承事件监听器。
 var Zone = function(opts) {
-	this.zoneId = id++;
-	this.width = opts.width;
-	this.height = opts.height;
-	this.x = opts.x;
+	this.zoneId = id++;           //实例zone时，id递增下去
+	this.width = opts.width;      //空间的宽度
+	this.height = opts.height;    //空间的高度
+	this.x = opts.x;              
 	this.y = opts.y;
-  this.area = opts.area;
+  this.area = opts.area;              //空间所在的场景
 };
 
 util.inherits(Zone, EventEmitter);
