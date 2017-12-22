@@ -36,7 +36,7 @@ var Instance = function(opts){
   this.channel = null;
 
   this.playerNum = 0;
-  this.emptyTime = Date.now();
+  this.emptyTime = Date.now();   //玩家走光时间
   //Init AOI 通过opts参数配置，建立地图灯塔阵为aoi,aoi就是对对象id及观察者id的管理
   this.aoi = aoiManager.getService(opts);  //aoi工厂实例
 
