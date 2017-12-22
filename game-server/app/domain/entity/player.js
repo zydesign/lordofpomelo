@@ -356,7 +356,7 @@ Player.prototype.recover = function(lastTick){
 };
 
 //Complete task and tasks' state.
-//单个任务完成，但任务要进阶，状态为完成不发送
+//玩家击杀怪物或收集道具达到数量时，由executeTask执行该函数，将任务状态改为完成未发送并同步到数据库...........................................
 Player.prototype.completeTask = function(taskId) {
   var task = this.curTasks[taskId];
   task.taskState = TaskState.COMPLETED_NOT_DELIVERY;
