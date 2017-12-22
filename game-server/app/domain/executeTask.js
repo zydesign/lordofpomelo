@@ -1,5 +1,5 @@
 /**
- * Module dependencies
+ * Module dependencies //执行任务模块
  */
 var consts = require('../consts/consts');
 var messageService = require('./messageService');
@@ -23,12 +23,12 @@ var executeTask = module.exports;
  * @param {Character} killed, the killed character(mob/player)
  * @api public
  */
-//击杀怪物后，调用该函数
+//玩家击杀怪物后，调用该函数
 executeTask.updateTaskData = function(player, killed) {
 	//先排除角色类型是怪物
   if (player.type === consts.EntityType.MOB) {return;}
 	var tasks = player.curTasks;
-	var reData = null;
+	var reData = null;  //记录任务进度数据
 	for (var id in tasks) {
 		var task = tasks[id];
 		//如果无任务或任务完成或任务完成一半，则遍历下一个任务
@@ -39,13 +39,14 @@ executeTask.updateTaskData = function(player, killed) {
 		var taskDesc = task.desc.split(';');
 		var taskType = task.type;    //任务类型
 		var killedNum = task.completeCondition[taskDesc[1]];  //刷怪数量
-		//满足3个条件：任务类型为击杀怪物，被击杀的目标是怪物，被击杀的目标类型id是描述的第二项
+		//满足3个条件：任务类型为击杀怪物，被击杀的目标是怪物，被击杀目标的怪物id是描述的第二项
 		if (taskType === consts.TaskType.KILL_MOB && killed.type === consts.EntityType.MOB && killed.kindId === parseInt(taskDesc[1])) {
 			task.taskData.mobKilled += 1;  //该属性由Player.startTask函数提供
 			reData = reData || {};
 			reData[id] = task.taskData;
 			task.save();   //更新了taskData后，同步数据库
 			player.curTasks[id] = task;  //更新角色player的当前任务
+			//击杀怪物达到数量时，即任务完成时，执行任务完成函数，推送消息给玩家，完成任务按钮激活
 			if (player.curTasks[id].taskData.mobKilled >= killedNum) {
 				isCompleted(player, id);
 			}
@@ -72,6 +73,7 @@ executeTask.updateTaskData = function(player, killed) {
  * @param {Number} taskId
  * @api private
  */
+//达到完成任务条件，推送消息给客户端，激活完成按钮
 var isCompleted = function(player, taskId) {
 		player.completeTask(taskId);
     messageService.pushMessageToPlayer({uid:player.userId, sid : player.serverId}, 'onTaskCompleted', {
