@@ -10,6 +10,7 @@ var defaultLimit = 10;
 /**
  * The mob zone for generate mobs
  */
+//怪物空间类。在特定区域内生成怪物
 var MobZone = function(opts) {
 	Zone.call(this, opts);
 	this.area = opts.area;
