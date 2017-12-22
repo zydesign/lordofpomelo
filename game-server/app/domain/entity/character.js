@@ -267,6 +267,7 @@ Character.prototype.attack = function(target, skillId) {
  * @param {Number} damage
  * @api public
  */
+//角色受攻击损失的HP值
 Character.prototype.hit = function(attacker, damage) {
   this.increaseHateFor(attacker.entityId);
   this.reduceHp(damage);
