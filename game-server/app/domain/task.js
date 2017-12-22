@@ -25,7 +25,7 @@ var Task = function(opts) {
 	this.startTime = opts.startTime;                      //开始执行时间
 	this.taskData = this._parseJson(opts.taskData);       //任务数据。实例task时，opt没有提供taskData属性，该函数生成了空对象{}
 
-	this._initTaskInfo();                          //执行初始化任务信息
+	this._initTaskInfo();                          //读取任务表单获取对应id的任务，执行初始化任务信息
 };
 util.inherits(Task, Persistent);
 
@@ -42,7 +42,7 @@ module.exports = Task;
  */
 
 Task.prototype._initTaskInfo = function() {
-	var info = taskData.findById(this.kindId);   //获取指定id的任务对象
+	var info = taskData.findById(this.kindId);   //通过任务表单获取指定id的任务
 	
 	//读取任务的内容为属性
 	if (!!info) {
