@@ -7,13 +7,13 @@ var logger = require('pomelo-logger').getLogger(__filename);
 formula.calDamage = function(attacker, target, skill) {
 	var atk = attacker.getTotalAttack();                 //攻击者的总攻击力
 	var def = target.getTotalDefence();                  //目标的总防御力
-	var mul = Math.sqrt(Math.abs(atk-def))/5 + 1;        //攻击伤害
+	var mul = Math.sqrt(Math.abs(atk-def))/5 + 1;         
 	
 	mul = atk>def?mul:0.8/mul;
 	var defence = 1/Math.pow((target.getTotalDefence()+5)/5, 0.33);
 	
-	var damage = Math.ceil(attacker.getTotalAttack()*defence*mul*(Math.random()*0.2 + 0.9));
-	damage = Math.ceil(skill.getAttackParam() * damage);
+	var damage = Math.ceil(attacker.getTotalAttack()*defence*mul*(Math.random()*0.2 + 0.9));  
+	damage = Math.ceil(skill.getAttackParam() * damage);     //最终伤害值
 	if (damage <= 0) {
 		damage = 1;
 	}
