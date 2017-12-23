@@ -4,7 +4,9 @@
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+//实体基类
 
+//基类都有一个id递增
 var id = 1;
 
 /**
