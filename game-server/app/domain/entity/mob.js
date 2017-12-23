@@ -19,11 +19,11 @@ var logger = require('pomelo-logger').getLogger(__filename);
  * @param {Object} opts
  * @api public
  */
-
+//怪物类。在怪物空间mobzone生成怪物时，实例这个函数
 var Mob = function(opts) {
   Character.call(this, opts);
   this.type = EntityType.MOB;
-  this.spawningX = opts.x;
+  this.spawningX = opts.x;        //怪物卵坐标
   this.spawningY = opts.y;
   this.level = Number(opts.level);
   this.armorLevel = opts.armorLevel;
@@ -31,16 +31,21 @@ var Mob = function(opts) {
   this.zoneId = opts.zoneId;
 
   // override the character hp calculate value
+  //根据怪物等级，怪物表基础血量，怪物升级系数，新计算怪物血量
   this.hp = formula.calMobValue(this.characterData.hp, this.level, this.characterData.upgradeParam);
   this.mp = formula.calMobValue(this.characterData.mp, this.level, this.characterData.upgradeParam);
   this.maxHp = this.hp;
   this.maxMp = this.mp;
 
+  //根据怪物等级，怪物表基础攻击防御，怪物升级系数，计算怪物攻击值和防御值
   this.attackValue = formula.calMobValue(this.characterData.attackValue, this.level, this.characterData.upgradeParam);
   this.defenceValue = formula.calMobValue(this.characterData.defenceValue, this.level, this.characterData.upgradeParam);
 
+  //怪物攻击范围
   this.range = this.range||0;
+  //执行初始化怪物技能
   this._initFightSkill();
+  //执行设置怪物总攻击和总防御
   this.setTotalAttackAndDefence();
 };
 
