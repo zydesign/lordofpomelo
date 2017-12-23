@@ -12,7 +12,7 @@ var Zone = function(opts) {
 	this.zoneId = id++;           //实例zone时，id递增下去
 	this.width = opts.width;      //空间的宽度
 	this.height = opts.height;    //空间的高度
-	this.x = opts.x;              
+	this.x = opts.x;              //空间的坐标，在空间的左下角
 	this.y = opts.y;
   this.area = opts.area;              //空间所在的场景
 };
