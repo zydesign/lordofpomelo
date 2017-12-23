@@ -12,10 +12,10 @@ var fs = require('fs');
  * map类将会被场景类调用（/domain/area/scene.js）
  */
 var Map = function(opts) {
-	//area.json场景配置的子对象的path属性为地图配置文件路径
+	//area.json场景配置的子对象的path属性为tiledMap地图数据脚本路径
 	this.mapPath = process.cwd() + opts.path;
 	//this.map为地图数据对象
-	this.map = null;
+	this.map = null;    //这个属性由this.configMap(map)赋值，
 	//默认关闭权重地图
 	this.weightMap = null;
 	this.name = opts.name;
@@ -34,7 +34,7 @@ var pro = Map.prototype;
  */
 Map.prototype.init = function(opts) {
 	var weightMap = opts.weightMap || false;
-	//地图配置文件（/config/map/xxx.json）
+	//地图配置文件（/config/map/xxx.json），获取tiledMap地图数据
 	var map = require(this.mapPath);
 	if(!map) {
 		logger.error('Load map failed! ');
@@ -84,7 +84,7 @@ Map.prototype.init = function(opts) {
 //障碍物可以用多边形和矩形来画，不能用圆形
 Map.prototype.configMap = function(map){
 	this.map = {};
-	var layers = map.layers;
+	var layers = map.layers; //这里的map是tiledMap地图数据对象
 	for(var i = 0; i < layers.length; i++){
 		var layer = layers[i];
 		if(layer.type === 'objectgroup'){
