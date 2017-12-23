@@ -47,7 +47,7 @@ var Character = function(opts) {
   this.equipmentParam = 1;
   this.buffs = [];     //拥有的buff
   this.curSkill = 1;  //default normal attack  //当前技能
-  this.characterData = dataApi.character.findById(this.kindId);  //角色数据
+  this.characterData = dataApi.character.findById(this.kindId);  //角色数据。kindId是基类Entity的属性，读到的是character怪物表单的id
   this.fightSkills = {};   //战斗技能
 };
 
