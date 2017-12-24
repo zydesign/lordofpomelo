@@ -104,6 +104,7 @@ MobZone.prototype.generateMobs = function() {
 	this.add(mob);
         
 	//将怪物加入场景（该怪物带有path巡逻路径了）........................................
+	//加入场景就会加入ai系统，ai判定实体为怪物就会给怪物装上tiger大脑，该大脑updata移到玩家就攻击否则巡逻，巡逻会使用path属性
 	this.area.addEntity(mob);
 	this.count++;  //生成一个怪物后，怪物空间的怪物数量加1
 };
