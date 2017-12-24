@@ -86,7 +86,9 @@ Timer.prototype.abortAllAction = function(id) {
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
-//给一个实体增加ai，（characterEvent注册攻击事件，怪物受到攻击时调用了这个函数）---------------------------0
+//给一个实体增加ai，----------------------------------------------------------------------------------0
+//（1.怪物处于巡逻状态时，characterEvent注册攻击事件，怪物受到攻击时调用了这个函数）
+//（2.怪物处于巡逻状态时，aoi事件监听玩家进入怪物视野，怪物通过Mob.increaseHateFor锁定目标，从巡逻系统转为ai系统从而攻击玩家 ）
 Timer.prototype.enterAI = function(entityId) {
   var area = this.area;
 
