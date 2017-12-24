@@ -31,7 +31,7 @@ pro.stop = function() {
  * Start the tick if it has not started yet.
  */
 
-//通过角色参数，创建大脑实例，并储存到玩家大脑组和怪物大脑中
+//通过角色实体，创建大脑实例，并储存到玩家大脑组和怪物大脑中。（怪物受到攻击，从巡逻状态转为攻击状态由Timer.enterAI调用该函数）
 
         //参数cs为角色数组，Blackboard参数就会在这里被创建
 pro.addCharacters = function(cs) {
