@@ -8,7 +8,7 @@ var exp = module.exports;
 //opt得到的参数{area：area；brainService：brainService}
 var Manager = function(opts) {
 	this.brainService = opts.brainService;
-	this.area = opts.area;
+	this.area = opts.area;    //引入该参数是为了创建黑板时候调用
 	this.players = {};
 	this.mobs = {};
 };
