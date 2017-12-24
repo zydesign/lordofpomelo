@@ -77,11 +77,12 @@ MobZone.prototype.generateMobs = function() {
 		logger.error('load mobData failed! mobId : ' + this.mobId);
 		return;
 	}
+	//先生成怪物坐标.......................................
         //do...while循环，如果生成的怪物数据坐标map地图内无效（不在地图内或在障碍物上），就从新生成坐标，限制20次内 	
 	var count = 0, limit = 20;
 	do{
-		//怪物数据添加一个坐标属性，空间的坐标是空间方块的左下角，这里生成的坐标在方块里面
-		mobData.x = Math.floor(Math.random()*this.width) + this.x;
+		//生成怪物数据坐标。空间的坐标是空间方块的左下角，这里生成的坐标在方块里面
+		mobData.x = Math.floor(Math.random()*this.width) + this.x;  //this.x是基类zone的坐标（左下角）
 		mobData.y = Math.floor(Math.random()*this.height) + this.y;
 	} while(!this.map.isReachable(mobData.x, mobData.y) && count++ < limit);
 
@@ -93,23 +94,23 @@ MobZone.prototype.generateMobs = function() {
             
 	//生成怪物实例
 	var mob = new Mob(mobData);
-	mob.spawnX = mob.x;   //给怪物添加卵坐标属性
+	mob.spawnX = mob.x;   //给怪物添加卵坐标(怪物坐标)属性
 	mob.spawnY = mob.y; 
 	
-	//执行生成怪物巡逻路径
+	//执行生成怪物巡逻路径，执行结果是给mob实体添加path属性（包括自身坐标在内的4个坐标）..................
 	genPatrolPath(mob);
 	
-	//执行将怪物实体加入怪物组
+	//执行将怪物实体加入MobZone的怪物组
 	this.add(mob);
         
-	//将怪物加入场景
+	//将怪物加入场景（该怪物带有path巡逻路径了）........................................
 	this.area.addEntity(mob);
 	this.count++;  //生成一个怪物后，怪物空间的怪物数量加1
 };
 
 /**
  * Add a mob to the mobzones
- * 增加怪物到怪物空间
+ * 增加怪物实体到怪物空间
  */
 MobZone.prototype.add = function(mob) {
 	this.mobs[mob.entityId] = mob;
@@ -129,15 +130,15 @@ MobZone.prototype.remove = function(id) {
 	return true;
 };
 
-var PATH_LENGTH = 3;   //路径长度，坐标数量
-var MAX_PATH_COST = 300;  //路径最大数量
+var PATH_LENGTH = 3;   //路径坐标数量
+var MAX_PATH_COST = 300;  //路径坐标最大数量
 
 /**
  * Generate patrol path for mob
- * 生成怪物巡逻路径，返回坐标数组（4个坐标）
+ * 生成3个怪物巡逻坐标，并加上怪物本身坐标，返回坐标数组（4个坐标）
  */
 var genPatrolPath = function(mob) {
-	var map = mob.area.map;  //地图
+	var map = mob.area.map;  //地图类实例
 	var path = []; //创建一个路径坐标数组
 	var x = mob.x, y = mob.y, p;
 	for(var i=0; i<PATH_LENGTH; i++) {
@@ -147,11 +148,12 @@ var genPatrolPath = function(mob) {
 			break;
 		}
 		path.push(p);
+		//以生成的坐标为基础，再生成下一个坐标
 		x = p.x;
 		y = p.y;
 	}
-	path.push({x: mob.x, y: mob.y}); //路径3个坐标，再加入怪物本身的坐标，共4个坐标
-	mob.path = path;
+	path.push({x: mob.x, y: mob.y}); //生成了3个巡逻坐标，再加入怪物本身的坐标，共4个坐标
+	mob.path = path;   //将路径添加到怪物实体中
 };
 
 /**
@@ -161,6 +163,7 @@ var genPatrolPath = function(mob) {
  * @param count {Number} The retry count before give up
  * @api private
  */
+//通过怪物当前坐标生成新的巡逻坐标。(originX, originY,是怪物坐标)
 var genPoint = function(map, originX, originY, count) {
 	count = count || 0;
 	var disx = Math.floor(Math.random() * 100) + 100;
@@ -177,6 +180,8 @@ var genPoint = function(map, originX, originY, count) {
 		y = originY + disy;
 	}
 
+	//保证新坐标在地图内
+	//如果生成的坐标小于0，取坐标+距离；如果生成坐标超出x，y最大值（地图宽高），取坐标-距离
 	if(x < 0) {
 		x = originX + disx;
 	} else if(x > map.width) {
@@ -188,6 +193,7 @@ var genPoint = function(map, originX, originY, count) {
 		y = originY - disy;
 	}
         //检测生成的坐标是否合法，如果不合法则从新生成，机会10次
+	//参数解析：originX, originY是怪物坐标；x, y是生成怪物巡逻的新坐标
 	if(checkPoint(map, originX, originY, x, y)) {
 		return {x: x, y: y};
 	} else {
