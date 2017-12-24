@@ -2,6 +2,7 @@ var bt = require('pomelo-bt');
 var BTNode = bt.Node;
 var util = require('util');
 
+//巡逻动作，会作为大脑tiger的子节点调用
 var Action = function(opts) {
 	BTNode.call(this, opts.blackboard);
 };
@@ -21,7 +22,7 @@ pro.doAction = function() {
 	var character = this.blackboard.curCharacter;
 	var area = this.blackboard.area;
 
-	//场景时间管理器执行巡逻函数（巡逻函数会先把实体从ai管理器中移除，再在巡逻管理器中加入）
+	//场景timer执行巡逻函数（巡逻函数会先把实体从ai管理器中移除，再在巡逻管理器中加入）
 	area.timer.patrol(character.entityId);
 	return bt.RES_SUCCESS;
 };
