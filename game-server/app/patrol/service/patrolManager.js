@@ -5,8 +5,9 @@ var Wait = require('../mode/wait');
 
 var STAND_TICK = 50;
 
+//巡逻管理器
 var Manager = function() {
-  this.characters = {};
+  this.characters = {};   //角色组，一般为怪物
 };
 
 var pro = Manager.prototype;
@@ -18,6 +19,7 @@ var pro = Manager.prototype;
  *        c.character {Character} character instance that with id and x, y stand for position of the character
  *        c.path {Array} array of position {x: x, y: y}
  */
+//创建一个角色巡逻动作。怪物ai大脑tiger执行巡逻子节点的doAction时，执行Timer.patrol，然后调用该函数
 pro.addCharacters = function(cs) {
   var c;
   for(var i=0, l=cs.length; i<l; i++) {
@@ -31,6 +33,8 @@ pro.addCharacters = function(cs) {
 /**
  * Remove character from patrol module by id
  */
+
+//删除一个怪物巡逻动作。怪物受攻击要切换巡逻为攻击时，timer.enterAI(entityId)会调用该函数
 pro.removeCharacter = function(id) {
   delete this.characters[id];
 };
@@ -44,6 +48,7 @@ pro.update = function() {
 /**
  * Generate patrol actions for character.
  */
+//生成巡逻动作，返回循环移动动作实例
 var genAction = function(character, path) {
   var start = path[0];
   var res = new Loop({
