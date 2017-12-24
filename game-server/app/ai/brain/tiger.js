@@ -84,6 +84,8 @@ var Brain = function(blackboard) {
 		blackboard: blackboard
 	});
 
+	//如果attackIfHaveTarget子节点的结果为失败，那么执行patrol子节点会，让ai去除该怪物的ai大脑，加入巡逻系统
+	//直到aoi系统监听到玩家进入怪物视野攻击范围，才从巡逻系统转回ai系统
 	this.action.addChild(attackIfHaveTarget);
 	//this.action.addChild(findTarget);
 	this.action.addChild(patrol);
