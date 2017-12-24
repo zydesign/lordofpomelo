@@ -100,6 +100,7 @@ Mob.prototype.isHate = function(entityId) {
  * @api public
  */
 
+//怪物看到玩家进入攻击范围，锁定玩家目标，调用timer.enterAI(entityId)函数从巡逻系统转为ai系统，从而攻击玩家
 Mob.prototype.increaseHateFor = function(entityId, points) {
   points = points || 1;
   if(this.haters[entityId]){
@@ -154,6 +155,7 @@ Mob.prototype.forEachHater = function(cb) {
 };
 
 //Increase hate for the player who is coming.
+//aoi事件监听到玩家加入，观察者中有怪物看到该玩家，就会执行该函数，锁定玩家增加仇恨，玩家也添加该敌人
 Mob.prototype.onPlayerCome = function(entityId) {
   var player = this.area.getEntity(entityId);
 
