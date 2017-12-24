@@ -82,7 +82,7 @@ Timer.prototype.abortAllAction = function(id) {
   this.area.actionManager.abortAllAction(id);
 };
 
-/** ai管理部分--------------------------------------------------------通常是area场景服务器调用
+/** ai管理部分------------------------------------------------------- 
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
@@ -99,16 +99,18 @@ Timer.prototype.enterAI = function(entityId) {
   }
 };
 
-/** 巡逻管理部分---------------------------------------------------------通常是area场景服务器调用
+/** 巡逻管理部分--------------------------------------------------------- 
  * Enter patrol for given entity
  * @param entityId {Number}
  */
-//给实体加入到巡逻系统（先从ai管理中移除，并判断这个实体必须在场景中）
+//给实体加入到巡逻系统。先从ai管理中移除，并判断这个实体必须在场景中（该函数由ai大脑tiger实例巡逻动作patrol的doAction调用）.............
 Timer.prototype.patrol = function(entityId) {
   var area = this.area;
 
+  //退出ai系统
   area.aiManager.removeCharacter(entityId);
 
+  //加入巡逻系统
   if(!!area.entities[entityId]) {
     area.patrolManager.addCharacters([{character: area.entities[entityId], path: area.entities[entityId].path}]);
   }
