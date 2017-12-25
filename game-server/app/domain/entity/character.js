@@ -194,12 +194,16 @@ Character.prototype.recoverMp = function(mpValue) {
  * @param {Boolean} useCache
  * @api public
  */
+//角色移动。cb的结果只有true或false（怪物巡逻系统、ai系统，客户端发移动指令调用该函数）
 Character.prototype.move = function(targetX, targetY, useCache, cb) {
   useCache = useCache || false;
 
+  //如果使用缓存
   if(useCache){
+    //从地图map中获取寻路路径（map.findPath使用了寻路系统，会避开障碍物返回最佳的坐标数组）
     var paths = this.area.map.findPath(this.x, this.y, targetX, targetY, useCache);
 
+    //如果地图map获取的寻路路径存在，发射“移动”事件，cb返回结果true
     if(!!paths){
       this.emit('move', {character: this, paths: paths});
       utils.invokeCallback(cb, null, true);
@@ -207,9 +211,12 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
       logger.warn('No path exist! {x: %j, y: %j} , target: {x: %j, y: %j} ', this.x, this.y, targetX, targetY);
       utils.invokeCallback(cb, 'find path error', false);
     }
+    //如果不使用缓存
   }else{
     var closure = this;
+    //rpc调用寻路服务器findPath函数获取寻路路径
     pomelo.app.rpc.path.pathFindingRemote.findPath(null, {areaId: this.areaId, start:{x:this.x, y:this.y}, end:{x:targetX, y: targetY}}, function(err, paths){
+      //寻路服务器获取的寻路路径paths存在，发射“移动”事件，cb返回结果true
       if(!!paths){
         closure.emit('move', {character: closure, paths: paths});
         utils.invokeCallback(cb, null, true);
