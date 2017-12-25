@@ -38,7 +38,7 @@ pro.update = function() {
   if(!this.started) {
     //开启循环
     this.started = true;
-    //角色移动到第一个巡逻坐标，返回等待，不再执行后面，等待下一次update
+    //角色移动到第一个巡逻坐标，返回等待，不再执行后面，等待下一次update-----------------------------------移动
     this.character.move(this.path[0].x, this.path[0].y, true);
     return patrol.RES_WAIT;
   }
@@ -79,7 +79,7 @@ pro.update = function() {
   }
 
   //move to next destination
-  //然后角色移动到下一个坐标，返回等待
+  //然后角色移动到下一个坐标，返回等待-------------------------------------------------------------------移动
   this.character.move(this.path[0].x, this.path[0].y, true);
   return patrol.RES_WAIT;
 };
