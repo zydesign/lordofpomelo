@@ -201,6 +201,7 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
   //如果使用缓存
   if(useCache){
     //从地图map中获取寻路路径（map.findPath使用了寻路系统，会避开障碍物返回最佳的坐标数组）
+    //参数的this.x, this.y在角色每执行action的move.update一次都会实时更新为移动后的坐标
     var paths = this.area.map.findPath(this.x, this.y, targetX, targetY, useCache);
 
     //如果地图map获取的寻路路径存在，发射“移动”事件，cb返回结果true
