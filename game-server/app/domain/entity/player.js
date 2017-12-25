@@ -308,7 +308,7 @@ Player.prototype.startTask = function(task) {
   };
    //任务的开始时间为当前时间
   task.startTime = formula.timeFormat(new Date());
-  //任务进度同步到数据库
+  //任务进度同步到数据库（/app/dao/taskDao.js的创建新任务createNewTask注册任务的on）
   task.save();
   var id = task.id; 
   //player的当前任务更新
