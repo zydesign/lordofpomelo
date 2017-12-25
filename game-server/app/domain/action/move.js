@@ -83,7 +83,9 @@ Move.prototype.update = function(){
 	//Update the aoi module
         //更新aoi模块
 	var watcher = {id : this.entity.entityId, type : this.entity.type};
+	//更新实体的在场景中从旧坐标oldPos移动到新坐标pos
   this.area.timer.updateObject(watcher, oldPos, pos);
+	//更新观察者
   this.area.timer.updateWatcher(watcher, oldPos, pos, this.entity.range, this.entity.range);
 	//如果移动的角色为【玩家】，则发射save事件，同步到数据库----------------------------------------------------
 	if(this.entity.type === consts.EntityType.PLAYER){
