@@ -3,7 +3,7 @@ var Loop = require('../mode/loop');
 var Composite = require('../mode/composite');
 var Wait = require('../mode/wait');
 
-var STAND_TICK = 50;
+var STAND_TICK = 50;  //停留时间
 
 //巡逻管理器
 var Manager = function() {
@@ -55,10 +55,10 @@ pro.update = function() {
 var genAction = function(character, path) {
   var start = path[0];
   var res = new Loop({
-    character: character, 
-    path: path, 
-    rounds: -1, 
-    standTick: STAND_TICK
+    character: character,   //角色实体
+    path: path,             //巡逻路径
+    rounds: -1,             //循环圈数
+    standTick: STAND_TICK   //停留时间
   });
 
   return res;
