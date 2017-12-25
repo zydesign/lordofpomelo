@@ -8,6 +8,7 @@ var logger = require('pomelo-logger').getLogger(__filename);
  * Move action, which is used to preserve and update user position
  * 移动动作，用于保存和更新用户位置，并把移动位置传递给aoi服务
  */
+//移动动作。（characterEvent监听on移动事件调用，生成move实例提供的参数为{entity: character,path: paths.path,speed: speed}）
 var Move = function(opts){
 	opts.type = 'move';
 	opts.id = opts.entity.entityId;
@@ -20,7 +21,7 @@ var Move = function(opts){
 	this.path = opts.path;
 	this.speed = Number(opts.speed);
 	this.time = Date.now();   //上一次刷新时间
-	this.pos = this.path[0];
+	this.pos = this.path[0];   //寻路路径第一个坐标，原点
 	this.index = 1;
 	this.tickNumber = 0;  //刷新次数
 };
@@ -75,7 +76,7 @@ Move.prototype.update = function(){
 	this.pos = pos;
 	this.index = index;
 
-	//update一次，实体移动后的坐标（给出了最后移动坐标，也要沿着路径坐标走）
+	//update一次，更新实体坐标为移动后的坐标（给出了最后移动坐标，也要沿着路径坐标走）
 	this.entity.x = Math.floor(pos.x);
 	this.entity.y = Math.floor(pos.y);
 
@@ -84,10 +85,10 @@ Move.prototype.update = function(){
 	var watcher = {id : this.entity.entityId, type : this.entity.type};
   this.area.timer.updateObject(watcher, oldPos, pos);
   this.area.timer.updateWatcher(watcher, oldPos, pos, this.entity.range, this.entity.range);
-	//如果移动的角色为玩家，则发射save事件，同步到数据库
+	//如果移动的角色为【玩家】，则发射save事件，同步到数据库----------------------------------------------------
 	if(this.entity.type === consts.EntityType.PLAYER){
 		this.entity.save();
-		//每刷新10次广播一次消失给玩家自己.........................
+		//每刷新10次广播一次消息给玩家自己.........................
 		if (this.tickNumber % 10 === 0) {
 			messageService.pushMessageToPlayer({uid:this.entity.userId, sid : this.entity.serverId}, 'onPathCheckout', {
 				entityId: this.entity.entityId,
