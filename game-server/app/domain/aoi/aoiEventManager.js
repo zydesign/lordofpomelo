@@ -6,10 +6,13 @@ var utils = require('../../util/utils');
 var exp = module.exports;
 
 //Add event for aoi
+//aoi事件添加。（当场景加载时，会立即执行该函数）............................................................0
+
 //为aoi添加事件监听,监听对象的add、remove、update，观察者的updateWatcher。
 //aoi就是对象ids和观察者ids的管理，对象ids会在updateWatcher被调用
 //当触发事件时，获取观察者uids，并广播消息。观察者时怪物的话，就激化这些怪物仇恨
 exp.addEvent = function(area, aoi){
+	//aoi对象是继承事件监听器的，并且aoi的函数里面带有很多发射事件----------------------------------------------1
 	aoi.on('add', function(params){   //加入事件
 		params.area = area;
 		switch(params.type){
