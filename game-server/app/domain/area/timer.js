@@ -118,14 +118,14 @@ Timer.prototype.patrol = function(entityId) {
   }
 };
 
-/** aoi管理部分------------------------------------------------------------通常是area场景服务器调用
+/** aoi管理部分----------------------------------------------------------- 
  * Update object for aoi
  * @param obj {Object} Given object need to update.
  * @param oldPos {Object} Old position.
  * @param newPos {Object} New position.
  * @return {Boolean} If the update success.
  */
-// 更新对象位置
+// 更新对象位置（action动作的move.update执行移动后，会执行该函数更新对象在场景area中的位置）.................
 Timer.prototype.updateObject = function(obj, oldPos, newPos) {
   return this.area.aoi.updateObject(obj, oldPos, newPos);
 };
@@ -176,7 +176,7 @@ Timer.prototype.getWatchers = function(pos, types) {
  * @param newRange {Number} The new range of the watcher.
  * @return Boolean If the update is success.
  */
-//更新观察者
+//更新观察者 （action动作的move.update执行移动后，会执行该函数更新观察者）.................
 Timer.prototype.updateWatcher = function(watcher, oldPos, newPos, oldRange, newRange) {
   return this.area.aoi.updateWatcher(watcher, oldPos, newPos, oldRange, newRange);
 };
