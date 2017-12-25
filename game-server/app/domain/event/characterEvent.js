@@ -17,13 +17,13 @@ exp.addEventForCharacter = function(character) {
 	/**
 	 * Move event handler
 	 */
-	//注册角色“移动”事件
+	//注册角色“移动”事件，参数args由Character.move提供，为{character: character, paths: paths}
 	character.on('move', function(args){
 		var character = args.character;
 		var area = character.area;
 		var speed = character.walkSpeed;
-		var paths = args.paths;
-		//生成移动行为，只要角色发射了移动事件，action.updata就会生成移动动作并广播消息
+		var paths = args.paths;   //寻路路径
+		//生成移动行为，只要角色发射了移动事件，action.update就会生成移动动作并广播消息
 		var action = new Move({
 			entity: character,
 			path: paths.path,
@@ -31,7 +31,7 @@ exp.addEventForCharacter = function(character) {
 		});
 
 		//Add move action to action manager
-		//把生成的动作加入actionManager动作管理器，方便updata，并广播消息给aoi附近玩家（updata移动动作只给自己发了消息而已）
+		//在if条件中把动作加入actionManager动作管理器，方便update，并广播消息给aoi附近玩家（update移动动作只给自己发了消息而已）
 		if(area.timer.addAction(action)){
 			//aoi广播消息----------------------------------
 			messageService.pushMessageByAOI(area, {
