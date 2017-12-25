@@ -19,11 +19,13 @@ var pro = Manager.prototype;
  *        c.character {Character} character instance that with id and x, y stand for position of the character
  *        c.path {Array} array of position {x: x, y: y}
  */
-//创建一个角色巡逻动作。怪物ai大脑tiger执行巡逻子节点的doAction时，执行Timer.patrol，然后调用该函数
+//创建一个角色巡逻动作。(怪物ai大脑tiger执行巡逻子节点的doAction时，执行Timer.patrol，然后调用该函数)
+//参数cs不是角色实体数组，cs[i]=={character: area.entities[entityId], path: area.entities[entityId].path}
 pro.addCharacters = function(cs) {
   var c;
   for(var i=0, l=cs.length; i<l; i++) {
     c = cs[i];
+	  //生成巡逻动作，并加入巡逻动作组
     if(!this.characters[c.character.entityId]) {
       this.characters[c.character.entityId] = genAction(c.character, c.path);
     }
@@ -34,11 +36,12 @@ pro.addCharacters = function(cs) {
  * Remove character from patrol module by id
  */
 
-//删除一个怪物巡逻动作。怪物受攻击要切换巡逻为攻击时，timer.enterAI(entityId)会调用该函数
+//删除一个怪物巡逻动作。（怪物受攻击要切换巡逻为ai攻击时，timer.enterAI(entityId)会调用该函数）
 pro.removeCharacter = function(id) {
   delete this.characters[id];
 };
 
+//（timer.tick会定时执行这个update函数）
 pro.update = function() {
 	for(var id in this.characters) {
 		this.characters[id].update();
