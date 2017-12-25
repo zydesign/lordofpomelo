@@ -9,7 +9,7 @@ var patrol = require('../patrol');
  *        opts.rounds {Number} loop rounds. -1 stands for infinite loop
  *        opts.standTick {Number} rest tick after per step. 0 stands for no rest
  */
-//巡逻系统的循环动作
+// 巡逻动作
 var Mode = function(opts) {
   this.character = opts.character;          //角色实体
   this.path = opts.path.slice(0);           //去掉角色自身坐标，剩余3个巡逻坐标
@@ -26,9 +26,9 @@ var pro = Mode.prototype;
 
 
 
-//patrolManager.update就是遍历巡逻动作组，执行每一对象的update
+//patrolManager.update就是遍历巡逻动作组，执行巡逻动作的update
 pro.update = function() {
-  //如果路径无坐标或循环次数为0，返回完成，不再执行后面，等待下一次update
+  //如果路径无坐标或循环圈数为0，返回完成，不再执行后面，等待下一次update
   if(this.path.length === 0 || this.rounds === 0) {
     //if path is empty or rounds is 0
     return patrol.RES_FINISH;
@@ -36,12 +36,14 @@ pro.update = function() {
 
   //如果循环动作未开启
   if(!this.started) {
+    //开启循环
     this.started = true;
     //角色移动到第一个巡逻坐标，返回等待，不再执行后面，等待下一次update
     this.character.move(this.path[0].x, this.path[0].y, true);
     return patrol.RES_WAIT;
   }
 
+  //到达的坐标
   var dest = this.path[0];
   //如果角色还没到达第一个巡逻坐标，返回等待，不再执行后面，等待下一次update
   if(this.character.x !== dest.x || this.character.y !== dest.y) {
