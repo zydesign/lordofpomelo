@@ -31,7 +31,7 @@ exp.addEventForCharacter = function(character) {
 		});
 
 		//Add move action to action manager
-		//在if条件中把动作加入actionManager动作管理器，方便update，并广播消息给aoi附近玩家（update移动动作只给自己发了消息而已）
+		//在if条件中把动作加入actionManager动作管理器，方便update，更新实体坐标，更新实体在场景位置和观察者，并广播消息给aoi附近玩家（update移动动作只给自己发了消息而已）
 		if(area.timer.addAction(action)){
 			//aoi广播消息----------------------------------
 			messageService.pushMessageByAOI(area, {
