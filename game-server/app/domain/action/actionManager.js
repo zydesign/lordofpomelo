@@ -76,7 +76,7 @@ ActionManager.prototype.update = function(){
 	var length = this.actionQueue.length;
 	
 	for(var i = 0; i < length; i++){
-		//pop() 方法用于删除数组最后一个并返回这个元素
+		//pop() 方法用于删除数组最后一个并返回这个元素，这里是从动作队列移除，并返回这个动作
 		var action = this.actionQueue.pop();
 	
 		if(action.aborted){
@@ -85,10 +85,11 @@ ActionManager.prototype.update = function(){
 			
 		action.update();
 		
-		//动作被更新后，移出动作图阵
+		//如果动作未完成，动作加回动作队列
 		if(!action.finished){
 			this.actionQueue.push(action);
 		}else{
+			//如果动作完成了，移除动作组
 			delete this.actionMap[action.type][action.id];
 		}
 	}
