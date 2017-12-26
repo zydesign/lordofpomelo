@@ -24,7 +24,8 @@ var pro = Action.prototype;
 pro.doAction = function() {
 	var character = this.blackboard.curCharacter;
 	var targetId = this.blackboard.curTarget;
-	var distance = this.blackboard.distanceLimit || 200;
+	 //尝试攻击tryAttack、尝试拾取tryPick、尝试对话NPCtryTalkToNpc，不在有效距离内时，会写入黑板distanceLimit属性，提供这里使用....
+	var distance = this.blackboard.distanceLimit || 200;  
 	var target = this.blackboard.area.getEntity(targetId);
 
 	//场景获取不到实体，角色放弃锁定目标，返回失败
