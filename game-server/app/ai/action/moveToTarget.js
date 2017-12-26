@@ -86,7 +86,7 @@ pro.doAction = function() {
 		var dis2 = formula.distance(character.x, character.y, target.x, target.y);
 
 		//target position has changed
-		//如果实体目标改变比较小，或者黑板停止移动，重新获取实体坐标，并移动角色，返回等待
+		//如果实体离目标较远，或者黑板停止移动，获取实时目标坐标，并继续移动角色
 		if(((dis1 * 3 > dis2) && (dis1 < distance)) || !this.blackboard.moved){
 			targetPos.x = target.x;
 			targetPos.y = target.y;
