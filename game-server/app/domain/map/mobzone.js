@@ -140,7 +140,7 @@ var MAX_PATH_COST = 300;  //路径坐标最大数量
  */
 var genPatrolPath = function(mob) {
 	var map = mob.area.map;  //地图类实例
-	var path = []; //创建一个路径坐标数组
+	var path = []; //创建一个巡逻路径 
 	var x = mob.x, y = mob.y, p;
 	for(var i=0; i<PATH_LENGTH; i++) {
 		p = genPoint(map, x, y);  //通过地图和怪物坐标，生成3个路径的坐标
@@ -154,7 +154,7 @@ var genPatrolPath = function(mob) {
 		y = p.y;
 	}
 	path.push({x: mob.x, y: mob.y}); //生成了3个巡逻坐标，再加入怪物本身的坐标，共4个坐标
-	mob.path = path;   //将路径添加到怪物实体中
+	mob.path = path;   //将巡逻路径添加到怪物实体中
 };
 
 /**
