@@ -12,7 +12,7 @@ var logger = require('pomelo-logger').getLogger(__filename);
 var Move = function(opts){
 	opts.type = 'move';
 	opts.id = opts.entity.entityId;
-	opts.singleton = true;  //移动动作是独立行为
+	opts.singleton = true;  //只是给参数添加singleton，并不是move属性..............................
 
 	 //上面是修改opt参数，下面是让move继承action函数对象。结合util.inherits()继承action的原型链,
 	Action.call(this, opts); 
