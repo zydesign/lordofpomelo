@@ -46,6 +46,7 @@ pro.update = function() {
   //到达的坐标
   var dest = this.path[0];
   //如果角色还没到达第一个巡逻坐标，返回等待，不再执行后面，等待下一次update
+  //【移动动作move.update会一直更新{character.x,character.y}坐标，给这个条件做判断】
   if(this.character.x !== dest.x || this.character.y !== dest.y) {
     //if i am on the road to dest
     return patrol.RES_WAIT;
