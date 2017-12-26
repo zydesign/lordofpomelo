@@ -58,7 +58,7 @@ pro.doAction = function() {
 		return bt.RES_SUCCESS;
 	}
 
-	//执行对话结果返回值是没在距离范围内，返回失败
+	//执行对话结果返回值是没在距离范围内，将对话距离写入黑板，提供给moveToTarget使用，返回失败
 	if(res.result === consts.NPC.NOT_IN_RANGE) {
 		this.blackboard.distanceLimit = res.distance;
 	}
