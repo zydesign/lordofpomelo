@@ -80,7 +80,9 @@ Move.prototype.update = function(){
 	//记录一次update使用的寻路坐标组的key
 	this.index = index;
 
-	//update一次，更新实体坐标为移动后的坐标 ------------------------------------------------------更新实体坐标
+	//update一次，更新实体坐标为移动后的坐标 -------------------------------------------------------------更新实体坐标 
+	//调用实时坐标：1.loop.update巡逻动作，生成move动作后，实时获取实体坐标，判断是否到达巡逻坐标；
+	//            2.ai动作moveToTarget生成move动作后，实时获取实体坐标，判断是否进入攻击距离，拾取距离，对话距离；
 	this.entity.x = Math.floor(pos.x);
 	this.entity.y = Math.floor(pos.y);
 
