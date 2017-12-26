@@ -194,7 +194,7 @@ Character.prototype.recoverMp = function(mpValue) {
  * @param {Boolean} useCache
  * @api public
  */
-//角色移动。cb的结果只有true或false（怪物巡逻系统、ai系统，客户端发移动指令调用该函数）
+//角色移动。作用：生成寻路路径，并发射移动事件。cb的结果只有true或false（怪物巡逻系统、ai系统，客户端发移动指令调用该函数）
 Character.prototype.move = function(targetX, targetY, useCache, cb) {
   useCache = useCache || false;
 
