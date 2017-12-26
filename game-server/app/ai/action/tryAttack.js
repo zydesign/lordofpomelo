@@ -71,7 +71,7 @@ pro.doAction = function() {
 		return bt.RES_SUCCESS;
 	}
 
-	//攻击返回结果没在攻击范围，返回失败
+	//攻击返回结果没在攻击范围，将攻击距离写入黑板，提供给moveToTarget使用，返回失败
 	if(res.result === consts.AttackResult.NOT_IN_RANGE) {
 		this.blackboard.distanceLimit = res.distance;
 	}
