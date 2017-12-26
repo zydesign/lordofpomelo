@@ -21,6 +21,7 @@ var pro = Manager.prototype;
  */
 //创建一个角色巡逻动作。(怪物ai大脑tiger执行巡逻子节点的doAction时，执行Timer.patrol，然后调用该函数)
 //参数cs不是角色实体数组，cs[i]=={character: area.entities[entityId], path: area.entities[entityId].path}
+//参数path是由怪物空间MobZone.update生成怪物卵时，生成的怪物巡逻路径（不是寻路路径，只是坐标数组）
 pro.addCharacters = function(cs) {
   var c;
   for(var i=0, l=cs.length; i<l; i++) {
