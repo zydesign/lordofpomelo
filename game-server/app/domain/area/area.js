@@ -118,11 +118,11 @@ Instance.prototype.getChannel = function() {
  */
 //初始化怪物空间，场景开启立即运行，添加怪物空间组..........................................
 Instance.prototype.initMobZones = function(mobZones) {
-  //遍历map的怪物对象组
+  //遍历map的怪物对象层的怪物数据组
   for(var i = 0; i < mobZones.length; i++) {
     var opts = mobZones[i]; //单个怪物对象数据
     opts.area = this;
-    var zone = new MobZone(opts);  //生成单个类型的怪物空间
+    var zone = new MobZone(opts);  //通过tiledMap的单种怪物数据，生成怪物空间
     this.zones[zone.zoneId] = zone;  //添加到怪物空间组
   }
 };
