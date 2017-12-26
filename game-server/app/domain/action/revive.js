@@ -7,7 +7,7 @@ var util = require('util');
 var Revive = function(opts){
 	opts.type = 'revive';
 	opts.id = opts.entity.entityId;
-	opts.singleton = true;   //复活是独立行为
+	opts.singleton = true;   //只是给参数添加独立行为，不是revive的属性
 
 	 //上面是修改opt参数，下面是让revive继承action函数对象。结合util.inherits()继承action的原型链,
 	Action.call(this, opts);
