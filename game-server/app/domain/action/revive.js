@@ -6,7 +6,7 @@ var util = require('util');
 //复活（怪物死亡复活）
 var Revive = function(opts){
 	opts.type = 'revive';
-	opts.id = opts.entity.entityId;
+	opts.id = opts.entity.entityId;   //用实体id作为revive的id
 	opts.singleton = true;   //只是给参数添加独立行为，不是revive的属性
 
 	 //上面是修改opt参数，下面是让revive继承action函数对象。结合util.inherits()继承action的原型链,
