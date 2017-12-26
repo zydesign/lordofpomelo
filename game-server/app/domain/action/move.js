@@ -19,11 +19,11 @@ var Move = function(opts){
 	Action.call(this, opts); 
 	this.entity = opts.entity;
 	this.area = this.entity.area;
-	this.path = opts.path;
+	this.path = opts.path;             //寻路路径，作为移动动作属性
 	this.speed = Number(opts.speed);
 	this.time = Date.now();   //上一次刷新时间
-	this.pos = this.path[0];   //寻路路径第一个坐标，原点
-	this.index = 1;
+	this.pos = this.path[0];   //寻路路径第一个坐标，原点。【update后会更新为移动后的坐标】
+	this.index = 1;            //移动到的坐标从path[1]开始的，因为path[0]是实体自身坐标。【update后会标记为下一个要移动的标签】
 	this.tickNumber = 0;  //刷新次数
 };
 
@@ -52,13 +52,13 @@ Move.prototype.update = function(){
 
 	//使用循环语句，完成一次刷新的移动距离
 	while(travelDistance > 0){
-		if(distance <= travelDistance){   //如果单次刷新能够完成移动距离,去运算下一个点
+		if(distance <= travelDistance){   //如果一个寻路坐标的距离小于刷新距离，计算剩下的刷新距离
 			travelDistance = travelDistance - distance;
-			pos = path[index];
+			pos = path[index];     //移动到的坐标................................pos
 			index++;
 
 			//If the index exceed the last point, means the move is finished
-			//如果索引超过了最后一点，则意味着该移动完成了
+			//如果索引了寻路最后一个坐标，则意味着该移动完成了，退出循环
 			if(index >= path.length){
 				this.finished = true;
 				this.entity.isMoving = false;
@@ -68,16 +68,19 @@ Move.prototype.update = function(){
 			dest = path[index];   //上面的index++，所以这个是下一个坐标
 			distance = getDis(pos, dest);  //下一次坐标要移动的距离
 		}else{
+			//如果寻路坐标距离超出刷新距离了，计算该段的剩余的寻路坐标距离
 			distance = distance - travelDistance; //点击新坐标后,单个tick内剩余未完成的距离
-			pos = getPos(pos, dest, distance); //计算出单次刷新移动到的坐标
-			travelDistance = 0;
+			pos = getPos(pos, dest, distance); //刷新距离用光后所能移动到的坐标...........................pos
+			travelDistance = 0;              //刷新距离归零
 		}
 	}
 
+	//更新一次update移动到的坐标，下次从这里开始
 	this.pos = pos;
+	//记录一次update使用的寻路坐标组的key
 	this.index = index;
 
-	//update一次，更新实体坐标为移动后的坐标（给出了最后移动坐标，也要沿着路径坐标走）
+	//update一次，更新实体坐标为移动后的坐标 ------------------------------------------------------更新实体坐标
 	this.entity.x = Math.floor(pos.x);
 	this.entity.y = Math.floor(pos.y);
 
