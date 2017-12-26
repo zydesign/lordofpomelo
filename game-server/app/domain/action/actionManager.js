@@ -27,14 +27,15 @@ var ActionManager = function(opts){
  * 加入一个非独立动作。先把动作添加都动作图阵里面，并返回排列过的数组（对象组）
  */
 ActionManager.prototype.addAction = function(action){
-	//独立动作是不会被加入到动作图阵的，如果是独立动作就会return（移动move、复活revive是独立动作）
+	//独立动作是不会被加入到动作图阵的，如果是独立动作就会return 
 	if(action.singleton) {
 		this.abortAction(action.type, action.id);
 	}
 	//判断动作组是否存在，没有就新建一个	
 	this.actionMap[action.type] = this.actionMap[action.type]||{};
 	
-	this.actionMap[action.type][action.id] = action;	
+	//也就是同一个角色只有一个类型的动作，如果重复new而加入actionManager，只会替换掉之前的（比如move、revive一个角色只能一个）	
+	this.actionMap[action.type][action.id] = action;   
 	
 	return this.actionQueue.push(action);
 };
