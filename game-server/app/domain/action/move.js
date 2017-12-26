@@ -6,8 +6,9 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 /**
  * Move action, which is used to preserve and update user position
- * 移动动作，用于保存和更新用户位置，并把移动位置传递给aoi服务
+ * 移动动作，【主要作用通过update，不断刷新角色的自身坐标{x,y}，其他函数可以获取实体移动的实时坐标了】, 保存和更新用户位置，并把移动位置传递给aoi服务
  */
+
 //移动动作。（characterEvent监听on移动事件调用，生成move实例提供的参数为{entity: character,path: paths.path,speed: speed}）
 var Move = function(opts){
 	opts.type = 'move';
