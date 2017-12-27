@@ -15,6 +15,8 @@ var consts = require('../../consts/consts');
  * Find the nearby target if have no target.
  * Begin to patrol if nothing to do.
  */
+
+//怪物大脑
 var Brain = function(blackboard) {
 	this.blackboard = blackboard;
 	//try attack and move to target action
