@@ -9,7 +9,7 @@ var patrol = require('../patrol');
  *        opts.rounds {Number} loop rounds. -1 stands for infinite loop
  *        opts.standTick {Number} rest tick after per step. 0 stands for no rest
  */
-// 巡逻动作
+// 循环模式
 var Mode = function(opts) {
   this.character = opts.character;          //角色实体
   this.path = opts.path.slice(0);           //去掉角色自身坐标，剩余3个巡逻坐标
@@ -34,7 +34,7 @@ pro.update = function() {
     return patrol.RES_FINISH;
   }
 
-  //如果循环动作未开启
+  //如果循环模式未开启
   if(!this.started) {
     //开启循环
     this.started = true;
