@@ -38,7 +38,7 @@ pro.update = function() {
   if(!this.started) {
     //开启循环
     this.started = true;
-    //角色移动到第一个巡逻坐标，返回等待，不再执行后面，等待下一次update-----------------------------------移动
+    //提取第一个巡逻坐标生成寻路路径，发射move事件，生成移动动作，返回等待，不再执行后面，等待下一次update-- ------------------------移动
     this.character.move(this.path[0].x, this.path[0].y, true);
     return patrol.RES_WAIT;
   }
@@ -46,7 +46,7 @@ pro.update = function() {
   //到达的坐标
   var dest = this.path[0];
   //如果角色还没到达第一个巡逻坐标，返回等待，不再执行后面，等待下一次update
-  //【移动动作move.update会一直更新{character.x,character.y}坐标，给这个条件做判断】
+  //【移动动作move.update会一直更新{character.x,character.y}坐标，直到完成一个寻路路径，才能到达一个巡逻坐标】--------------------
   if(this.character.x !== dest.x || this.character.y !== dest.y) {
     //if i am on the road to dest
     return patrol.RES_WAIT;
