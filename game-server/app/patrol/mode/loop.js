@@ -13,7 +13,7 @@ var patrol = require('../patrol');
 var Mode = function(opts) {
   this.character = opts.character;          //角色实体
   this.path = opts.path.slice(0);           //去掉角色自身坐标，剩余3个巡逻坐标
-  this.rounds = opts.rounds || 1;           //循环圈数
+  this.rounds = opts.rounds || 1;           //循环圈数，参数提供是-1（-1是无限循环）
   this.step = this.path.length;             //步数，坐标数量
   this.standTick = opts.standTick || 0;     //停留时间
   this.tick = this.standTick;
@@ -70,7 +70,7 @@ pro.update = function() {
       if(this.rounds === 0) {
         return patrol.RES_FINISH;
       }
-      //如果圈数还有，重置步数step，并执行后面
+      //如果步数走完，圈数还有，重置步数step，并执行后面
       this.step = this.path.length;
     }
   }
