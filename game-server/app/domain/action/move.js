@@ -60,7 +60,8 @@ Move.prototype.update = function(){
 			//If the index exceed the last point, means the move is finished
 			//如果索引了寻路最后一个坐标，则意味着该移动完成了，退出循环
 			if(index >= path.length){
-				this.finished = true;
+			//寻路路径完成，move动作添加finnished属性，ActionManager.update检测动作组中的Finnished属性，true就删除该动作-----0
+				this.finished = true;  
 				this.entity.isMoving = false;
 				break;
 			}
