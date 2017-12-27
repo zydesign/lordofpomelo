@@ -1,6 +1,6 @@
 var patrol = require('../patrol');
 
-//复合模式：添加子巡逻模式组，
+//复合模式：添加巡逻模式数组children，及记录要执行的子模式标签index
 /**
  * Composite mode: compose children and invoke them one by one.
  */
