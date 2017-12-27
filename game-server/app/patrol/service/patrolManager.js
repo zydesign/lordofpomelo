@@ -7,7 +7,7 @@ var STAND_TICK = 50;  //停留时间
 
 //巡逻管理器
 var Manager = function() {
-  this.characters = {};   //角色组，一般为怪物
+  this.characters = {};   //角色巡逻动作组
 };
 
 var pro = Manager.prototype;
@@ -26,7 +26,7 @@ pro.addCharacters = function(cs) {
   var c;
   for(var i=0, l=cs.length; i<l; i++) {
     c = cs[i];
-	  //生成巡逻动作，并加入巡逻动作组
+	  //生成巡逻动作，并加入角色巡逻动作组
     if(!this.characters[c.character.entityId]) {
       this.characters[c.character.entityId] = genAction(c.character, c.path);
     }
@@ -58,7 +58,7 @@ var genAction = function(character, path) {
   var res = new Loop({
     character: character,   //角色实体
     path: path,             //巡逻路径
-    rounds: -1,             //循环圈数
+    rounds: -1,             //循环圈数（-1是无限循环）
     standTick: STAND_TICK   //停留时间
   });
 
