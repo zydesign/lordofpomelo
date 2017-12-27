@@ -89,7 +89,7 @@ ActionManager.prototype.update = function(){
 		if(!action.finished){
 			this.actionQueue.push(action);
 		}else{
-			//如果动作完成了，移除动作组
+			//如果动作完成了，移除动作组（move寻路路径走到最后一个坐标，就添加finished=true）
 			delete this.actionMap[action.type][action.id];
 		}
 	}
