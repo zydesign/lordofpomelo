@@ -21,7 +21,9 @@ var Entity = function(opts) {
   //让实体继承事件派发器，可以使用EventEmitter的属性和方法了
   EventEmitter.call(this);
   this.entityId = id++;//让每new一次的实例id递增不相同
-  this.kindId = Number(opts.kindId);
+  
+  //kindId是怪物数据表的id（或npc表、角色表、道具表、装备表等等的id）【在生成单份数据时，添加的属性】
+  this.kindId = Number(opts.kindId);     
   this.kindName = opts.kindName;
   this.englishName = opts.englishName;
   this.type = opts.type;
