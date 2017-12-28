@@ -20,11 +20,14 @@ var consts = require('../../consts/consts');
 var Brain = function(blackboard) {
 	this.blackboard = blackboard;
 	//try attack and move to target action
+	////先创建一个（尝试攻击或调整再攻击）节点（选择节点：tryAction>adjustAction）------------------------------2
 	var attack = new TryAndAdjust({
 		blackboard: blackboard, 
+		//调整
 		adjustAction: new MoveToTarget({
 			blackboard: blackboard
 		}), 
+		//尝试攻击
 		tryAction: new TryAttack({
 			blackboard: blackboard, 
 			getSkillId: function(bb) {
@@ -34,6 +37,7 @@ var Brain = function(blackboard) {
 	});
 
 	//loop attack action
+	//循环攻击的条件-------------------------------------------------------------------3
 	var checkTarget = function(bb) {
 		if(bb.curTarget !== bb.curCharacter.target) {
 			// target has change
@@ -44,6 +48,7 @@ var Brain = function(blackboard) {
 		return !!bb.curTarget;
 	};
 
+	//循环攻击节点
 	var loopAttack = new Loop({
 		blackboard: blackboard, 
 		child: attack, 
@@ -51,6 +56,7 @@ var Brain = function(blackboard) {
 	});
 
 	//if have target then loop attack action
+	//条件攻击的条件---------------------------------------------------------------------1
 	var haveTarget = function(bb) {
 		var character = bb.curCharacter;
 		var targetId = character.target;
@@ -63,13 +69,15 @@ var Brain = function(blackboard) {
 			return false;
 		}
 
+		//角色的属性target类型为玩家，返回true。条件攻击的条件就会成立，返回等待下一次update
 		if(target.type === consts.EntityType.PLAYER) {
-			bb.curTarget = targetId;
+			bb.curTarget = targetId;  //将怪物的targetId属性写入黑板，提供给attack调用..................
 			return true;
 		}
 		return false;
 	};
 
+	//条件攻击
 	var attackIfHaveTarget = new If({
 		blackboard: blackboard, 
 		cond: haveTarget, 
@@ -79,6 +87,7 @@ var Brain = function(blackboard) {
 	//find nearby target action
 	//var findTarget = new FindNearbyPlayer({blackboard: blackboard});
 	//patrol action
+	//生成巡逻节点-------------------------------------------------------------------4
 	var patrol = new Patrol({blackboard: blackboard});
 
 	//composite them together
@@ -86,7 +95,7 @@ var Brain = function(blackboard) {
 		blackboard: blackboard
 	});
 
-	//如果attackIfHaveTarget子节点的结果为失败，那么执行patrol子节点会，让ai去除该怪物的ai大脑，加入巡逻系统
+	//如果attackIfHaveTarget子节点的结果为失败，那么执行patrol子节点，会让aiManager去除该怪物的ai大脑，加入巡逻系统
 	//直到aoi系统监听到玩家进入怪物视野攻击范围，才从巡逻系统转回ai系统
 	this.action.addChild(attackIfHaveTarget);
 	//this.action.addChild(findTarget);
