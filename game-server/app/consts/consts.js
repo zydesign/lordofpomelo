@@ -154,13 +154,16 @@ module.exports = {
   /**
    * check a entity that whether can be picked.
    */
+  //检测实体是否能拾取，返回的结果提供给其他if语句做条件判断
   isPickable: function(entity) {
+    //如果实体存在而且实体类型为装备或道具
     return entity && (entity.type === module.exports.EntityType.EQUIPMENT || entity.type === module.exports.EntityType.ITEM);
   },
 
   /**
    * check a entity that whether can be attacked.
    */
+  //检测实体是否能够被攻击
   isAttackable: function(entity) {
     return entity && (entity.type === module.exports.EntityType.PLAYER || entity.type === module.exports.EntityType.MOB);
   }
