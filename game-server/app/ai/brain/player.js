@@ -69,8 +69,9 @@ var genAttackAction = function(blackboard) {
 
 	//loop attack action
 	//循环条件（因为是循环节点的条件，所以bb会先被替换成this.blackboard才会被执行，并将checkTarge（blackboard）的结果作为条件判断）
+	//该循环条件的目的：判断角色的target是否还是当前的target
 	var checkTarget = function(bb) {
-		//如果黑板的目标id不匹配角色绑定的目标id，这解除目标，返回false作为条件
+		//如果黑板target不匹配角色target，说明角色target实时改变了，黑板的target要清空，返回false作为条件
 		if(bb.curTarget !== bb.curCharacter.target) {
 			// target has change
 			bb.curTarget = null;
@@ -125,8 +126,10 @@ var genAttackAction = function(blackboard) {
 	});
 };
 
+//生成拾取
 var genPickAction = function(blackboard) {
 	//try pick and move to target action
+	//先创建一个（尝试拾取或调整再拾取）节点（选择节点：tryAction>adjustAction）
 	var pick = new TryAndAdjust({
 		blackboard: blackboard, 
 		adjustAction: new MoveToTarget({
@@ -138,11 +141,13 @@ var genPickAction = function(blackboard) {
 	});
 
 	//if have target then pick it
+	//条件拾取的条件
 	var haveTarget = function(bb) {
 		var character = bb.curCharacter;
 		var targetId = character.target;
 		var target = bb.area.getEntity(targetId);
 
+		//如果目标不存在
 		if(!target) {
 			// target has disappeared
 			character.forgetHater(targetId);
@@ -150,8 +155,9 @@ var genPickAction = function(blackboard) {
 			return false;
 		}
 
+		//检测目标实体类型是否为装备或道具
 		if(consts.isPickable(target)) {
-			bb.curTarget = targetId;
+			bb.curTarget = targetId;  //将角色的属性target写入黑板，提供给pick拾取函数引用---------------
 			return true;
 		}
 		return false;
@@ -165,8 +171,9 @@ var genPickAction = function(blackboard) {
 };
 
 var genNpcAction = function(blackboard) {
-	//try talk and move to target action
-	var pick = new TryAndAdjust({
+	//try talk and move to target action0
+	//先创建一个（尝试对话或调整再对话）节点（选择节点：tryAction>adjustAction）
+	var talk = new TryAndAdjust({
 		blackboard: blackboard, 
 		adjustAction: new MoveToTarget({
 			blackboard: blackboard
@@ -189,8 +196,9 @@ var genNpcAction = function(blackboard) {
 			return false;
 		}
 
+		//如果目标类型为NPC
 		if(target.type === consts.EntityType.NPC) {
-			bb.curTarget = targetId;
+			bb.curTarget = targetId;      //将角色的属性target写入黑板，提供给talk对话函数引用---------------
 			return true;
 		}
 		return false;
@@ -199,7 +207,7 @@ var genNpcAction = function(blackboard) {
 	return new If({
 		blackboard: blackboard, 
 		cond: haveTarget, 
-		action: pick
+		action: talk
 	});
 };
 
