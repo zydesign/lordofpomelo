@@ -68,7 +68,7 @@ var genAttackAction = function(blackboard) {
 	});
 
 	//loop attack action
-	//循环条件（因为是循环节点的条件，所以bb会被替换成this.blackboard）
+	//循环条件（因为是循环节点的条件，所以bb会先被替换成this.blackboard才会被执行，并将checkTarge（blackboard）的结果作为条件判断）
 	var checkTarget = function(bb) {
 		//如果黑板的目标id不匹配角色绑定的目标id，这解除目标，返回false作为条件
 		if(bb.curTarget !== bb.curCharacter.target) {
@@ -93,7 +93,7 @@ var genAttackAction = function(blackboard) {
 	
 	//if have target then loop attack action
 	//这个主节点的条件，作为条件节点的条件参数，第一优先被执行.被创建成condition条件节点........................................1
-	//这个bb也是被执行时变成了this.blackboard
+	//这个bb也是先被替换成了this.blackboard，而执行haveTarget (blackboard)作为条件判断
 	var haveTarget = function(bb) {
 		var character = bb.curCharacter;
 		var targetId = character.target;
@@ -110,7 +110,7 @@ var genAttackAction = function(blackboard) {
 		//如果场景实体类型是怪物或玩家，返回true，主节点的条件节点成立------------------bt.RES_SUCCESS
 		if(target.type === consts.EntityType.MOB || 
 			target.type === consts.EntityType.PLAYER) {
-			bb.curTarget = targetId;
+			bb.curTarget = targetId;   //将角色属性的targetid写入黑板上
 			return true;
 		}
 		//场景实体类型是道具或装备，返回false，主节点的条件节点不成立
