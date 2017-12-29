@@ -9,12 +9,15 @@ var exp = module.exports;
 //aoi事件添加。（当场景加载时，会立即执行该函数）............................................................0
 
 //为aoi添加事件监听,监听对象的add、remove、update，观察者的updateWatcher。
-//aoi就是对象ids和观察者ids的管理，对象ids会在updateWatcher被调用
+//aoi是对灯塔的管理，灯塔点就是对象ids和观察者ids的管理，对象ids会在updateWatcher被调用
 //当触发事件时，获取观察者uids，并广播消息。观察者时怪物的话，就激化这些怪物仇恨
 exp.addEvent = function(area, aoi){
 	//aoi对象是继承事件监听器的，并且aoi的函数里面带有很多发射事件----------------------------------------------1
-	aoi.on('add', function(params){   //加入事件
-		params.area = area;
+	
+	//add实体加入事件。aoi执行添加对象函数时，就会发射add事件。
+	//参数params为{id: obj.id, type:obj.type, watchers:aoi.towers[p.x][p.y].watchers}
+	aoi.on('add', function(params){   
+		params.area = area;       //参数加入场景属性
 		switch(params.type){
 			case EntityType.PLAYER:
 	//广播消息给玩家观察者们，并给MOB观察者们添加仇恨，对该玩家id
@@ -27,7 +30,9 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	aoi.on('remove', function(params){  //离开事件
+	//remove实体删除事件。
+	//参数params为{id: obj.id, type:obj.type, watchers:aoi.towers[p.x][p.y].watchers}
+	aoi.on('remove', function(params){ 
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
@@ -39,6 +44,8 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
+	//update实体更新事件。
+	//参数params为{id: obj.id, type:obj.type, oldWatchers:oldTower.watchers, newWatchers:newTower.watchers}
 	aoi.on('update', function(params){  //更新事件
 		params.area = area;
 		switch(params.type){
@@ -52,7 +59,8 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	aoi.on('updateWatcher', function(params) {  //更新观察者事件
+	//updateWatcher更新观察者事件。
+	aoi.on('updateWatcher', function(params) {  
 		params.area = area;
 		switch(params.type) {
 			case EntityType.PLAYER:
