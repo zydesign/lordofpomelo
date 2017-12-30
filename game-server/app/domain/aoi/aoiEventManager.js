@@ -44,13 +44,14 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	//update实体更新事件。
+	//update‘实体更新’事件。实体位置改变，通知对应的灯塔点观察者组，看见与看不见该实体----多看1---------------------------------
 	//参数params为{id: obj.id, type:obj.type, oldWatchers:oldTower.watchers, newWatchers:newTower.watchers}
-	aoi.on('update', function(params){  //更新事件
+	aoi.on('update', function(params){   
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
 	//推送消息给玩家观察者们，旧观察者删除可视实体，新观察者添加可视实体
+				//执行更新对象函数
 				onObjectUpdate(params);
 				break;
 			case EntityType.MOB:
@@ -59,7 +60,7 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	//updateWatcher更新观察者事件。（玩家自己移动，更新地图可视实体的改变）
+	//updateWatcher更新观察者事件。（玩家自己移动，通知作为观察者的自己，即将看不见和即将看见的实体组）-------1看多-------------------
 	//参数params为{id: watcher.id, type:watcher.type, addObjs: addObjs, removeObjs:removeObjs}
 	aoi.on('updateWatcher', function(params) {  
 		params.area = area;
