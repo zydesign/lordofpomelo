@@ -60,6 +60,7 @@ exp.addEvent = function(area, aoi){
 	});
 
 	//updateWatcher更新观察者事件。（玩家自己移动，更新地图可视实体的改变）
+	//参数params为{id: watcher.id, type:watcher.type, addObjs: addObjs, removeObjs:removeObjs}
 	aoi.on('updateWatcher', function(params) {  
 		params.area = area;
 		switch(params.type) {
@@ -189,13 +190,12 @@ function onPlayerRemove(params) {
 
 /**
  * Handle object update event 
- * 处理对象更新事件.
- * 如果离开玩家视野告诉这部分玩家,玩家离开;如果进入新玩家视野,告诉这部分玩家,玩家加入
- * 进入新怪物视野或离开旧怪物视野,告诉这部分怪物进入与离开
  * @param {Object} params Params for add object, the content is : {oldWatchers, newWatchers, id}
  * @return void
  * @api private
  */
+
+//通过新旧观察者，创建删除组和添加组。广播消息给删除组，删除对移动对象的可见；让添加组添加对对象的可见
 function onObjectUpdate(params) {
 	var area = params.area;
 	var entityId = params.id;
@@ -257,11 +257,12 @@ function onObjectUpdate(params) {
 }
 
 /**
- * Handle player update event  处理玩家更新事件
+ * Handle player update event  
  * @param {Object} params Params for player update, the content is : {watchers, id}
  * @return void
  * @api private
  */
+//处理
 function onPlayerUpdate(params) {
 	var area = params.area;
 	var player = area.getEntity(params.id);
@@ -271,12 +272,12 @@ function onPlayerUpdate(params) {
 
 	var uid = {sid : player.serverId, uid : player.userId};
 
-	//推送消息给自己，参数为被删除的实体id
+	//推送消息给自己，参数为即将看不到的实体id数组removeObjs：[id,id,id...]
 	if(params.removeObjs.length > 0) {
     messageService.pushMessageToPlayer(uid, 'onRemoveEntities', {'entities' : params.removeObjs});
 	}
 
-	//推送消息给自己，参数为被增加的【实体】（添加是要获取坐标的，所以要实体）
+	//推送消息给自己，参数为即将看见的【实体组】（添加是要获取坐标的，所以要实体）
 	if(params.addObjs.length > 0) {
 		var entities = area.getEntities(params.addObjs);
 		if(entities.length > 0) {
