@@ -50,7 +50,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
-	//广播消息给玩家观察者们（移除的观察者removeWatchers和新加的观察者addWatchers）
+	//推送消息给玩家观察者们，旧观察者删除可视实体，新观察者添加可视实体
 				onObjectUpdate(params);
 				break;
 			case EntityType.MOB:
@@ -59,12 +59,12 @@ exp.addEvent = function(area, aoi){
 		}
 	});
 
-	//updateWatcher更新观察者事件。
+	//updateWatcher更新观察者事件。（玩家自己移动，更新地图可视实体的改变）
 	aoi.on('updateWatcher', function(params) {  
 		params.area = area;
 		switch(params.type) {
 			case EntityType.PLAYER:
-	//广播消息给玩家自己，观察的实体的变动
+	//推送消息给玩家自己，观察的实体的变动
 				onPlayerUpdate(params);
 				break;
 		}
@@ -72,11 +72,13 @@ exp.addEvent = function(area, aoi){
 };
 
 /**
- * Handle player add event  处理玩家加入事件,要告诉视野范围内的玩家和怪物,自己加入了
+ * Handle player add event  
  * @param {Object} params Params for add player, the content is : {watchers, id}
  * @return void
  * @api private
  */
+
+//处理玩家加入事件,要告诉视野范围内的玩家和怪物,玩家（自己）加入了
 function onPlayerAdd(params) {
 	var area = params.area;
 	var watchers = params.watchers;
@@ -88,9 +90,11 @@ function onPlayerAdd(params) {
 	}
 
 	var uids = [], id;
+	//让所在灯塔点的不同类型观察者，做成不同反应。
 	for(var type in watchers) {
 		switch (type){
 			case EntityType.PLAYER:
+				//如果观察者类型是玩家，获取玩家用户id组，广播消息告知有玩家加入
 				for(id in watchers[type]) {
 					var watcher = area.getEntity(watchers[type][id]);
 					if(watcher && watcher.entityId !== entityId) {
@@ -102,6 +106,7 @@ function onPlayerAdd(params) {
 				}
 				break;
 			case EntityType.MOB:
+				//如果观察者的类型是怪物，让所有怪物观察者，攻击玩家
 				for(id in watchers[type]) {
 					var mob = area.getEntity(watchers[type][id]);
 					if(mob) {
@@ -114,11 +119,13 @@ function onPlayerAdd(params) {
 }
 
 /**
- * Handle mob add event 处理怪物加入事件,告诉视野范围的玩家,有怪物进入视野
+ * Handle mob add event 
  * @param {Object} params Params for add mob, the content is : {watchers, id}
  * @return void
  * @api private
  */
+
+//处理怪物加入事件,告诉视野范围的玩家,有怪物进入视野
 function onMobAdd(params){
 	var area = params.area;
 	var watchers = params.watchers;
@@ -150,11 +157,12 @@ function onMobAdd(params){
 }
 
 /**
- * Handle player remove event   处理玩家离开事件
+ * Handle player remove event   
  * @param {Object} params Params for remove player, the content is : {watchers, id}
  * @return void
  * @api private
  */
+//处理玩家离开事件
 function onPlayerRemove(params) {
 	var area = params.area;
 	var watchers = params.watchers;
@@ -200,6 +208,7 @@ function onObjectUpdate(params) {
 	var oldWatchers = params.oldWatchers;
 	var newWatchers = params.newWatchers;
 	var removeWatchers = {}, addWatchers = {}, type, w1, w2, id;
+	//在旧观察者中筛选需要删除的观察者，存入观察者删除组，【实体移动后，删除组removeWatchers看不到该实体】
 	for(type in oldWatchers) {
 		if(!newWatchers[type]) {
 			removeWatchers[type] = oldWatchers[type];
@@ -215,6 +224,7 @@ function onObjectUpdate(params) {
 		}
 	}
 
+	//在新观察者中筛选需要添加的观察者，存入观察者添加组【实体移动后，添加组addWatchers将添加对该实体的可视化】
 	for(type in newWatchers) {
 		if(!oldWatchers[type]) {
 			addWatchers[type] = newWatchers[type];
@@ -234,12 +244,12 @@ function onObjectUpdate(params) {
 
 	switch(params.type) {
 		case EntityType.PLAYER:
-			//如果实体为玩家，广播消息给周围玩家，更新周围玩家对自己角色的可见不可见视野
+			//如果移动的实体类型为玩家，执行玩家加入，执行玩家离开（广播消息让添加组看到该玩家，让删除组看不到该玩家）
 			onPlayerAdd({area:area, id:params.id, watchers:addWatchers});
 			onPlayerRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
 		case EntityType.MOB:
-			//如果实体为怪物，广播消息给周围玩家，更新周围玩家对该怪物的可见不可见视野
+			//如果移动的实体类型为怪物，执行怪物加入，执行怪物离开（广播消息让添加组看到该怪物，让删除组看不到该怪物）
 			onMobAdd({area:area, id:params.id, watchers:addWatchers});
 			onMobRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
@@ -261,10 +271,12 @@ function onPlayerUpdate(params) {
 
 	var uid = {sid : player.serverId, uid : player.userId};
 
+	//推送消息给自己，参数为被删除的实体id
 	if(params.removeObjs.length > 0) {
     messageService.pushMessageToPlayer(uid, 'onRemoveEntities', {'entities' : params.removeObjs});
 	}
 
+	//推送消息给自己，参数为被增加的【实体】（添加是要获取坐标的，所以要实体）
 	if(params.addObjs.length > 0) {
 		var entities = area.getEntities(params.addObjs);
 		if(entities.length > 0) {
@@ -306,10 +318,13 @@ function onMobRemove(params) {
  * @param {Number} entityId The entityId to add
  * @api private
  */
+
+//通知玩家组，有实体加入。
 function onAddEntity(uids, entity) {
 	var entities = {};
 	entities[entity.type] = [entity];
 
+	//推送消息到玩家组，参数为实体组entities
   messageService.pushMessageByUids(uids, 'onAddEntities', entities);
 
 	if (entity.type === EntityType.PLAYER) {
