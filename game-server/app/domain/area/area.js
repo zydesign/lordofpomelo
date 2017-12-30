@@ -287,7 +287,8 @@ Instance.prototype.getEntity = function(entityId) {
  * @param {Array} The given entities' list.
  * @return {Map} The entities
  */
-//从场景中获取一批实体，返回对象
+//从场景中获取一批实体，返回对象（aoiEventManager监听的'updateWatcher'事件发生时，就会执行该函数）
+//参数ids的形式：[id,id,id...]
 Instance.prototype.getEntities = function(ids) {
   var result = {};
 
@@ -304,7 +305,7 @@ Instance.prototype.getEntities = function(ids) {
       result.length++;
     }
   }
-
+//返回结果的形式：{player:[],mob:[],length:length,...}
   return result;
 };
 
