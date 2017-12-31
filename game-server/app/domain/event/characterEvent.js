@@ -75,19 +75,19 @@ exp.addEventForCharacter = function(character) {
 			executeTask.updateTaskData(attacker, target);
 			//如果攻击目标是怪物，场景删除该怪物，增加玩家经验，怪物掉落道具加入场景中
 			if(target.type === EntityType.MOB){
-				area.removeEntity(target.entityId);
+				area.removeEntity(target.entityId);   //怪物死亡，场景删除目标怪物实体
 				msg.exp = attacker.experience;
 				for(var id in result.items){
-					area.addEntity(result.items[id]);
+					area.addEntity(result.items[id]);   //怪物死亡，场景添加掉落的道具实体
 				}
 			} else {
 				//clear the target and make the mobs forget him if player die
-				//如果是怪物攻击玩家致死的，这里的target是玩家，先玩家解除锁定怪物，然后玩家的敌人组（怪物）放弃对玩家的仇恨
-				target.target = null;  //这个是玩家解锁目标
-				target.forEachEnemy(function(hater) {
-					hater.forgetHater(target.entityId);
+				//如果是怪物攻击目标玩家并致死的，这里的target是玩家，先玩家解除锁定怪物，然后玩家的敌人组（怪物）放弃对玩家的仇恨
+				target.target = null;                       //这个是解锁玩家的目标
+				target.forEachEnemy(function(hater) {       //遍历锁定该目标玩家的敌人（即怪物），解除仇恨，从敌人组删除
+					hater.forgetHater(target.entityId);    
 				});
-				//玩家清除仇恨，玩家死亡为true
+				//目标玩家清空仇恨id组，目标玩家死亡为true
 				target.clearHaters();
 
 				target.died = true;
