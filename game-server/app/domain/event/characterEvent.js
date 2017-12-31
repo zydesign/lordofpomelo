@@ -75,10 +75,10 @@ exp.addEventForCharacter = function(character) {
 			executeTask.updateTaskData(attacker, target);
 			//如果攻击目标是怪物，场景删除该怪物，增加玩家经验，怪物掉落道具加入场景中
 			if(target.type === EntityType.MOB){
-				area.removeEntity(target.entityId);   //怪物死亡，场景删除目标怪物实体
+				area.removeEntity(target.entityId);   //怪物死亡，场景删除目标怪物实体..........................
 				msg.exp = attacker.experience;
 				for(var id in result.items){
-					area.addEntity(result.items[id]);   //怪物死亡，场景添加掉落的道具实体
+					area.addEntity(result.items[id]);   //怪物死亡，场景添加掉落的道具实体..................
 				}
 			} else {
 				//clear the target and make the mobs forget him if player die
@@ -121,7 +121,7 @@ exp.addEventForCharacter = function(character) {
 				logger.error('[onattack] attack result: target is null!	attackerId: ' + attacker.entityId + '	targetId: ' + target.entityId +' result: ' + result);
 				return;
 			}
-			//如果攻击目标为怪物，怪物加入aiManager，从巡逻状态转换为ai状态
+			//如果攻击目标为怪物，怪物加入aiManager，从巡逻状态转换为ai状态......................
 			if(target.type === EntityType.MOB) {
 				timer.enterAI(target.entityId);
 			}
