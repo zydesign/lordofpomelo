@@ -129,6 +129,7 @@ Mob.prototype.getMostHater = function() {
 };
 
 // Forget the hater
+//解除对目标的锁定........................................
 Mob.prototype.forgetHater = function(entityId) {
   if(this.haters[entityId]) {
     delete this.haters[entityId];
@@ -142,7 +143,7 @@ Mob.prototype.forgetHater = function(entityId) {
  * @param {Function} cb
  * @api public
  */
-
+//遍历自己锁定的目标id组，场景获取对应的实体..............................
 Mob.prototype.forEachHater = function(cb) {
   for(var id in this.haters){
     var hater = this.area.getEntity(id);
