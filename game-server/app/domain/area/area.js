@@ -133,7 +133,7 @@ Instance.prototype.initMobZones = function(mobZones) {
  */
 
 //场景添加实体，加入实体组，加入事件管理器，加入场景频道channel，加入ai大脑，加入aoi观察者等等，添加成功会返回true=========
-//场景启动是，初始化npcs时，timer执行怪物空间update时，角色进入场景切换场景时，掉落物品时，调用该函数，
+//场景启动是，初始化npcs时，timer执行怪物空间zone.update时，角色进入场景切换场景时，掉落物品时，调用该函数，
 Instance.prototype.addEntity = function(e) {
   var entities = this.entities;
   var players = this.players;
@@ -160,12 +160,12 @@ Instance.prototype.addEntity = function(e) {
   //添加事件。所有实体都继承了事件派发器，添加事件也就是都on（Event），只要实体类执行emit（Event）就会触发事件------
   eventManager.addEvent(e);
 
-  //如果实体类型为玩家，加入频道channel，加入ai大脑，加入aoi观察者，加入角色id组
+  //如果实体类型为玩家，加入频道channel，加入ai大脑，加入成为aoi观察者，加入角色id组
   if(e.type === EntityType.PLAYER) {
     this.getChannel().add(e.userId, e.serverId);
     this.aiManager.addCharacters([e]);
 
-    this.aoi.addWatcher({id: e.entityId, type: e.type}, {x : e.x, y: e.y}, e.range);
+    this.aoi.addWatcher({id: e.entityId, type: e.type}, {x : e.x, y: e.y}, e.range);   //aoi增加该观察者
     players[e.id] = e.entityId;   //该角色的实体id
     users[e.userId] = e.id;   //对应用户的角色id（player.id）
 
@@ -178,7 +178,7 @@ Instance.prototype.addEntity = function(e) {
   }else if(e.type === EntityType.MOB) {
     this.aiManager.addCharacters([e]);
 
-    this.aoi.addWatcher({id: e.entityId, type: e.type}, {x : e.x, y: e.y}, e.range);
+    this.aoi.addWatcher({id: e.entityId, type: e.type}, {x : e.x, y: e.y}, e.range);   //aoi增加该观察者
     
     //如果实体类型为道具
   }else if(e.type === EntityType.ITEM) {
@@ -200,7 +200,8 @@ Instance.prototype.addEntity = function(e) {
  * @return {boolean} remove result
  */
 
-//场景中删除实体，包括从频道中移除，从ai大脑组中移除，从巡逻组中移除，从aoi对象组中移除，停止该实体的动作等，删除成功返回true========
+//场景中删除实体，包括从频道中移除，从怪物空间中删除，从ai大脑组中移除，从巡逻组中移除，从aoi对象组中移除，停止该实体的动作等，删除成功返回true======
+//（事件监听的characterEvent的‘attack’事件发生，并导致怪物或玩家死亡时，调用该函数）
 Instance.prototype.removeEntity = function(entityId) {
   var zones = this.zones;
   var entities = this.entities;
@@ -213,26 +214,27 @@ Instance.prototype.removeEntity = function(entityId) {
 
   //If the entity belong to a subzone, remove it
   if(!!zones[e.zoneId]) {
-    zones[e.zoneId].remove(entityId);
+    zones[e.zoneId].remove(entityId);   //怪物空间删除实体
   }
 
   //If the entity is a player, remove it
+  //如果删除的实体类型为player.......................................................
   if(e.type === 'player') {
-    this.getChannel().leave(e.userId, pomelo.app.getServerId());
-    this.aiManager.removeCharacter(e.entityId);
-    this.patrolManager.removeCharacter(e.entityId);
-    this.aoi.removeObject({id:e.entityId, type: e.type}, {x: e.x, y: e.y});
-    this.actionManager.abortAllAction(entityId);
+    this.getChannel().leave(e.userId, pomelo.app.getServerId());             //该玩家退出频道
+    this.aiManager.removeCharacter(e.entityId);                              //ai系统删除该角色大脑
+    this.patrolManager.removeCharacter(e.entityId);                          //巡逻系统删除该角色动作
+    this.aoi.removeObject({id:e.entityId, type: e.type}, {x: e.x, y: e.y});  //aoi系统灯塔点删除该【对象】
+    this.actionManager.abortAllAction(entityId);                             //行为系统停止该角色的所有行为 
 
-    e.forEachEnemy(function(enemy) {
+    e.forEachEnemy(function(enemy) {                                         //让锁定自己的敌人解除对自己的仇恨
       enemy.forgetHater(e.entityId);
     });
 
-    e.forEachHater(function(hater) {
+    e.forEachHater(function(hater) {                                         //对自己锁定的目标解除仇恨
       hater.forgetEnemy(e.entityId);
     });
 
-    this.aoi.removeWatcher(e, {x : e.x, y: e.y}, e.range);
+    this.aoi.removeWatcher(e, {x : e.x, y: e.y}, e.range);                   //aoi系统删除该角色【观察者】
     delete players[e.id];
     delete users[e.userId];
 
@@ -242,10 +244,11 @@ Instance.prototype.removeEntity = function(entityId) {
       this.emptyTime = Date.now();
     }
     delete entities[entityId];
+    //如果删除的实体是怪物mob..........................................................
   }else if(e.type === 'mob') {
     this.aiManager.removeCharacter(e.entityId);
     this.patrolManager.removeCharacter(e.entityId);
-    this.aoi.removeObject({id: e.entityId, type: e.type}, {x: e.x, y: e.y});
+    this.aoi.removeObject({id: e.entityId, type: e.type}, {x: e.x, y: e.y});        //aoi系统灯塔点删除该【对象】
     this.actionManager.abortAllAction(entityId);
 
     e.forEachEnemy(function(enemy) {
@@ -256,11 +259,12 @@ Instance.prototype.removeEntity = function(entityId) {
       hater.forgetEnemy(e.entityId);
     });
 
-    this.aoi.removeWatcher(e, {x : e.x, y: e.y}, e.range);
+    this.aoi.removeWatcher(e, {x : e.x, y: e.y}, e.range);                           //aoi系统删除该角色【观察者】
     delete entities[entityId];
+    //如果删除的实体是道具或装备........................................................
   }else if(e.type === EntityType.ITEM || e.type === EntityType.EQUIPMENT) {
     delete items[entityId];
-    this.aoi.removeObject({id: e.entityId, type: e.type}, {x: e.x, y: e.y});
+    this.aoi.removeObject({id: e.entityId, type: e.type}, {x: e.x, y: e.y});       //aoi系统灯塔点删除该【对象】
     delete entities[entityId];
   }
 
