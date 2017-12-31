@@ -19,11 +19,11 @@ var Character = function(opts) {
 
   // the entity who hate me
   // I would notify my enemies to forget me when I disapear or die
-  this.enemies = {};
+  this.enemies = {};        //锁定自己的敌人id组
 
   // the entity I hate
   // I would set my target as the entity that I hate most
-  this.haters = {};
+  this.haters = {};         //自己锁定的目标id组
 
   this.died = false;
   this.hp = opts.hp;           //血量值
@@ -379,6 +379,7 @@ Character.prototype.removeBuff = function(buff) {
  * @param {Function} callback(enemyId)
  * @api public
  */
+//遍历锁定自己的敌人id组，从场景获取对应的实体
 Character.prototype.forEachEnemy = function(callback) {
   var enemy;
   for(var enemyId in this.enemies) {
