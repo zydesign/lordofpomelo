@@ -20,10 +20,11 @@ exp.addEvent = function(area, aoi){
 		params.area = area;       //参数加入场景属性
 		switch(params.type){
 			case EntityType.PLAYER:
-	//广播消息给玩家观察者们，并给MOB观察者们添加仇恨，对该玩家id
+			//执行玩家加入函数。让不同type（player和mob）的观察者做成不同反应
 				onPlayerAdd(params);
 				break;
 			case EntityType.MOB:
+				//执行怪物加入函数
 	//广播消息给玩家观察者们，并获取实体MOB所在灯塔的实体ids（类型为player），对ids都添加MOB仇恨
 				onMobAdd(params);
 				break;
@@ -80,7 +81,7 @@ exp.addEvent = function(area, aoi){
  * @api private
  */
 
-//处理玩家加入事件,要告诉视野范围内的玩家和怪物,玩家（自己）加入了
+//处理玩家加入事件,要告诉灯塔点的观察者（玩家和怪物）,玩家（自己）加入了
 function onPlayerAdd(params) {
 	var area = params.area;
 	var watchers = params.watchers;
@@ -98,6 +99,7 @@ function onPlayerAdd(params) {
 			case EntityType.PLAYER:
 				//如果观察者类型是玩家，获取玩家用户id组，广播消息告知有玩家加入
 				for(id in watchers[type]) {
+					//获取加入玩家的实体
 					var watcher = area.getEntity(watchers[type][id]);
 					if(watcher && watcher.entityId !== entityId) {
 						uids.push({sid: watcher.serverId, uid: watcher.userId});
@@ -108,7 +110,7 @@ function onPlayerAdd(params) {
 				}
 				break;
 			case EntityType.MOB:
-				//如果观察者的类型是怪物，让所有怪物观察者，攻击玩家
+				//如果观察者的类型是怪物，让所有怪物攻击玩家，执行mob.onPlayerCome
 				for(id in watchers[type]) {
 					var mob = area.getEntity(watchers[type][id]);
 					if(mob) {
@@ -326,7 +328,7 @@ function onAddEntity(uids, entity) {
 	var entities = {};
 	entities[entity.type] = [entity];
 
-	//推送消息到玩家组，参数为实体组entities
+	//推送消息到玩家组，参数为实体组entities：{player:[entity]}或{mob:[entity]}
   messageService.pushMessageByUids(uids, 'onAddEntities', entities);
 
 	if (entity.type === EntityType.PLAYER) {
