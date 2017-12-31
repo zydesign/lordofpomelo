@@ -123,6 +123,7 @@ MobZone.prototype.add = function(mob) {
  * @param {Number} id The entity id of the mob to remove.
  */
 //怪物空间的怪物组中删除指定实体id的怪物实体，返回true
+//（场景删除实体时，area.removeEntity会执行该函数）..............................
 MobZone.prototype.remove = function(id) {
 	if(!!this.mobs[id]) {
 		delete this.mobs[id];
