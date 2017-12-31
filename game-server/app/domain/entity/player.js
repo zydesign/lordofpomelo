@@ -464,6 +464,7 @@ Player.prototype.forgetHater = function(entityId) {
  * @param {Function} cb
  * @api public
  */
+//遍历自己锁定的目标，从场景获取对应的实体
 Player.prototype.forEachHater = function(cb) {
   for(var id in this.haters) {
     var hater = this.area.getEntity(id);
