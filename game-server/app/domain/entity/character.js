@@ -19,7 +19,7 @@ var Character = function(opts) {
 
   // the entity who hate me
   // I would notify my enemies to forget me when I disapear or die
-  this.enemies = {};        //锁定自己的敌人id组
+  this.enemies = {};        //锁定自己的敌人id组，key为entityId
 
   // the entity I hate
   // I would set my target as the entity that I hate most
@@ -409,6 +409,7 @@ Character.prototype.addEnemy = function(enemyId) {
  * @param {Number} entityId
  * @api public
  */
+//解除敌人对自己的仇恨
 Character.prototype.forgetEnemy = function(entityId) {
   delete this.enemies[entityId];
 };
