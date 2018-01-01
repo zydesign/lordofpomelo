@@ -156,7 +156,7 @@ Mob.prototype.forEachHater = function(cb) {
 };
 
 //Increase hate for the player who is coming.
-//aoi事件监听到玩家加入，观察者中有怪物看到该玩家，就会执行该函数，锁定玩家增加仇恨，玩家也添加该敌人
+//（aoi事件，‘add’监听事件触发时，灯塔点怪物类型的观察者，执行onPlayerAdd函数会执行该函数，看见玩家，锁定目标，timer.enterAI转入ai系统，自动攻击）
 Mob.prototype.onPlayerCome = function(entityId) {
   var player = this.area.getEntity(entityId);
 
