@@ -20,12 +20,11 @@ exp.addEvent = function(area, aoi){
 		params.area = area;       //参数加入场景属性
 		switch(params.type){
 			case EntityType.PLAYER:
-			//执行玩家加入函数。让不同type（player和mob）的观察者做成不同反应
+			//执行玩家加入函数。让不同type（player和mob）的观察者做出不同反应
 				onPlayerAdd(params);
 				break;
 			case EntityType.MOB:
-				//执行怪物加入函数
-	//广播消息给玩家观察者们，并获取实体MOB所在灯塔的实体ids（类型为player），对ids都添加MOB仇恨
+			//执行怪物加入函数。1.广播通知玩家观察者；2.获取看到的玩家ids，添加仇恨，加入ai攻击玩家
 				onMobAdd(params);
 				break;
 		}
@@ -37,7 +36,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type){
 			case EntityType.PLAYER:
-	//广播消息给玩家观察者们
+	                //执行玩家删除函数。
 				onPlayerRemove(params);
 				break;
 			case EntityType.MOB:
@@ -52,7 +51,7 @@ exp.addEvent = function(area, aoi){
 		switch(params.type){
 			case EntityType.PLAYER:
 	//推送消息给玩家观察者们，旧观察者删除可视实体，新观察者添加可视实体
-				//执行更新对象函数
+				//执行对象更新函数。
 				onObjectUpdate(params);
 				break;
 			case EntityType.MOB:
@@ -67,7 +66,7 @@ exp.addEvent = function(area, aoi){
 		params.area = area;
 		switch(params.type) {
 			case EntityType.PLAYER:
-	//推送消息给玩家自己，观察的实体的变动
+	                //执行玩家更新函数（玩家自己的更新）。推送消息给玩家自己，周围对象的删除和添加
 				onPlayerUpdate(params);
 				break;
 		}
@@ -97,7 +96,7 @@ function onPlayerAdd(params) {
 	for(var type in watchers) {
 		switch (type){
 			case EntityType.PLAYER:
-				//如果观察者类型是玩家，获取玩家用户id组，广播消息告知有玩家加入
+				//如果观察者类型是玩家，遍历观察者，获取玩家uid数组，广播消息告知有玩家加入
 				for(id in watchers[type]) {
 					//获取加入玩家的实体
 					var watcher = area.getEntity(watchers[type][id]);
@@ -106,11 +105,12 @@ function onPlayerAdd(params) {
 					}
 				}
 				if(uids.length > 0){
-					onAddEntity(uids, player); //广播消息给视野内玩家,玩家加入
+					//执行实体加入函数，推送消息给该灯塔点的玩家，有新对象加入
+					onAddEntity(uids, player); 
 				}
 				break;
 			case EntityType.MOB:
-				//如果观察者的类型是怪物，让所有怪物攻击玩家，执行mob.onPlayerCome
+				//如果观察者的类型是怪物，遍历观察者，让所有怪物攻击玩家，执行mob.onPlayerCome
 				for(id in watchers[type]) {
 					var mob = area.getEntity(watchers[type][id]);
 					if(mob) {
@@ -141,6 +141,7 @@ function onMobAdd(params){
 	}
 
 	var uids = [];
+	//遍历玩家类型的观察者，推送消息给该灯塔点的玩家，有新对象加入
 	for(var id in watchers[EntityType.PLAYER]) {
 		var watcher = area.getEntity(watchers[EntityType.PLAYER][id]);
 		if(watcher) {
@@ -149,9 +150,9 @@ function onMobAdd(params){
 	}
 
 	if(uids.length > 0) {
-		onAddEntity(uids, mob);  //广播消息给玩家(玩家视野),怪物加入
+		onAddEntity(uids, mob);  //执行实体加入函数，推送消息给该灯塔点的玩家，有新对象加入
 	}
-            //获取怪物视野内的玩家ids，并添加仇恨
+            //获取怪物所在的灯塔点的玩家ids，并添加仇恨，转入ai攻击玩家
 	var ids = area.aoi.getIdsByRange({x:mob.x, y:mob.y}, mob.range, [EntityType.PLAYER])[EntityType.PLAYER];
 	if(!!ids && ids.length > 0 && !mob.target){
 		for(var key in ids){
@@ -166,7 +167,7 @@ function onMobAdd(params){
  * @return void
  * @api private
  */
-//处理玩家离开事件
+//处理玩家删除事件
 function onPlayerRemove(params) {
 	var area = params.area;
 	var watchers = params.watchers;
@@ -174,8 +175,10 @@ function onPlayerRemove(params) {
 
 	var uids = [];
 
+	//让所在灯塔点的不同类型观察者，做成不同反应。
 	for(var type in watchers) {
 		switch (type){
+				//如果观察者类型是玩家，遍历观察者，获取玩家uid数组，广播消息告知有玩家离开
 			case EntityType.PLAYER:
 				var watcher;
 				for(var id in watchers[type]) {
@@ -185,7 +188,8 @@ function onPlayerRemove(params) {
 					}
 				}
 
-				onRemoveEntity(uids, entityId); //广播消息给观察者,玩家离开
+				//执行实体删除函数。广播消息给玩家观察者,玩家离开
+				onRemoveEntity(uids, entityId); 
 				break;
 		}
 	}
@@ -248,6 +252,7 @@ function onObjectUpdate(params) {
 	switch(params.type) {
 		case EntityType.PLAYER:
 			//如果移动的实体类型为玩家，执行玩家加入，执行玩家离开（广播消息让添加组看到该玩家，让删除组看不到该玩家）
+			//添加组addWatcher、删除组removeWatchers参数形式为：{player:{id,id,id...},mob:{id,id,id...}}
 			onPlayerAdd({area:area, id:params.id, watchers:addWatchers});
 			onPlayerRemove({area:area, id:params.id, watchers:removeWatchers});
 			break;
@@ -265,7 +270,7 @@ function onObjectUpdate(params) {
  * @return void
  * @api private
  */
-//处理
+//处理玩家更新。（也就是玩家自己），推送消息给自己，视野内要删除的对象和要添加的对象
 function onPlayerUpdate(params) {
 	var area = params.area;
 	var player = area.getEntity(params.id);
@@ -281,20 +286,25 @@ function onPlayerUpdate(params) {
 	}
 
 	//推送消息给自己，参数为即将看见的【实体组】（添加是要获取坐标的，所以要实体）
+	
 	if(params.addObjs.length > 0) {
+		//执行场景获取实体组函数.......................
 		var entities = area.getEntities(params.addObjs);
 		if(entities.length > 0) {
+		//参数entities的形式为：{player:[],mob:[],item:[],length:length,...}，有一个length属性，记录实体数量
       messageService.pushMessageToPlayer(uid, 'onAddEntities', entities);
 		}
 	}
 }
 
 /**
- * Handle mob remove event  处理怪物的离开事件
+ * Handle mob remove event  
  * @param {Object} params Params for remove mob, the content is : {watchers, id}
  * @return void
  * @api private
  */
+
+//处理怪物删除
 function onMobRemove(params) {
 	var area = params.area;
 	var watchers = params.watchers;
@@ -303,6 +313,7 @@ function onMobRemove(params) {
 
 	for(var type in watchers) {
 		switch (type){
+				//观察者类型为玩家，推送消息给灯塔点的玩家观察者，有对象删除
 			case EntityType.PLAYER:
 				for(var id in watchers[type]) {
 					var watcher = area.getEntity(watchers[type][id]);
@@ -323,7 +334,7 @@ function onMobRemove(params) {
  * @api private
  */
 
-//通知玩家组，有实体加入。
+//通知玩家数组，有实体加入。
 function onAddEntity(uids, entity) {
 	var entities = {};
 	entities[entity.type] = [entity];
@@ -344,6 +355,7 @@ function onAddEntity(uids, entity) {
  * @param {Number} entityId The entityId to remove
  * @api private
  */
+//通知玩家数组，有实体删除
 function onRemoveEntity(uids, entityId) {
 	if(uids.length <= 0) {
 		return;
