@@ -201,7 +201,7 @@ Instance.prototype.addEntity = function(e) {
  */
 
 //场景中删除实体，包括从频道中移除，从怪物空间中删除，从ai大脑组中移除，从巡逻组中移除，从aoi对象组中移除，停止该实体的动作等，删除成功返回true======
-//（事件监听的characterEvent的‘attack’事件发生，并导致怪物或玩家死亡时，调用该函数）
+//（玩家‘attack’攻击怪物致死亡；玩家‘pickItem’拾取道具，都会执行该函数）（玩家退出或切换场景）
 Instance.prototype.removeEntity = function(entityId) {
   var zones = this.zones;
   var entities = this.entities;
@@ -291,7 +291,7 @@ Instance.prototype.getEntity = function(entityId) {
  * @param {Array} The given entities' list.
  * @return {Map} The entities
  */
-//从场景中获取一批实体，返回对象（aoiEventManager监听的'updateWatcher'事件发生时，就会执行该函数）
+//从场景中获取一批实体，返回对象（aoiEventManager监听的'updateWatcher'事件发生时，onPlayerUpdate函数就会执行该函数）
 //参数ids的形式：[id,id,id...]
 Instance.prototype.getEntities = function(ids) {
   var result = {};
@@ -309,7 +309,7 @@ Instance.prototype.getEntities = function(ids) {
       result.length++;
     }
   }
-//返回结果的形式：{player:[],mob:[],length:length,...}
+//返回结果的形式：{player:[],mob:[],item:[],length:length,...},有一个length属性，记录实体数量
   return result;
 };
 
