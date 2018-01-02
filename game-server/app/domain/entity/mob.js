@@ -175,6 +175,7 @@ Mob.prototype.onPlayerCome = function(entityId) {
  * @api public
  */
 
+//怪物死亡，掉落道具。（战斗技能fightskill攻击怪物致死后，执行Player.afterKill就会调用该函数）
 Mob.prototype.dropItems = function(player) {
   var itemCount = Math.floor(Math.random()*2.1);
   var dropItems = [];
