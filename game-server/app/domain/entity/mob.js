@@ -298,11 +298,13 @@ Mob.prototype.returnToSpawningPosition = function(time) {
 };
 
 //Emit the event 'died'
+//发射死亡事件。（角色HP小于0时，Character.reduceHp执行该函数）
 Mob.prototype.afterDied = function() {
   this.emit('died', this);
 };
 
 //Emit the event 'killed'
+// 怪物杀死玩家后，发射killed事件（fightskill的attack攻击到目标死亡了，执行该函数）
 Mob.prototype.afterKill = function(target) {
   this.emit('killed', target);
 };
