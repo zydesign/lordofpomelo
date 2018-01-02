@@ -61,13 +61,13 @@ util.inherits(Player, Character);
 module.exports = Player;
 
 //emit the event 'died' after it is died
-// 反射死亡事件
+// 发射死亡事件
 Player.prototype.afterDied = function() {
   this.emit('died', this);
 };
 
 //Add experience add Drop out items after it kills mob
-// 杀死怪物后，增加经验和掉落物品
+// 杀死怪物后，增加经验和掉落物品（fightskill的attack攻击到目标死亡了，执行该函数）
 Player.prototype.afterKill = function(target) {
   var items = null;
   if (target.type === EntityType.MOB) {
@@ -79,6 +79,7 @@ Player.prototype.afterKill = function(target) {
 };
 
 //Add experience
+//杀死怪物获得经验
 Player.prototype.addExperience = function(exp) {
   this.experience += exp;
   if (this.experience >= this.nextLevelExp) {
@@ -94,6 +95,7 @@ Player.prototype.addExperience = function(exp) {
  *
  * @api public
  */
+//玩家升级
 Player.prototype.upgrade = function() {
   while (this.experience >= this.nextLevelExp) {
     //logger.error('player.upgrade ' + this.experience + ' nextLevelExp: ' + this.nextLevelExp);
