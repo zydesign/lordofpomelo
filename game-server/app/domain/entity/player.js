@@ -61,7 +61,7 @@ util.inherits(Player, Character);
 module.exports = Player;
 
 //emit the event 'died' after it is died
-// 发射死亡事件
+// 发射死亡事件（角色HP小于0时，Character.reduceHp调用该函数）
 Player.prototype.afterDied = function() {
   this.emit('died', this);
 };
