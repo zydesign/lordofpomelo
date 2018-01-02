@@ -275,7 +275,7 @@ Character.prototype.attack = function(target, skillId) {
  * @param {Number} damage
  * @api public
  */
-//角色受攻击损失的HP值
+//角色受攻击损失的HP值（玩家使用战斗技能时，fightskill会调用该函数）
 Character.prototype.hit = function(attacker, damage) {
   this.increaseHateFor(attacker.entityId);
   this.reduceHp(damage);
@@ -287,8 +287,10 @@ Character.prototype.hit = function(attacker, damage) {
  * @param {Number} damageValue
  * @api public
  */
+//角色减少血量
 Character.prototype.reduceHp = function(damageValue) {
   this.hp -= damageValue;
+  //如果HP小于0，角色死亡，执行afterDied
   if (this.hp <= 0) {
     this.died = true;
     this.afterDied();
@@ -304,6 +306,7 @@ Character.prototype.reduceHp = function(damageValue) {
  * @param {Number} mp
  * @api public
  */
+//角色攻击扣除MP值（玩家使用战斗技能时，fightskill会调用该函数）
 Character.prototype.reduceMp = function(mp) {
   this.mp -= mp;
   if (this.mp <= 0) {
