@@ -41,6 +41,7 @@ module.exports = Item;
  *
  * @api public
  */
+//场景掉落道具生命周期更新，没拾取就删除。（场景area开启，Timer.tick会定时执行该函数）
 Item.prototype.update = function(){
   var next = Date.now();
   this.lifetime -= (next - this.time);
