@@ -8,15 +8,16 @@ var fs = require('fs');
 
 /**
  * The data structure for map in the area
- * 游戏地图类。opts参数入口为场景配置文件（/config/data/area.json）的指定id的子地图对象area[id]
- * map类将会被场景类调用（/domain/area/scene.js）
+ * 游戏地图类。
  */
+
+//opts参数为场景数据表子场景数据。（map类将会被场景脚本scene.js调用，生成场景area的同时，生成地图map））
 var Map = function(opts) {
 	//area.json场景配置的子对象的path属性为tiledMap地图数据脚本路径
 	this.mapPath = process.cwd() + opts.path;
 	//this.map为地图数据对象
 	this.map = null;    //这个属性由this.configMap(map)赋值，
-	//默认关闭权重地图
+	//默认权重图阵为空（权重值：1为可走，Infinity为不可走）
 	this.weightMap = null;
 	this.name = opts.name;
 
@@ -28,7 +29,7 @@ var pro = Map.prototype;
 
 /**
  * Init game map
- * 游戏地图初始化，opts参数入口为场景配置文件（/config/data/area.json）的子地图对象area[id]
+ * 游戏地图初始化，opts参数场景表单获取的场景数据
  * @param {Object} opts
  * @api private
  */
@@ -39,79 +40,84 @@ Map.prototype.init = function(opts) {
 	if(!map) {
 		logger.error('Load map failed! ');
 	} else {
-		//给this.map赋值，this.map={layers：[{layer}，{layer}...]}
+		//通过tiledMap地图数据，给this.map赋值，this.map为：{birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}
 		this.configMap(map);
 		
-		this.id = opts.id;
-		this.width = opts.width;   //像素宽
-		this.height = opts.height; //像素高
-		this.tileW = 20;           //瓦片图块宽
-		this.tileH = 20;           //瓦片图块高
-		this.rectW = Math.ceil(this.width/this.tileW);  //tiledMap宽
-		this.rectH = Math.ceil(this.height/this.tileH); //tiledMap高
+		this.id = opts.id;                                 //场景area的id
+		this.width = opts.width;                           //地图宽度
+		this.height = opts.height;                         //地图高度
+		this.tileW = 20;                                   //瓦片宽
+		this.tileH = 20;                                   //瓦片高
+		
+		//Math.ceil()舍入小数，返回值大于自身
+		this.rectW = Math.ceil(this.width/this.tileW);     //瓦片宽数量
+		this.rectH = Math.ceil(this.height/this.tileH);    //瓦片高数量
 
-		this.pathCache = new PathCache({limit:1000});
-		this.pfinder = buildFinder(this);
+		this.pathCache = new PathCache({limit:1000});      //路径缓存
+		this.pfinder = buildFinder(this);                  //寻路
 
 		if(weightMap) {
 			//Use cache map first
 			//优先使用缓存地图
-			//其中'/tmp/map.json'的配置文件的数据是通过fsfs.writeFileSync（）生成的，用到新项目先清空数据
+			//其中'/tmp/map.json'的配置文件的数据是通过fs.writeFileSync（）生成的，用到新项目先清空数据
 			var path = process.cwd() + '/tmp/map.json';
-			//先判断这个配置文件是否存在，不存在就赋值为空对象
+			//障碍物数据。先判断这个配置文件是否存在，不存在就赋值为空对象
 			var maps = fs.existsSync(path)?require(path) : {};
 
-			//判断地图数据是否存在，没有就生成并入该地图数据
+			//如果指定场景id的【障碍物数据】存在
 			if(!!maps[this.id]){
-				this.collisions = maps[this.id].collisions;
-				this.weightMap = this.getWeightMap(this.collisions);
+				this.collisions = maps[this.id].collisions;             //障碍物
+				this.weightMap = this.getWeightMap(this.collisions);    //生成权重图阵
 			}else{
-				this.initWeightMap();
-				this.initCollisons();
-				maps[this.id] = {version : Date.now(), collisions : this.collisions};
-				fs.writeFileSync(path, JSON.stringify(maps));
+			//如果指定场景id没有【障碍物数据】
+				this.initWeightMap();           //执行初始化权重图阵，生成this.weightMap数组
+				this.initCollisons();           //执行初始化障碍物，生成this.collisions数组
+				maps[this.id] = {version : Date.now(), collisions : this.collisions}; //生成指定id场景的【障碍物数据】
+				fs.writeFileSync(path, JSON.stringify(maps));        //将指定场景id的障碍物写入障碍物脚本    
 			}
 
 		}
 	}
 };
 
-//读取地图配置文件（/config/map/xxx.json），给this.map赋值，属性为图层layers
+//读取tiledMap地图数据，给this.map赋值，属性为图层layers
 //地图配置文件由tiledmap生成，tiled用法，图层用于地图背景；对象层用于玩家、出生地、怪物、道具、障碍物
 //tiledmap的障碍物对象层命名必须为collision，这样this.map[layer.name]就得到this.map.collision为objs数组
 //tiledmap坐标原点在左上角，y轴朝下；画出的矩形、多边形原点也是左上角
 //tiledmap对象层约定命名规则：出生地（birth）、障碍物（collision）、npc（npc）、怪物（mob）
 //障碍物可以用多边形和矩形来画，不能用圆形
 Map.prototype.configMap = function(map){
-	this.map = {};
-	var layers = map.layers; //这里的map是tiledMap地图数据对象
+	this.map = {};          //地图对象数据
+	var layers = map.layers; //获取图层属性layers
+	//遍历所有图层，只获取对象层的数据作为this.map的属性值，key为对象成的name
 	for(var i = 0; i < layers.length; i++){
 		var layer = layers[i];
 		if(layer.type === 'objectgroup'){
 			//图层的属性类型为对象层时，读取对象层，并配置对象层objects属性的每一个object的属性
-			//this.map[layer.name]的值为objs数组
+			//this.map[layer.name]的值为修改过的objects数组
 			this.map[layer.name] = configObjectGroup(layer.objects);
 		}
 	}
 };
 
-//遍历图层的单个obj对象的properties的属性提取作为obj的属性，并删除properties项
+//遍历对象成的单个obj对象的properties的属性提取作为obj的属性，并删除properties项
 function configProps(obj){
 	if(!!obj && !!obj.properties){
 		for(var key in obj.properties){
 			obj[key] = obj.properties[key];
 		}
 
-		//删除一个属性名
+		//删除properties属性
 		delete obj.properties;
 	}
 
 	return obj;
 }
 
+//遍历对象层的objects数组，从新配置每一个对象
 function configObjectGroup(objs){
 	for(var i = 0; i < objs.length; i++){
-		//每一个对象执行提取属性函数，返回对象obj本身
+		//每一个对象properties属性获取属性作为对象属性
 		objs[i] = configProps(objs[i]);
 	}
 
@@ -124,11 +130,12 @@ function configObjectGroup(objs){
  * 通过地图配置的Collision对象层的objs数组，算出每一个瓦片坐标的权重映射值
  * @api private
  */
+//初始化权重图阵。通过this.map中的障碍物数组，算出每一个瓦片的权重值
 Map.prototype.initWeightMap = function() {
-	var collisions = this.getCollision();//值为障碍物对象成的objs数组
+	var collisions = this.getCollision();       //障碍物对象数组  
 	var i, j, x, y, x1, y1, x2, y2, p, l, p1, p2, p3, p4;
 	this.weightMap =  [];
-	//遍历每一块瓦片，添加权重映射数据，初始值设置为1
+	//遍历每一块瓦片，创建权重图阵数组，初始值设置为1
 	for(i = 0; i < this.rectW; i++) {
 		this.weightMap[i] = [];
 		for(j = 0; j < this.rectH; j++) {
@@ -141,9 +148,12 @@ Map.prototype.initWeightMap = function() {
 	for(i = 0; i < collisions.length; i++) {
 		var collision = collisions[i];
 		var polygon = [];
-		var points = collision.polygon;
+		
+		//单个障碍物的多边形变形[坐标点数组]（tiledMap生成的多边形点是相对坐标）
+		//画多边形第一个点所在的地图位置是多边形坐标
+		var points = collision.polygon;   
 
-		//如果障碍物是用多边形画的时候
+		//如果障碍物是用多边形polygon画的...............................................................
 		if(!!points && points.length > 0) {
 			if(points.length < 3) {
 				logger.warn('The polygon data is invalid! points: %j', points);
@@ -154,17 +164,19 @@ Map.prototype.initWeightMap = function() {
 			//通过多边形障碍物获取矩形极限
 			var minx = Infinity, miny = Infinity, maxx = 0, maxy = 0;
 
+			//遍历多边形polygon的点
 			for(j = 0; j < points.length; j++) {
 				var point = points[j];
 
-				//point是相对collision的坐标点，转换为大地图坐标点
+				//转换多边形的点坐标为tiledMap地图的实际坐标
 				x = Number(point.x) + Number(collision.x);
 				y = Number(point.y) + Number(collision.y);
-				//限制x,y的值在Infinity~0之间
-				minx = minx>x?x:minx;
-				miny = miny>y?y:miny;
-				maxx = maxx<x?x:maxx;
-				maxy = maxy<y?y:maxy;
+				
+				//计算多边形所在的矩形左上、右下两实际坐标点（minx，miny) ,(maxx，maxy)
+				minx = minx>x?x:minx;           
+				miny = miny>y?y:miny;           
+				maxx = maxx<x?x:maxx;           
+				maxy = maxy<y?y:maxy;           
 				polygon.push({x: x, y: y});
 			}
 
@@ -174,32 +186,33 @@ Map.prototype.initWeightMap = function() {
 				continue;
 			}
 
-			//算出该像素点的（最大瓦片，最小瓦片），两瓦片为对角线端点
+			//多边形所在矩形左上、右下瓦片点
+			//floor为小数去掉，返回最小整数；ceil为小数舍入，返回最大整数
 			x1 = Math.floor(minx/this.tileW);
 			y1 = Math.floor(miny/this.tileH);
 			x2 = Math.ceil(maxx/this.tileW);
 			y2 = Math.ceil(maxy/this.tileH);
 
 			//regular the poinit to not exceed the map
-			//限制瓦片坐标不超过地图
+			//限制瓦片点不超过地图
 			x1 = x1<0?0:x1;
 			y1 = y1<0?0:y1;
 			x2 = x2>this.rectW?this.rectW:x2;
 			y2 = y2>this.rectH?this.rectH:y2;
 
 			//For all the tile in the polygon's externally rect, check if the tile is in the collision
-			//遍历多边形外部的矩形框内的所有点的最大瓦片和最小瓦片，检测瓦片是否包含了障碍物
+			//遍历多边形外部的矩形框内的所有瓦片点，检测瓦片是否包含了障碍物
 			for(x = x1; x < x2; x++) {
 				for(y = y1; y < y2; y++) {
-					//瓦片所在的像素坐标，为该瓦片的中心点
+					//瓦片所在的像素点，为该瓦片的中心点
 					p = {x: x*this.tileW + this.tileW/2, y : y*this.tileH + this.tileH/2};
 					l = this.tileW/4;
-					//在（最大瓦片，最小瓦片）内取4个点
+					//每一个瓦片内取4个像素点
 					p1 = { x: p.x - l, y: p.y - l};
 					p2 = { x: p.x + l, y: p.y - l};
 					p3 = { x: p.x - l, y: p.y + l};
 					p4 = { x: p.x + l, y: p.y + l};
-					//瓦片内取的4个像素点，如果有一个在多边形内，则该瓦片值为无穷大
+					//瓦片内取的4个像素点，如果有一个在多边形内，则该瓦片的权重值为Infinity（不可走）
 					if(geometry.isInPolygon(p1, polygon) ||
 						 geometry.isInPolygon(p2, polygon) ||
 						 geometry.isInPolygon(p3, polygon) ||
@@ -209,7 +222,7 @@ Map.prototype.initWeightMap = function() {
 				}
 			}
 		} else {
-			//障碍物是用矩形画的时候，取对角线端点瓦片坐标
+		//如果障碍物是用矩形画的时候，获取左上、右下两个瓦片点......................................................
 			x1 = Math.floor(collision.x/this.tileW);
 			y1 = Math.floor(collision.y/this.tileH);
 
@@ -217,13 +230,13 @@ Map.prototype.initWeightMap = function() {
 			y2 = Math.ceil((collision.y+collision.height)/this.tileH);
 
 			//regular the poinit to not exceed the map
-			//保证点不超过地图边界
+			//保证瓦片点不超过地图边界
 			x1 = x1<0?0:x1;
 			y1 = y1<0?0:y1;
 			x2 = x2>this.rectW?this.rectW:x2;
 			y2 = y2>this.rectH?this.rectH:y2;
 
-			//遍历两对角线点内的矩形内的所有瓦片坐标，给这些瓦片坐标权重映射值为Infinity
+			//遍历矩形内的所有瓦片点，给这些瓦片权重值都设置为Infinity（不可走）
 			for(x = x1; x < x2; x++) {
 				for(y = y1; y < y2; y++) {
 					this.weightMap[x][y] = Infinity;
@@ -233,7 +246,7 @@ Map.prototype.initWeightMap = function() {
 	}
 };
 
-//初始化地图障碍物，通过this.weightMap生成this.collisions
+//初始化地图障碍物，通过权重图阵this.weightMap生成this.collisions数组
 Map.prototype.initCollisons = function(){
 	var map = [];
 	var flag = false;//（是否标记了障碍物）
@@ -329,10 +342,11 @@ Map.prototype.getNPCs = function() {
 
 /**
  * Get all collisions form the map
- * 获取障碍物对象层的objs数组
+ * 
  * @return {Array} All collisions
  * @api public
  */
+//获取地图对象数据的障碍物数组
 Map.prototype.getCollision = function() {
 	return this.map.collision;
 };
