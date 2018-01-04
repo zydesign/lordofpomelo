@@ -84,12 +84,12 @@ Instance.prototype.close = function(){
  */
 // 初始化NPC，场景开启立即运行，添加npcs实体组........................................
 Instance.prototype.initNPCs = function() {
-  var npcs = this.map.getNPCs();
+  var npcs = this.map.getNPCs();  //获取地图NPC对象数组
 
   for(var i = 0; i < npcs.length; i++) {
     var data = npcs[i];
 
-    data.kindId = data.id;
+    data.kindId = data.id;   //地图NPC设置时要自定义属性加入id属性（npc表的id）
     var npcInfo = dataApi.npc.findById(data.kindId);
     data.kindName = npcInfo.name;
     data.englishName = npcInfo.englishName;
