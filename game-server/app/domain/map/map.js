@@ -55,7 +55,7 @@ Map.prototype.init = function(opts) {
 		this.rectH = Math.ceil(this.height/this.tileH);    //瓦片高数量
 
 		this.pathCache = new PathCache({limit:1000});      //路径缓存
-		this.pfinder = buildFinder(this);                  //寻路
+		this.pfinder = buildFinder(this);                  //寻路模块
 
 		if(weightMap) {
 			//Use cache map first
@@ -443,9 +443,11 @@ Map.prototype.genPos = function(pos, range) {
  */
 //获取所有地图内可走的瓦片点，用于寻路函数
 Map.prototype.forAllReachable = function(x, y, processReachable) {
+	//瓦片点对应的斜上方点、斜下方点
 	var x1 = x - 1, x2 = x + 1;
 	var y1 = y - 1, y2 = y + 1;
 
+	//确保获取的两点在tiled地图里面
 	x1 = x1<0?0:x1;
 	y1 = y1<0?0:y1;
 	x2 = x2>=this.rectW?(this.rectW-1):x2;
@@ -477,16 +479,19 @@ Map.prototype.getWeight = function(x, y) {
  * Return is reachable for given pos
  * 通过权重值判断可走不可走，1为可走
  */
-//判断瓦片点的权重值。1为可走，Infinity为不可走。可走返回true，不可走返回false
+//通过坐标所在的瓦片点发权重值，判断可走不可走。1为可走，Infinity为不可走。可走返回true，不可走返回false
 Map.prototype.isReachable = function(x, y) {
+	//如果坐标不在地图里，返回false
 	if(x < 0 || y < 0 || x >= this.width || y >= this.height) {
 		return false;
 	}
 
 	try{
+		//转换坐标为瓦片点
 	var x1 = Math.floor(x/this.tileW);
 	var y1 = Math.floor(y/this.tileH);
 
+		//如果瓦片点不在权重图阵中，返回false
 	if(!this.weightMap[x1] || !this.weightMap[x1][y1]) {
 		return false;
   }
@@ -494,6 +499,7 @@ Map.prototype.isReachable = function(x, y) {
 	console.error('reachable error : %j', e);
 }
 
+	//最终结果，返回：坐标对应的瓦片点权重值是否为1
 	return this.weightMap[x1][y1] === 1;
 };
 
@@ -505,35 +511,44 @@ Map.prototype.isReachable = function(x, y) {
  * @param useCache {Boolean} If pathfinding cache is used
  * @api public
  */
+//返回寻路路径。map.findPath(entity.x, entity.y, targetX, targetY, useCache)，参数为：实体自身坐标、目标坐标
+//(ai系统、巡逻系统、点击移动等操作，执行character.move时，调用该函数)
 Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	useCache = useCache || false;
+	//如果自身坐标，目标坐标不在地图内，返回null
 	if( x < 0 || x > this.width || y < 0 || y > this.height || x1 < 0 || x1 > this.width || y1 < 0 || y1 > this.height) {
 		logger.warn('The point exceed the map range!');
 		return null;
 	}
 
+	//如果自身坐标为不可走，返回null
 	if(!this.isReachable(x, y)) {
 		logger.warn('The start point is not reachable! start :(%j, %j)', x, y);
 		return null;
 	}
 
+	//如果目标坐标为不可走，返回null
 	if(!this.isReachable(x1, y1)) {
 		logger.warn('The end point is not reachable! end : (%j, %j)', x1, y1);
 		return null;
 	}
 
+	//如果自身坐标和目标坐标之间没有障碍物就是【直线路径】，返回路径为自身坐标和目标坐标
   if(this._checkLinePath(x, y, x1, y1)) {
     return {path: [{x: x, y: y}, {x: x1, y: y1}], cost: formula.distance(x, y, x1, y1)};
   }
 
+	//转换自身坐标、目标坐标为对应的瓦片点
 	var tx1 = Math.floor(x/this.tileW);
 	var ty1 = Math.floor(y/this.tileH);
 	var tx2 = Math.floor(x1/this.tileW);
 	var ty2 = Math.floor(y1/this.tileH);
 
 	//Use cache to get path
+	//从寻路缓存中获取这两瓦片点的寻路路径
 	var path = this.pathCache.getPath(tx1, ty1, tx2, ty2);
 
+	//如果缓存获取不到寻路路径，从新生成路径数组
 	if(!path || !path.paths) {
 		path = this.pfinder(tx1, ty1, tx2, ty2);
 		if(!path || !path.paths) {
@@ -541,6 +556,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 			return null;
 		}
 
+		//如果允许使用缓存，则将生成的新路径存入缓存，方便调用
 		if(useCache) {
 			this.pathCache.addPath(tx1, ty1, tx2, ty2, path);
 		}
@@ -549,26 +565,32 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	var result = {};
 	var paths = [];
 
+	//将瓦片点转换为坐标，生成坐标寻路路径
 	for(var i = 0; i < path.paths.length; i++) {
 		paths.push(transPos(path.paths[i], this.tileW, this.tileH));
 	}
+	//如果存在共线的3坐标，则合并掉多余的坐标
 	paths = this.compressPath2(paths);
 	if(paths.length > 2) {
+		//相隔合拼
 		paths = this.compressPath1(paths, 3);
+		//共线合并
 		paths = this.compressPath2(paths);
 	}
 
 	result.path = paths;
 	result.cost = computeCost(paths);
 
+	//最后得到：{path: [{x, y}, {x, y},{x, y}...], cost: cost}
 	return result;
 };
 
 /**
  * Compute cost for given path
- * 计算路径费用
+ * 
  * @api public
  */
+//计算路径费用（移动到路径上所有坐标的总距离）
 function computeCost(path) {
 	var cost = 0;
 	for(var i = 1; i < path.length; i++) {
@@ -589,6 +611,7 @@ function computeCost(path) {
  * @param y1 {Number}	end y
  * @api private
  */
+//如果路径有3点共线坐标，合并掉多余坐标
 Map.prototype.compressPath2= function(tilePath) {
 		var oldPos = tilePath[0];
 		var path = [oldPos];
@@ -597,6 +620,7 @@ Map.prototype.compressPath2= function(tilePath) {
 			var pos = tilePath[i];
 			var nextPos = tilePath[i + 1];
 
+			//如果3点不共线
 			if(!isLine(oldPos, pos, nextPos)) {
 				path.push(pos);
 			}
@@ -627,11 +651,13 @@ Map.prototype.compressPath1 = function(path, loopTime) {
 		for(var i = 0, j = 2; j < path.length;) {
 			start = path[i];
 			end = path[j];
+			//如果相隔一个坐标为直线路径，那么忽略中间坐标
 			if(this._checkLinePath(start.x, start.y, end.x, end.y)) {
 				newPath.push(end);
 				i = j;
 				j += 2;
 			} else {
+				//如果相隔一个坐标之间有障碍物，则不能忽略中间坐标
 				newPath.push(path[i+1]);
 				i++;
 				j++;
@@ -679,35 +705,77 @@ Map.prototype.verifyPath = function(path) {
 
 /**
  * Check if the line is valid
- * @param x1 {Number} start x
+ * @param x1 {Number}   start x
  * @param y1 {Number}	start y
  * @param x2 {Number}	end x
  * @param y2 {Number}	end y
  */
+//检测是否为直线路径
 Map.prototype._checkLinePath = function(x1, y1, x2, y2) {
   var px = x2 - x1;
   var py = y2 - y1;
-  var tile = this.tileW/2;
+  var tile = this.tileW/2;   //半个瓦片宽度
+	
+//-------------我修改的部分代码--------------------------------
+	
+	//如果x坐标相同，检测y轴坐标之间是否有障碍物
   if(px === 0) {
-    while(x1 < x2) {
-      x1 += tile;
-      if(!this.isReachable(x1, y1)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  if(py === 0) {
     while(y1 < y2) {
       y1 += tile;
       if(!this.isReachable(x1, y1)) {
         return false;
       }
     }
+    while(y1 > y2) {
+      y1 -= tile;
+      if(!this.isReachable(x1, y1)) {
+        return false;
+      }	    
+    }
     return true;
   }
 
+	//如果y坐标相同，检测x轴坐标之间是否有障碍物
+  if(py === 0) {
+    while(x1 < x2) {
+      x1 += tile;
+      if(!this.isReachable(x1, y1)) {
+        return false;
+      }
+    }
+    while(x1 > x2) {
+      x1 -= tile;
+      if(!this.isReachable(x1, y1)) {
+        return false;
+      }
+    }
+    return true;
+  }
+	
+//  ---------原来代码部分----------------------------------------我觉得不合理,会被人利用这个bug开发穿墙外挂	
+//  if(px === 0) {
+//    while(x1 < x2) {
+//      x1 += tile;
+//      if(!this.isReachable(x1, y1)) {
+//        return false;
+//      }
+//    }
+//    return true;
+//  }
+
+//	//如果两坐标y相同，返回true
+//  if(py === 0) {
+//    while(y1 < y2) {
+//      y1 += tile;
+//      if(!this.isReachable(x1, y1)) {
+//        return false;
+//      }
+//    }
+//    return true;
+//  }	
+//-----------------------------------------------------------------------------
+	
+	//计算两坐标距离
   var dis = formula.distance(x1, y1, x2, y2);
   var rx = (x2 - x1) / dis;
   var ry = (y2 - y1) / dis;
@@ -719,6 +787,7 @@ Map.prototype._checkLinePath = function(x1, y1, x2, y2) {
   x1 += dx;
   y1 += dy;
 
+	//沿着对角线循环增加一小段直到目标坐标，判断之间是否有障碍物，如果没有障碍物则最后返回true
   while((dx > 0 && x1 < x2) || (dx < 0 && x1 > x2)) {
     if(!this._testLine(x0, y0, x1, y1)) {
       return false;
@@ -733,6 +802,7 @@ Map.prototype._checkLinePath = function(x1, y1, x2, y2) {
 };
 
 Map.prototype._testLine = function(x, y, x1, y1) {
+	//先确定两检测坐标可走的
 	if(!this.isReachable(x, y) || !this.isReachable(x1, y1)) {
 		return false;
 	}
@@ -745,13 +815,17 @@ Map.prototype._testLine = function(x, y, x1, y1) {
 	var tileX1 = Math.floor(x1/this.tileW);
 	var tileY1 = Math.floor(y1/this.tileW);
 
+	//如果两瓦片点呈水平或垂直排列，则为一直线，返回true
 	if(tileX === tileX1 || tileY === tileY1) {
 		return true;
 	}
 
+	//获取两坐标其中最小的y坐标
 	var minY = y < y1 ? y : y1;
+	//获取两坐标其中最大的y坐标
 	var maxTileY = (tileY > tileY1 ? tileY : tileY1) * this.tileW;
 
+	//最大y坐标等于最小y坐标，说明垂直排列一直线，返回true
 	if((maxTileY-minY) === 0) {
 		return true;
 	}
@@ -778,6 +852,7 @@ Map.prototype._testLine = function(x, y, x1, y1) {
  * @return {Object} The real position
  * @api public
  */
+//将瓦片点转换为坐标
 function transPos(pos, tileW, tileH) {
 	var newPos = {};
 	newPos.x = pos.x*tileW + tileW/2;
@@ -794,6 +869,7 @@ function transPos(pos, tileW, tileH) {
  * @return {Boolean}
  * @api public
  */
+//3点共线
 function isLine(p0, p1, p2) {
 	return ((p1.x-p0.x)===(p2.x-p1.x)) && ((p1.y-p0.y) === (p2.y-p1.y));
 }
