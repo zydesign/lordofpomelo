@@ -40,7 +40,8 @@ Map.prototype.init = function(opts) {
 	if(!map) {
 		logger.error('Load map failed! ');
 	} else {
-		//通过tiledMap地图数据，给this.map赋值，this.map为：{birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}
+		//通过tiledMap地图数据，给this.map赋值，
+		//this.map为：{birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}
 		this.configMap(map);
 		
 		this.id = opts.id;                                 //场景area的id
@@ -130,7 +131,7 @@ function configObjectGroup(objs){
  * 通过地图配置的Collision对象层的objs数组，算出每一个瓦片坐标的权重映射值
  * @api private
  */
-//初始化权重图阵。通过this.map中的障碍物数组，算出每一个瓦片的权重值
+//初始化权重图阵。通过this.map中的障碍物数组，算出每一个瓦片的权重值--------------------------------------------------------
 Map.prototype.initWeightMap = function() {
 	var collisions = this.getCollision();       //障碍物对象数组  
 	var i, j, x, y, x1, y1, x2, y2, p, l, p1, p2, p3, p4;
@@ -246,7 +247,8 @@ Map.prototype.initWeightMap = function() {
 	}
 };
 
-//初始化地图障碍物，通过权重图阵this.weightMap生成this.collisions数组
+//初始化地图障碍物，通过权重图阵this.weightMap生成this.collisions数组------------------------------------------------------
+//this.collisions形式：[{collisions: [{"start":26,"length":3},{"start":79,"length":3}...]},{collisions: []},{collisions: []}...]
 Map.prototype.initCollisons = function(){
 	var map = [];
 	var flag = false;//（是否标记了障碍物）
@@ -255,24 +257,23 @@ Map.prototype.initCollisons = function(){
 	for(var x = 0; x < this.weightMap.length; x++){
 		var array = this.weightMap[x];
 		var length = array.length;
-		//障碍物数组的子对象为x列的障碍物瓦片
-		//障碍物数量为x个[]，每个[]可以有0~N个对象作为障碍物
-		var collisions = [];
+		//每x列的障碍物数组
+		var collisions = [];  //形式：[{"start":y,"length":3},{"start":y,"length":1}...]
 		for(var y = 0; y < length; y++){
-			//conllisions start
-			//，如果flag为fasle（未标记障碍物）而且瓦片位置为不可走，设置障碍物的第x列的起点为y
+		//conllisions start
+		//start，如果flag为fasle（未标记障碍物）而且瓦片点位置为不可走，设置障碍物的第x列的起点该瓦片点的y，flag标记为true
 			if(!flag && (array[y] === Infinity)){
 				collision = {}; //第x列，第y块瓦片设置一个障碍物对象
 				collision.start = y;
 				flag = true;
 			}
 
-			//如果flag为标记状态，第x列第y位置为1可走时，标记停止，该x列的障碍物加入数组
+		//end，如果flag标记为true，第x列第y位置为1（可走）时，标记停止，该x列的障碍物加入数组
 			if(flag && array[y] === 1){
 				flag = false;
-				collision.length = y - collision.start;
+				collision.length = y - collision.start;  //x列障碍物起点到终点的长度length
 				collisions.push(collision);
-			//如果flag为标记状态，而且第x列遍历到了尽头，标记停止，该x列的障碍物加入数组
+		//end，如果flag标记为true，而且第x列遍历到了尽头，标记停止，该x列的障碍物加入数组
 			}else if(flag && (y === length - 1)){
 				flag = false;
 				collision.length = y - collision.start + 1;
@@ -280,15 +281,15 @@ Map.prototype.initCollisons = function(){
 			}
 		}
 
-		//将每x一列的障碍物作为map数组的一个对象
+		//将每x列的障碍物作为对象存入map数组
 		map[x] = {collisions: collisions};
 	}
 
-	//保存 列障碍物 数组到脚本的this.collisions
+	//保存 障碍物图阵 到this.collisions
 	this.collisions = map;
 };
 
-//通过this.collisions作为参数，获取权重映射
+//通过this.collisions作为参数，获取权重图阵
 Map.prototype.getWeightMap = function(collisions){
 	var map = [];
 	var x, y;
