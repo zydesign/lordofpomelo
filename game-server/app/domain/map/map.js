@@ -82,11 +82,13 @@ Map.prototype.init = function(opts) {
 };
 
 //读取tiledMap地图数据，给this.map赋值，属性为图层layers
-//地图配置文件由tiledmap生成，tiled用法，图层用于地图背景；对象层用于玩家、出生地、怪物、道具、障碍物
-//tiledmap的障碍物对象层命名必须为collision，这样this.map[layer.name]就得到this.map.collision为objs数组
-//tiledmap坐标原点在左上角，y轴朝下；画出的矩形、多边形原点也是左上角
+//地图配置文件由tiledmap生成，tiled用法，只使用对象层。对象层用于地图背景、玩家、出生地、怪物、道具、障碍物
+//tiledmap的障碍物对象层命名必须为collision，这样this.map[layer.name]就得到this.map.collision为obj数组
+//tiledmap坐标原点在左上角，y轴朝下；画出的矩形、多边形原点也是左上角（多边形要从左上角开始画）
 //tiledmap对象层约定命名规则：出生地（birth）、障碍物（collision）、npc（npc）、怪物（mob）
-//障碍物可以用多边形和矩形来画，不能用圆形
+//障碍物可以用多边形和矩形来画，不能用圆形。而出生地、npc、怪物、道具都必须是用矩形画
+
+//只获取tiledMap地图数据的对象层，生成不同类型的对象数组：{birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}
 Map.prototype.configMap = function(map){
 	this.map = {};          //地图对象数据
 	var layers = map.layers; //获取图层属性layers
@@ -101,7 +103,7 @@ Map.prototype.configMap = function(map){
 	}
 };
 
-//遍历对象成的单个obj对象的properties的属性提取作为obj的属性，并删除properties项
+//遍历对象层的单个obj对象的properties的自定义属性提取作为obj的属性，并删除properties项
 function configProps(obj){
 	if(!!obj && !!obj.properties){
 		for(var key in obj.properties){
@@ -318,11 +320,11 @@ Map.prototype.getWeightMap = function(collisions){
 
 /**
  * Get all mob zones in the map
- * 获取怪物对象层的objs
+ * 获取地图怪物对象数组
  * @return {Array} All mobzones in the map
  * @api public
  */
-//这个函数在area场景运行时立刻执行........................................0
+//获取地图怪物对象，用于生成怪物空间MobZones。（area场景运行时作为area.initMobZones（opt）的参数调用）............................0
 Map.prototype.getMobZones = function() {
 	if(!this.map) {
 		logger.error('map not load');
@@ -333,32 +335,31 @@ Map.prototype.getMobZones = function() {
 
 /**
  * Get all npcs from map
- * 获取NPCs对象层的objs数组
  * @return {Array} All npcs in the map
  * @api public
  */
+//获取地图npc对象数组。地图NPC设置时要自定义属性加入npc表单的id（area.initNPCs调用该函数，用到id）
 Map.prototype.getNPCs = function() {
 	return this.map.npc;
 };
 
 /**
  * Get all collisions form the map
- * 
  * @return {Array} All collisions
  * @api public
  */
-//获取地图对象数据的障碍物数组
+//获取地图障碍物数组
 Map.prototype.getCollision = function() {
 	return this.map.collision;
 };
 
 /**
  * Get born place for this map
- * 获取出生地的objs数组
  * @return {Object} Born place for this map
  * @api public
  */
 // temporary code
+//获取地图出生地对象数组，返回出生地第一个对象（由出生点Map.getBornPoint调用）
 Map.prototype.getBornPlace = function() {
 	var bornPlace = this.map.birth[0];
 	if(!bornPlace) {
@@ -388,10 +389,11 @@ Map.prototype.getBornPlace = function() {
 
 /**
  * Get born point for this map, the point is random generate in born place
- * 出生地内，随机生成出生点
  * @return {Object} A random generated born point for this map.
  * @api public
  */
+
+//从出生地内部随机生成出生点（像素坐标）（角色进入地图，或复活时调用）
 Map.prototype.getBornPoint = function() {
 	var bornPlace = this.getBornPlace();
 
@@ -405,16 +407,18 @@ Map.prototype.getBornPoint = function() {
 
 /**
  * Random generate a position for give pos and range
- * 指定坐标及范围，随机生成怪物出生点
+ * 
  * @param pos {Object} The center position
  * @param range {Number} The max distance form the pos
  * @return {Object} A random generate postion in the range of given pos
  * @api public
  */
+//指定坐标及范围，随机生成一个怪物出生点（像素坐标）
 Map.prototype.genPos = function(pos, range) {
 	var result = {};
 	var limit = 10;
 
+	//10次生成机会，在指定的空间内返回生成一个可走的坐标
 	for(var i = 0; i < limit; i++) {
 		var x = pos.x + Math.random()*range - range/2;
 		var y = pos.y + Math.random()*range - range/2;
@@ -432,12 +436,12 @@ Map.prototype.genPos = function(pos, range) {
 /**
  * Get all reachable pos for given x and y
  * This interface is used for pathfinding
- * 获取所有地图内可走的点(瓦片)，用于寻路函数
  * @param x {Number} x position.
  * @param y {Number} y position.
  * @param processReachable {function} Call back function, for all reachable x and y, the function will bu called and use the position as param
  * @api public
  */
+//获取所有地图内可走的瓦片点，用于寻路函数
 Map.prototype.forAllReachable = function(x, y, processReachable) {
 	var x1 = x - 1, x2 = x + 1;
 	var y1 = y - 1, y2 = y + 1;
@@ -463,8 +467,8 @@ Map.prototype.forAllReachable = function(x, y, processReachable) {
 
 /**
  * Get weicht for given pos
- * 通过位置获取对应的权重
  */
+//获取瓦片点的权重值
 Map.prototype.getWeight = function(x, y) {
 	return this.weightMap[x][y];
 };
@@ -473,6 +477,7 @@ Map.prototype.getWeight = function(x, y) {
  * Return is reachable for given pos
  * 通过权重值判断可走不可走，1为可走
  */
+//判断瓦片点的权重值。1为可走，Infinity为不可走。可走返回true，不可走返回false
 Map.prototype.isReachable = function(x, y) {
 	if(x < 0 || y < 0 || x >= this.width || y >= this.height) {
 		return false;
