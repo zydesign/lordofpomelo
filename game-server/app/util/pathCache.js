@@ -90,7 +90,7 @@ pro.addPath = function(x1, y1, x2, y2, path) {
 			});
 			
 			//再提取调整过的首位
-			delKey = this.queue.pop().key;
+			delKey = this.queue.pop().key;             //这里我加了key------------------------------bug
 		}
 		
 		//一直检测到有一个没有更新过的，就从缓存中删除该路径
