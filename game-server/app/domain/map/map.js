@@ -545,10 +545,10 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	var ty2 = Math.floor(y1/this.tileH);
 
 	//Use cache to get path
-	//从寻路缓存中获取这两瓦片点的寻路路径
+	//通过瓦片点参数，从寻路缓存中获取这两瓦片点的坐标寻路路径
 	var path = this.pathCache.getPath(tx1, ty1, tx2, ty2);
 
-	//如果缓存获取不到寻路路径，从新生成路径数组
+	//如果缓存获取不到寻路路径，通过瓦片点，从新生成坐标寻路路径
 	if(!path || !path.paths) {
 		path = this.pfinder(tx1, ty1, tx2, ty2);
 		if(!path || !path.paths) {
@@ -557,6 +557,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 		}
 
 		//如果允许使用缓存，则将生成的新路径存入缓存，方便调用
+		//储存参数tx1, ty1, tx2, ty2是瓦片点，path是坐标数组
 		if(useCache) {
 			this.pathCache.addPath(tx1, ty1, tx2, ty2, path);
 		}
