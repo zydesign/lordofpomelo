@@ -545,10 +545,10 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	var ty2 = Math.floor(y1/this.tileH);
 
 	//Use cache to get path
-	//通过瓦片点参数，从寻路缓存中获取这两瓦片点的坐标寻路路径
+	//通过瓦片点参数，从寻路缓存中获取瓦片点路径
 	var path = this.pathCache.getPath(tx1, ty1, tx2, ty2);
 
-	//如果缓存获取不到寻路路径，通过瓦片点，从新生成坐标寻路路径
+	//如果缓存获取不到寻路路径，通过瓦片点，从新生成瓦片点路径
 	if(!path || !path.paths) {
 		path = this.pfinder(tx1, ty1, tx2, ty2);
 		if(!path || !path.paths) {
@@ -566,7 +566,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	var result = {};
 	var paths = [];
 
-	//将瓦片点转换为坐标，生成坐标寻路路径
+	//将【瓦片点路径】转换成【坐标路径】--------------------------------------------------
 	for(var i = 0; i < path.paths.length; i++) {
 		paths.push(transPos(path.paths[i], this.tileW, this.tileH));
 	}
@@ -582,7 +582,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	result.path = paths;
 	result.cost = computeCost(paths);
 
-	//最后得到：{path: [{x, y}, {x, y},{x, y}...], cost: cost}
+	//最后得到坐标路径和费用：{path: [{x, y}, {x, y},{x, y}...], cost: cost}
 	return result;
 };
 
@@ -853,7 +853,7 @@ Map.prototype._testLine = function(x, y, x1, y1) {
  * @return {Object} The real position
  * @api public
  */
-//将瓦片点转换为坐标
+//将瓦片点转换为坐标（Map.findPath生成瓦片点路径转换成坐标路径用到）
 function transPos(pos, tileW, tileH) {
 	var newPos = {};
 	newPos.x = pos.x*tileW + tileW/2;
