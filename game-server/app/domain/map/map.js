@@ -512,7 +512,7 @@ Map.prototype.isReachable = function(x, y) {
  * @api public
  */
 //返回寻路路径。map.findPath(entity.x, entity.y, targetX, targetY, useCache)，参数为：实体自身坐标、目标坐标
-//(ai系统、巡逻系统、点击移动等操作，执行character.move时，调用该函数)
+//(ai系统、巡逻系统、点击移动等操作，执行character.move时，调用该函数)------------------------------------------------------寻路函数
 Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	useCache = useCache || false;
 	//如果自身坐标，目标坐标不在地图内，返回null
