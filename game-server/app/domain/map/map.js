@@ -55,7 +55,9 @@ Map.prototype.init = function(opts) {
 		this.rectH = Math.ceil(this.height/this.tileH);    //瓦片高数量
 
 		this.pathCache = new PathCache({limit:1000});      //路径缓存
-		this.pfinder = buildFinder(this);                  //寻路模块
+		
+		//执行寻路创建函数。得到一个未执行的函数：finder(sx,sy,gx,gy)  【参数：开始瓦片点{sx,sy},目标瓦片点{gx,gy}】
+		this.pfinder = buildFinder(this);                  
 
 		if(weightMap) {
 			//Use cache map first
@@ -342,7 +344,7 @@ Map.prototype.getMobZones = function() {
  * @return {Array} All npcs in the map
  * @api public
  */
-//获取地图npc对象数组。地图NPC设置时要自定义属性加入npc表单的id（area.initNPCs调用该函数，用到id）
+//获取地图npc对象数组。地图NPC设置时要自定义属性加入npc表单的id（area.initNPCs调用该函数，用到id）..................................1
 Map.prototype.getNPCs = function() {
 	return this.map.npc;
 };
@@ -352,7 +354,7 @@ Map.prototype.getNPCs = function() {
  * @return {Array} All collisions
  * @api public
  */
-//获取地图障碍物对象数组
+//获取地图障碍物对象数组。(该函数由这里的Map.initWeightMap()函数,初始化权重矩阵调用)
 Map.prototype.getCollision = function() {
 	return this.map.collision;
 };
@@ -474,7 +476,7 @@ Map.prototype.forAllReachable = function(x, y, processReachable) {
 /**
  * Get weicht for given pos
  */
-//获取瓦片点的权重值
+//获取瓦片点的权重值（寻路模块的finder(sx,sy,gx,gy)函数会调用该函数检测目标瓦片点是否可走）
 Map.prototype.getWeight = function(x, y) {
 	return this.weightMap[x][y];
 };
@@ -552,7 +554,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	//通过瓦片点参数，从寻路缓存中获取瓦片点路径
 	var path = this.pathCache.getPath(tx1, ty1, tx2, ty2);
 
-	//如果缓存获取不到寻路路径，通过瓦片点，从新生成瓦片点路径
+	//如果缓存获取不到寻路路径，通过瓦片点，从新生成瓦片点路径path：{paths: paths, cost:goalTile.cost}
 	if(!path || !path.paths) {
 		path = this.pfinder(tx1, ty1, tx2, ty2);
 		if(!path || !path.paths) {
