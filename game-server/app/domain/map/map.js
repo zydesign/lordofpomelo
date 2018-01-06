@@ -71,10 +71,12 @@ Map.prototype.init = function(opts) {
 				this.weightMap = this.getWeightMap(this.collisions);    //生成权重图阵
 			}else{
 			//如果指定场景id没有【障碍物数据】
-				this.initWeightMap();           //执行初始化权重图阵，生成this.weightMap数组
+				this.initWeightMap();           //执行初始化权重矩阵，生成this.weightMap数组
 				this.initCollisons();           //执行初始化障碍物，生成this.collisions数组
-				maps[this.id] = {version : Date.now(), collisions : this.collisions}; //生成指定id场景的【障碍物数据】
-				fs.writeFileSync(path, JSON.stringify(maps));        //将指定场景id的障碍物写入障碍物脚本    
+				
+				 //生成指定id场景的【障碍物数据】，版本号是日期。之后将id场景的障碍物数据写入/tmp/map.json脚本
+				maps[this.id] = {version : Date.now(), collisions : this.collisions};
+				fs.writeFileSync(path, JSON.stringify(maps));            
 			}
 
 		}
@@ -129,16 +131,17 @@ function configObjectGroup(objs){
 
 /**
  * Init weight map, which is used to record the collisions info, used for pathfinding
- * 初始化权重映射，用来记录障碍物信息，用于寻路，1为可走，Infinity为不可走
- * 通过地图配置的Collision对象层的objs数组，算出每一个瓦片坐标的权重映射值
+ * 初始化权重矩阵，用来记录障碍物信息，用于寻路，1为可走，Infinity为不可走
+ * 通过地图配置的Collision对象层的objs数组，算出每一个瓦片的权重值
  * @api private
  */
-//初始化权重图阵。通过this.map中的障碍物数组，算出每一个瓦片的权重值--------------------------------------------------------
+//初始化权重矩阵。通过this.map中的障碍物数组，算出每一个瓦片的权重值
+//（由于/tmp/map.json没有指定id场景的障碍物数据才初始化）--------------------------------------------------
 Map.prototype.initWeightMap = function() {
-	var collisions = this.getCollision();       //障碍物对象数组  
+	var collisions = this.getCollision();       //障碍物对象数组（this.map.collision）  
 	var i, j, x, y, x1, y1, x2, y2, p, l, p1, p2, p3, p4;
 	this.weightMap =  [];
-	//遍历每一块瓦片，创建权重图阵数组，初始值设置为1
+	//遍历每一块瓦片，创建权重矩阵数组，初始值设置为1
 	for(i = 0; i < this.rectW; i++) {
 		this.weightMap[i] = [];
 		for(j = 0; j < this.rectH; j++) {
@@ -147,12 +150,12 @@ Map.prototype.initWeightMap = function() {
 	}
 
 	//Use all collsions to construct the weight map
-	//使用所有的障碍物构成权重映射
+	//使用所有的障碍物设置对应的权重值
 	for(i = 0; i < collisions.length; i++) {
 		var collision = collisions[i];
 		var polygon = [];
 		
-		//单个障碍物的多边形变形[坐标点数组]（tiledMap生成的多边形点是相对坐标）
+		//单个障碍物的多边形[坐标点数组]（tiledMap生成的多边形点是相对坐标）
 		//画多边形第一个点所在的地图位置是多边形坐标
 		var points = collision.polygon;   
 
@@ -167,11 +170,11 @@ Map.prototype.initWeightMap = function() {
 			//通过多边形障碍物获取矩形极限
 			var minx = Infinity, miny = Infinity, maxx = 0, maxy = 0;
 
-			//遍历多边形polygon的点
+			//遍历多边形polygon的点的相对坐标，转换为实际坐标
 			for(j = 0; j < points.length; j++) {
 				var point = points[j];
 
-				//转换多边形的点坐标为tiledMap地图的实际坐标
+				//转换多边形各点的相对坐标为大地图tiledMap的绝对坐标----------------------------
 				x = Number(point.x) + Number(collision.x);
 				y = Number(point.y) + Number(collision.y);
 				
@@ -249,7 +252,8 @@ Map.prototype.initWeightMap = function() {
 	}
 };
 
-//初始化地图障碍物，通过权重图阵this.weightMap生成this.collisions数组------------------------------------------------------
+//初始化地图障碍物，通过权重矩阵this.weightMap生成this.collisions数组
+//（由于/tmp/map.json没有指定id场景的障碍物数据才初始化）--------------------------------------------------
 //this.collisions形式：[{collisions: [{"start":26,"length":3},{"start":79,"length":3}...]},{collisions: []},{collisions: []}...]
 Map.prototype.initCollisons = function(){
 	var map = [];
@@ -291,8 +295,8 @@ Map.prototype.initCollisons = function(){
 	this.collisions = map;
 };
 
-//通过this.collisions作为参数，获取权重图阵
-Map.prototype.getWeightMap = function(collisions){
+//通过this.collisions作为参数，生成权重矩阵
+//（new map实例游戏地图的时候，如果/tmp/map.json有某id场景的障碍物数据，就会用该数据生成this.weightMap）(这里的innit调用该函数)-----------
 	var map = [];
 	var x, y;
 	for(x = 0; x < this.rectW; x++) {
@@ -348,7 +352,7 @@ Map.prototype.getNPCs = function() {
  * @return {Array} All collisions
  * @api public
  */
-//获取地图障碍物数组
+//获取地图障碍物对象数组
 Map.prototype.getCollision = function() {
 	return this.map.collision;
 };
@@ -438,7 +442,7 @@ Map.prototype.genPos = function(pos, range) {
  * This interface is used for pathfinding
  * @param x {Number} x position.
  * @param y {Number} y position.
- * @param processReachable {function} Call back function, for all reachable x and y, the function will bu called and use the position as param
+ * @param processReachable {function} Call back function, for all reachable x and y, 
  * @api public
  */
 //获取所有地图内可走的瓦片点，用于寻路函数
@@ -637,7 +641,7 @@ Map.prototype.compressPath2= function(tilePath) {
 /**
  * Compress path to remove unneeded point
  * @param path [Ayyay] The origin path
- * @param loopTime [Number] The times to remove point, the bigger the number, the better the result, it should not exceed log(2, path.length)
+ * @param loopTime [Number] The times to remove point,
  * @return The compressed path
  * @api private
  */
