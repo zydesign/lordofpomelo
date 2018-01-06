@@ -539,7 +539,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 		return null;
 	}
 
-	//如果自身坐标和目标坐标之间没有障碍物就是【直线路径】，返回路径为自身坐标和目标坐标
+	//如果自身坐标和目标坐标之间没有障碍物就是【直线路径】，返回路径为自身坐标和目标坐标------------------------------直线路径（结果1）
   if(this._checkLinePath(x, y, x1, y1)) {
     return {path: [{x: x, y: y}, {x: x1, y: y1}], cost: formula.distance(x, y, x1, y1)};
   }
@@ -554,7 +554,7 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	//通过瓦片点参数，从寻路缓存中获取瓦片点路径
 	var path = this.pathCache.getPath(tx1, ty1, tx2, ty2);
 
-	//如果缓存获取不到寻路路径，通过瓦片点，从新生成瓦片点路径path：{paths: paths, cost:goalTile.cost}
+	//如果缓存获取不到寻路路径，通过瓦片点，从新生成瓦片点路径path：{paths: paths, cost:goalTile.cost}-----------寻路器生成瓦片点路径
 	if(!path || !path.paths) {
 		path = this.pfinder(tx1, ty1, tx2, ty2);
 		if(!path || !path.paths) {
@@ -572,23 +572,26 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 	var result = {};
 	var paths = [];
 
-	//将【瓦片点路径】转换成【坐标路径】--------------------------------------------------
+	//将【瓦片点路径】转换成【坐标路径】（因为是转换得到的坐标，所以这些坐标肯定都是位于瓦片点中心）-----------------------转换成坐标路径
 	for(var i = 0; i < path.paths.length; i++) {
 		paths.push(transPos(path.paths[i], this.tileW, this.tileH));
 	}
+	
+	//清理路径中一些多余的坐标，减少坐标数量（比如一些阶梯型坐标，可以保留首尾直接走直线）--------------------------------清理多余坐标
+	
 	//如果存在共线的3坐标，则合并掉多余的坐标
 	paths = this.compressPath2(paths);
 	if(paths.length > 2) {
-		//相隔合拼
+		//相隔合拼（有【直线路径】则清理中间坐标，循环清理3次）
 		paths = this.compressPath1(paths, 3);
-		//共线合并
+		//共线合并（有【共线坐标】则清理中间坐标）
 		paths = this.compressPath2(paths);
 	}
 
-	result.path = paths;                //像素坐标路径
+	result.path = paths;                //得到【精简】后的坐标路径
 	result.cost = computeCost(paths);   //使用的坐标路径计算的总距离，是像素距离
 
-	//最后得到坐标路径和费用：{path: [{x, y}, {x, y},{x, y}...], cost: cost}
+	//最后得到坐标路径和费用：{path: [{x, y}, {x, y},{x, y}...], cost: cost}----------------------------------------最终结果2
 	return result;
 };
 
@@ -650,15 +653,17 @@ Map.prototype.compressPath2= function(tilePath) {
 Map.prototype.compressPath1 = function(path, loopTime) {
 	var newPath;
 
+	//循环三次遍历
 	for(var k = 0; k < loopTime; k++) {
 		var start;
 		var end;
 		newPath = [path[0]];
 
+		//遍历坐标路径，提取相隔坐标检测是直线路径，那么忽略中间坐标
 		for(var i = 0, j = 2; j < path.length;) {
 			start = path[i];
 			end = path[j];
-			//如果相隔一个坐标为直线路径，那么忽略中间坐标
+			//如果相隔一个坐标为直线路径，
 			if(this._checkLinePath(start.x, start.y, end.x, end.y)) {
 				newPath.push(end);
 				i = j;
