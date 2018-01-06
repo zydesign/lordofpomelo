@@ -579,8 +579,8 @@ Map.prototype.findPath = function(x, y, x1, y1, useCache) {
 		paths = this.compressPath2(paths);
 	}
 
-	result.path = paths;
-	result.cost = computeCost(paths);
+	result.path = paths;                //像素坐标路径
+	result.cost = computeCost(paths);   //使用的坐标路径计算的总距离，是像素距离
 
 	//最后得到坐标路径和费用：{path: [{x, y}, {x, y},{x, y}...], cost: cost}
 	return result;
