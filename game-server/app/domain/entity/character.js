@@ -198,7 +198,7 @@ Character.prototype.recoverMp = function(mpValue) {
 Character.prototype.move = function(targetX, targetY, useCache, cb) {
   useCache = useCache || false;
 
-  //如果使用缓存
+  //如果使用缓存---------------------------------------------------------------------------------使用寻路缓存pathCache的情况
   if(useCache){
     //从地图map中获取寻路路径（map.findPath使用了寻路系统，会避开障碍物返回最佳的坐标数组）
     //参数的this.x, this.y在角色每执行action的move.update一次都会实时更新为移动后的坐标
@@ -212,7 +212,7 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
       logger.warn('No path exist! {x: %j, y: %j} , target: {x: %j, y: %j} ', this.x, this.y, targetX, targetY);
       utils.invokeCallback(cb, 'find path error', false);
     }
-    //如果不使用缓存
+    //如果不使用缓存------------------------------------------------------------------------------------不使用寻路缓存的情况
   }else{
     var closure = this;
     //rpc调用寻路服务器findPath函数获取寻路路径
