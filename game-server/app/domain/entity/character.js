@@ -320,6 +320,7 @@ Character.prototype.reduceMp = function(mp) {
  * @return {Number}
  * @api private
  */
+//获取攻击值
 Character.prototype.getAttackValue = function() {
   return this.attackValue * this.attackParam;
 };
@@ -330,6 +331,7 @@ Character.prototype.getAttackValue = function() {
  * @return {Number}
  * @api private
  */
+//获取防御值
 Character.prototype.getDefenceValue = function() {
   return this.defenceValue * this.defenceParam;
 };
