@@ -124,6 +124,7 @@ handler.enterScene = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//改变玩家视野
 handler.changeView = function(msg, session, next){
   var timer = session.area.timer;
 
@@ -141,6 +142,7 @@ handler.changeView = function(msg, session, next){
 		return;
 	}
 
+	//更新玩家aoi对象位置，推送消息给自己，哪些实体看见与看不见
 	if(player.range !== range){
     timer.updateWatcher({id:player.entityId, type:player.type}, player, player, player.range, range);
 		player.range = range;
@@ -152,12 +154,12 @@ handler.changeView = function(msg, session, next){
 /**
  * Player moves. Player requests move with the given movePath.
  * Handle the request from client, and response result to client
- * 玩家移动，通过寻路路径发起请求
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
  * @api public
  */
+//客户端点击地面，发起移动请求。
 handler.move = function(msg, session, next) {
   var area = session.area;
   var timer = area.timer;
@@ -169,6 +171,7 @@ handler.move = function(msg, session, next) {
 
   player.target = null;
 
+   //如果验证路径有不可走的坐标，返回错误码
   if(!area.map.verifyPath(path)){
     logger.warn('The path is illegal!! The path is: %j', msg.path);
     next(null, {
@@ -179,6 +182,7 @@ handler.move = function(msg, session, next) {
     return;
   }
 
+  //如果路径没问题，生成移动动作
   var action = new Move({
     entity: player,
     path: path,
@@ -186,15 +190,18 @@ handler.move = function(msg, session, next) {
   });
 
 	var ignoreList = {};
+	//将玩家自己加入aoi广播的排除组里。就是为了推送消息给除了自己以外的玩家观察者
 	ignoreList[player.userId] = true;
+	//动作加入动作管理器，方便update
   if (timer.addAction(action)) {
 			player.isMoving = true;
 			//Update state
+	                //玩家离开原坐标就是移动了，aoi更新对象，更新观察者（会同时发射对应事件'update'和'updateWatcher'）
 			if(player.x !== path[0].x || player.y !== path[0].y){
 					timer.updateObject({id:player.entityId, type:consts.EntityType.PLAYER}, {x : player.x, y : player.y}, path[0]);
           timer.updateWatcher({id:player.entityId, type:consts.EntityType.PLAYER}, {x : player.x, y : player.y}, path[0], player.range, player.range);
 			}
-
+     //同时广播aoi消息自己位置的灯塔的观察者（排除自己）【消息有玩家id、路径和移动速度，客户端‘播放’玩家在路径上移动到目标点】
       messageService.pushMessageByAOI(area, {
       route: 'onMove',
       entityId: player.entityId,
@@ -212,6 +219,7 @@ handler.move = function(msg, session, next) {
 };
 
 //drop equipment or item
+//客户端发起，玩家掉落道具或装备（PK掉落）
 handler.dropItem = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
 
@@ -221,6 +229,7 @@ handler.dropItem = function(msg, session, next) {
 };
 
 //add equipment or item
+//客户端发起，玩家拾取道具
 handler.addItem = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
 
@@ -230,6 +239,7 @@ handler.addItem = function(msg, session, next) {
 };
 
 //Change area
+//客户端发起，玩家切换场景
 handler.changeArea = function(msg, session, next) {
 	var playerId = session.get('playerId');
 	var areaId = msg.areaId;
@@ -274,14 +284,17 @@ handler.changeArea = function(msg, session, next) {
 };
 
 //Use item
+//客户端发起，玩家使用道具
 handler.useItem = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
 
+	//index是背包栏第几格
   var status = player.useItem(msg.index);
 
   next(null, {code: consts.MESSAGE.RES, status: status});
 };
 
+//客户端发起，玩家对话npc，添加target，ai系统自动执行npc行为
 handler.npcTalk = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
   player.target = msg.targetId;
@@ -297,6 +310,7 @@ handler.npcTalk = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，玩家拾取道具。添加target，ai系统自动执行拾取行为
 handler.pickItem = function(msg, session, next) {
   var area = session.area;
 
@@ -317,6 +331,7 @@ handler.pickItem = function(msg, session, next) {
 };
 
 //Player  learn skill
+//客户端发起，玩家学习技能
 handler.learnSkill = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
   var status = player.learnSkill(msg.skillId);
@@ -325,6 +340,7 @@ handler.learnSkill = function(msg, session, next) {
 };
 
 //Player upgrade skill
+//客户端发起，玩家升级技能
 handler.upgradeSkill = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
   var status = player.upgradeSkill(msg.skillId);
