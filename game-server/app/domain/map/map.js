@@ -693,18 +693,23 @@ Map.prototype.compressPath1 = function(path, loopTime) {
  * @return {Boolean} verify result
  * @api public
  */
+
+//验证参数路径是否有效。（场景服务器的playerHandler.move调用该函数）
 Map.prototype.verifyPath = function(path) {
+	//路径坐标至少2个，不是就返回false
 	if(path.length < 2) {
 		return false;
 	}
 
 	var i;
+	//遍历坐标路径数组，是否有不可走的，不是就返回false
 	for(i = 0; i < path.length; i++) {
 		if(!this.isReachable(path[i].x, path[i].y)) {
 			return false;
 		}
 	}
 
+	//验证相邻两点是否为直线路径，不是就返回false
 	for(i = 1; i < path.length; i++) {
 		if(!this._checkLinePath(path[i-1].x, path[i-1].y, path[i].x, path[i].y)) {
 			logger.error('illigle path ! i : %j, path[i] : %j, path[i+1] : %j', i, path[i], path[i+1]);
