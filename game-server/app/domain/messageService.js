@@ -14,9 +14,9 @@ exp.pushMessageToPlayer = function (uid, route, msg) {
   exp.pushMessageByUids([uid], route, msg);
 };
 
-//获取aoi灯塔用户数组，然后用户组推送消息
+//获取aoi灯塔用户数组，然后用户组推送消息（ignoreList是排除组，排除自己uid）
 exp.pushMessageByAOI = function (area, msg, pos, ignoreList) {
-	//获取区域内观察者uids 
+	//获取指定灯塔点的玩家观察者uids 
   var uids = area.timer.getWatcherUids(pos, [EntityType.PLAYER], ignoreList);
 
 	//然后用户组推送
