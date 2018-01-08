@@ -95,7 +95,7 @@ Player.prototype.addExperience = function(exp) {
  *
  * @api public
  */
-//玩家升级
+//玩家升级。2个工作：1.执行升级函数更新属性。2.发射'upgrade'升级事件，将更新的玩家属性状态player.strip()推送给客户端
 Player.prototype.upgrade = function() {
   while (this.experience >= this.nextLevelExp) {
     //logger.error('player.upgrade ' + this.experience + ' nextLevelExp: ' + this.nextLevelExp);
@@ -117,6 +117,7 @@ Player.prototype.updateTeamMemberInfo = function() {
 };
 
 //Upgrade, update player's state
+//玩家升级类。更新player玩家的属性值，设置攻防总值，更新队伍信息
 Player.prototype._upgrade = function() {
   this.level += 1;
   this.maxHp += Math.round(this.characterData.upgradeParam * this.characterData.hp);
@@ -132,13 +133,16 @@ Player.prototype._upgrade = function() {
   this.updateTeamMemberInfo();
 };
 
+//设置总攻击和总防御
 Player.prototype.setTotalAttackAndDefence = function() {
   var attack = 0, defence = 0;
 
+  //遍历角色穿戴的装备
   for (var key in this.equipments) {
     if(!this.equipments.isEquipment(key)) {
       continue;
     }
+    //获取穿戴装备的数据
     var equip = dataApi.equipment.findById(this.equipments[key]);
     if (!!equip) {
       attack += Number(equip.attackValue);
@@ -147,6 +151,7 @@ Player.prototype.setTotalAttackAndDefence = function() {
   }
 
   //logger.error('defence :%j, %j', this.getDefenceValue() , defence);
+  //更新总攻击属性、总防御属性
   this.totalAttackValue = this.getAttackValue() + attack;
   this.totalDefenceValue = this.getDefenceValue() + defence;
 };
@@ -158,6 +163,7 @@ Player.prototype.setTotalAttackAndDefence = function() {
  * @param {Number} equipId
  * @api public
  */
+//穿戴装备
 Player.prototype.equip = function(kind, equipId) {
   var index = -1;
   var curEqId = this.equipments.get(kind);
@@ -177,6 +183,7 @@ Player.prototype.equip = function(kind, equipId) {
  * @param {Number} kind
  * @api public
  */
+//脱掉装备
 Player.prototype.unEquip = function(kind) {
   this.equipments.unEquip(kind);
   this.setTotalAttackAndDefence();
@@ -189,18 +196,20 @@ Player.prototype.unEquip = function(kind) {
  * @return {Boolean}
  * @api public
  */
+//玩家使用道具。（场景服务器的playerHandler.useItem调用该函数）
 Player.prototype.useItem = function(index) {
   var item = this.bag.get(index);
   if (!item || item.type !== 'item') {
     return false;
   }
+  //通过道具id从表单获取道具数据
   var itm = dataApi.item.findById(item.id);
   if (itm) {
-    this.recoverHp(itm.hp);
-    this.recoverMp(itm.mp);
-    this.updateTeamMemberInfo();
+    this.recoverHp(itm.hp);         //回复HP
+    this.recoverMp(itm.mp);         //回复MP
+    this.updateTeamMemberInfo();    //更新队伍信息
   }
-  this.bag.removeItem(index);
+  this.bag.removeItem(index);       //背包删除指定标签道具
   return true;
 };
 
@@ -366,7 +375,7 @@ Player.prototype.completeTask = function(taskId) {
 };
 
 //Convert player' state to json and return
-//角色状态信息，发射save事件，同步角色数据到数据库时使用
+//角色状态信息。（发射save事件，同步角色数据到数据库）（发射'upgrade'升级事件，推送消息给客户端）
 Player.prototype.strip = function() {
   return {
     id: this.id,
@@ -403,7 +412,7 @@ Player.prototype.strip = function() {
  *	@return {Object}
  *	@api public
  */
-//玩家登录场景时执行该函数，获取角色信息、背包信息、装备信息、战斗技能、当前任务
+//获取玩家信息（玩家登录场景时执行该函数，获取角色信息、背包信息、装备信息、战斗技能、当前任务）
 Player.prototype.getInfo = function() {
   var playerData = this.strip();
   playerData.bag = this.bag.getData();
