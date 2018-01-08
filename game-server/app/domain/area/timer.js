@@ -58,7 +58,7 @@ Timer.prototype.tick = function() {
  * @return {Boolean}
  */
 
-//增加一个动作到动作管理器（characterEvent注册移动事件时调用了该函数，）
+//增加一个动作到动作管理器（characterEvent注册移动事件时调用了该函数）（场景服务器的playerHandler.move调用该函数）
 Timer.prototype.addAction = function(action) {
   return this.area.actionManager.addAction(action);
 };
@@ -137,16 +137,19 @@ Timer.prototype.updateObject = function(obj, oldPos, newPos) {
  * @param ignoreList {Array} The ignore watchers' list.
  * @return {Array} The qualified watchers id list.
  */
-// 获取观察者uid（这个主要是给观察者广播自己位置的）
+// 获取观察者uids（messageService.pushMessageByAOI调用该函数）
 Timer.prototype.getWatcherUids = function(pos, types, ignoreList) {
   var area = this.area;
 
+  //获取某灯塔点指定类型的观察者
   var watchers = area.aoi.getWatchers(pos, types);
   var result = [];
+  //如果玩家类型观察者存在，遍历观察者组，获取对应玩家实体，然后获取对应uid存入，uid组
   if(!!watchers && !! watchers[EntityType.PLAYER]) {
     var pWatchers = watchers[EntityType.PLAYER];
     for(var entityId in pWatchers) {
       var player = area.getEntity(entityId);
+      //玩家存在，而且排除不存在，或获取的玩家不在排除组内（ignoreList就是排除玩家自己）
       if(!!player && !! player.userId && (!ignoreList || !ignoreList[player.userId])) {
         result.push({uid:player.userId, sid : player.serverId});
       }
