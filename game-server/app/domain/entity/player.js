@@ -221,11 +221,15 @@ Player.prototype.useItem = function(index) {
  * @return {Blooean}
  * @api public
  */
+//玩家学习技能
 Player.prototype.learnSkill = function(skillId, callback) {
+  //技能id获取技能数据
   var skillData = dataApi.fightskill.findById(skillId);
+  //如果玩家等级没达到学习技能等级或战斗技能组已有该技能，返回false
   if (this.level < skillData.playerLevel || !!this.fightSkills[skillId]) {
     return false;
   }
+  //生成战斗技能实例
   var fightSkill = fightskill.create({skillId: skillId, level: 1, playerId: this.id, type:'attack'});
   this.fightSkills[skillId] = fightSkill;
   fightskillDao.add(fightSkill, callback);
