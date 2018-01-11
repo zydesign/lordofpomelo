@@ -15,6 +15,7 @@ var Code = require('../../../../../shared/code');
  * @param {Object} session
  * @api public
  */
+//客户端请求，发起攻击
 handler.attack = function(msg, session, next) {
 	var player = session.area.getPlayer(session.get('playerId'));
 	var target = session.area.getEntity(msg.targetId);
@@ -25,6 +26,7 @@ handler.attack = function(msg, session, next) {
 		return;
 	}
 
+	//时间器停止玩家移动行为
 	session.area.timer.abortAction('move', player.entityId);
 	//只需给角色添加目标，ai系统就会获取目标，自动循环攻击
 	player.target = target.entityId;
@@ -42,6 +44,7 @@ handler.attack = function(msg, session, next) {
  * @param {Object} session
  * @api public
  */
+//客户端发起，使用技能
 handler.useSkill = function(msg, session, next) {
 	var playerId = msg.playerId;
 	var skillId = msg.skillId;
@@ -52,8 +55,8 @@ handler.useSkill = function(msg, session, next) {
 		return;
 	}
 
-	next();
-	player.attack(target, skillId);
+	next();  //无需返回客户端
+	player.attack(target, skillId);     //执行玩家攻击函数
 };
 
 
