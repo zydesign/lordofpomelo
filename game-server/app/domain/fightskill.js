@@ -19,7 +19,7 @@
  * @api public
  */
 
-//技能攻击
+//技能攻击。（攻击类技能use方法调用该函数）
 var attack = function(attacker, target, skill) {
 	//不能攻击自己
 	if (attacker.entityId === target.entityId) {
@@ -33,7 +33,7 @@ var attack = function(attacker, target, skill) {
 //	}
 
 	//技能伤害值
-	var damageValue = formula.calDamage(attacker, target, skill);
+	var damageValue = formula.calDamage(attacker, target, skill);   //伤害公式
 	//执行目标受攻击函数，目标HP值减少
 	target.hit(attacker, damageValue);
 	//攻击者扣除MP
@@ -54,12 +54,13 @@ var attack = function(attacker, target, skill) {
 		skill.coolDownTime = Date.now() + Number(skill.skillData.cooltime)*1000;
 	}
 
-	//如果目标死亡
+	//如果目标死亡，获取掉落的道具。返回杀死代码，伤害值，MP消耗，道具
 	if (target.died) {
 		//执行攻击者刷怪后，目标掉落道具 
 		var items = attacker.afterKill(target);
 		return {result: consts.AttackResult.KILLED, damage: damageValue, mpUse: skill.skillData.mp, items: items};
 	} else{
+	//如果技能攻击未致其死亡，返回攻击成功，伤害值，MP消耗	
 		return {result: consts.AttackResult.SUCCESS, damage: damageValue, mpUse: skill.skillData.mp};
 	}
 };
@@ -67,7 +68,7 @@ var attack = function(attacker, target, skill) {
 /**
  * Add buff to Character, attacker or target
  */
-//加buff技能，返回成功验证码
+//加buff技能，返回成功验证码（buff类技能use方法调用该函数）
 var addBuff = function(attacker, target, buff) {
 	//如果加buff的目标是自己，而且自己没有死
 	if (buff.target === 'attacker' && !attacker.died) {
@@ -86,7 +87,7 @@ var addBuff = function(attacker, target, buff) {
  * @api public
  *
  */
-//战斗技能类，继承Persistent，所以带save发射事件
+//战斗技能基类，继承Persistent，所以带save发射事件
 var FightSkill = function(opts) {
 	Persistent.call(this, opts);
 	this.skillId = opts.skillId;     //技能id
@@ -207,11 +208,12 @@ util.inherits(CommonAttackSkill, AttackSkill);
  * @param {Object}
  * @api public
  */
-//创建技能，参数来源暂时未知？
+//创建技能，通过参数技能的type属性，实例对应类型的技能
+//（Player.learnSkill函数，玩家学习技能执行该函数，生成实例）
+//参数skill：{skillId: skillId, level: 1, playerId: this.id, type:'attack'}
 var create = function(skill) {
-	var curBuff = buff.create(skill);
-	//先给产生添加一个buff技能
-	skill.buff = curBuff;
+	var curBuff = buff.create(skill);  //生成buff实例
+	skill.buff = curBuff;              //然后将buff实例添加到参数skill里
 	
 	         //技能类型为attack
 	if (skill.type === 'attack'){
@@ -229,9 +231,9 @@ var create = function(skill) {
 	throw new Error('error skill type in create skill: ' + skill);
 };
 
- module.exports.create = create;
+ module.exports.create = create;                      //生成技能实例（Player.learnSkill函数，玩家学习技能执行该函数，生成实例）
  module.exports.FightSkill = FightSkill;
- module.exports.AttackSkill = AttackSkill;
- module.exports.BuffSkill = BuffSkill;
- module.exports.PassiveSkill = PassiveSkill;
- module.exports.AttackBuffSkill = AttackBuffSkill;
+ module.exports.AttackSkill = AttackSkill;            //攻击技能  工厂函数（未实例）
+ module.exports.BuffSkill = BuffSkill;                //buff技能 工厂函数（未实例）
+ module.exports.PassiveSkill = PassiveSkill;          //被动技能  工厂函数（未实例）
+ module.exports.AttackBuffSkill = AttackBuffSkill;    //攻击buff 工厂函数 （未实例）
