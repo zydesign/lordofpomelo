@@ -236,7 +236,8 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
  * @param {Number} skillId
  * @return {Object}
  */
-//攻击函数。player类、mob类继承了character类，能直接调用该函数，ai大脑添加了目标Target时，触发攻击行为时调用这个函数-------返回技能攻击结果----------------
+//攻击函数（使用技能攻击）。player类、mob类继承了character类，能直接调用该函数，
+//(ai大脑添加了目标Target时，触发攻击行为时调用这个函数)-------返回技能攻击结果----------------------------------------
 Character.prototype.attack = function(target, skillId) {
   if (this.confused) {
     return {result: consts.AttackResult.ATTACKER_CONFUSED};
@@ -362,7 +363,7 @@ Character.prototype.getTotalDefence = function() {
  * @param {Buff} buff
  * @api public
  */
-//玩家或怪物开启buff技能时调用.............................
+//玩家或怪物开启buff技能时调用.只要buff数组有该技能，就算开启.............................
 Character.prototype.addBuff = function(buff) {
   this.buffs[buff.type] = buff;
 };
