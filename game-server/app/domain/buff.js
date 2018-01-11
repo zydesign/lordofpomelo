@@ -7,11 +7,11 @@ function Buff(opts){
 	this.unuseCallback = opts.unuseCallback;     //取消使用技能函数
 }
 
-//使用buff技能
+//buff技能的use方法
 Buff.prototype.use = function(player) {
-	//如果使用技能函数可用
+	//如果useCallback属性为true
 	if (!!this.useCallback) {
-		player.addBuff(this);  //角色实体执行addBuff函数，将buff实例加入buff数组
+		player.addBuff(this);  //Character.addBuff函数，将buff实例加入buff数组
 		this.useCallback(player);  //执行使用技能函数
 		
 		//如果设置了有效时间，并且取消技能函数可用
