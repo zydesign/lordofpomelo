@@ -141,7 +141,7 @@ FightSkill.prototype.getAttackParam = function(){
 	return value;
 };
 
-//攻击技能类。继承战斗技能
+//主动攻击技能类。继承战斗技能---------------------------------------------------------------------------1.1
 var AttackSkill = function(opts) {
 	FightSkill.call(this, opts);
 };
@@ -159,7 +159,7 @@ AttackSkill.prototype.use = function(attacker, target) {
 	return attack(attacker, target, this);
 };
 
-//buff技能类。继承战斗技能
+//buff技能类。继承战斗技能--------------------------------------------------------------------------2.1
 var BuffSkill = function(opts) {
 	FightSkill.call(this, opts);
 	this.buff = opts.buff;
@@ -174,7 +174,7 @@ BuffSkill.prototype.use = function(attacker, target) {
 };
 
 // both attack and buff
-//攻击buff类。继承战斗技能
+//状态攻击类技能。（比如投毒，晕眩，定身等待）继承战斗技能------------------------------------------------------------3
 var AttackBuffSkill = function(opts) {
 	FightSkill.call(this, opts);
 	this.attackParam = opts.attackParam;
@@ -189,14 +189,14 @@ AttackBuffSkill.prototype.use = function(attacker, target) {
 };
 
 // like BuffSkill, excep init on startup, and timeout is 0
-//被动技能类。继承buff技能
+//被动技能类。继承buff技能（相当于永久buff技能，没时间限制）--------------------------------------------------------2.2
 var PassiveSkill = function(opts) {
 	BuffSkill.call(this, opts);
 };
 
 util.inherits(PassiveSkill, BuffSkill);
 
-//普通攻击类。继承攻击技能
+//普通攻击类。继承攻击技能--------------------------------------------------------------------------1.2
 var CommonAttackSkill = function(opts) {
 	AttackSkill.call(this, opts);
 };
@@ -216,16 +216,16 @@ var create = function(skill) {
 	var curBuff = buff.create(skill);  //生成buff实例
 	skill.buff = curBuff;              //然后将buff实例添加到参数skill里
 	
-	         //技能类型为attack
+	         //技能类型为attack，实例主动攻击技能
 	if (skill.type === 'attack'){
 		return new AttackSkill(skill);
-		//技能类型为buff
+		//技能类型为buff,实例buff技能
 	} else if (skill.type === 'buff'){
 		return new BuffSkill(skill);
-		//技能类型为attackBuff
+		//技能类型为attackBuff，实例状态攻击技能
 	} else if (skill.type === 'attackBuff'){
 		return new AttackBuffSkill(skill);
-		//技能类型为被动passive
+		//技能类型为被动passive，实例被动技能
 	} else if (skill.type === 'passive') {
 		return new PassiveSkill(skill);
 	}
@@ -233,8 +233,8 @@ var create = function(skill) {
 };
 
  module.exports.create = create;                      //生成技能实例（Player.learnSkill函数，玩家学习技能执行该函数，生成实例）
- module.exports.FightSkill = FightSkill;
- module.exports.AttackSkill = AttackSkill;            //攻击技能  工厂函数（未实例）
- module.exports.BuffSkill = BuffSkill;                //buff技能 工厂函数（未实例）
- module.exports.PassiveSkill = PassiveSkill;          //被动技能  工厂函数（未实例）
- module.exports.AttackBuffSkill = AttackBuffSkill;    //攻击buff 工厂函数 （未实例）
+ module.exports.FightSkill = FightSkill;              //技能基类
+ module.exports.AttackSkill = AttackSkill;            //主动攻击技能   工厂函数（未实例）调用的时候要前面加new来实例
+ module.exports.BuffSkill = BuffSkill;                //buff技能      工厂函数（未实例）
+ module.exports.PassiveSkill = PassiveSkill;          //被动技能       工厂函数（未实例）
+ module.exports.AttackBuffSkill = AttackBuffSkill;    //状态攻击技能   工厂函数 （未实例）
