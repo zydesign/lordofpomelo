@@ -47,7 +47,7 @@ var attack = function(attacker, target, skill) {
 	}
 
 	//If normal attack, use attack speed
-	//计算技能冷却时间
+	//给技能参数添加冷却时间属性
 	if(skill.skillId == 1){
 		skill.coolDownTime = Date.now() + Number(skill.skillData.cooltime/attacker.attackSpeed*1000);
 	}else{
@@ -68,11 +68,11 @@ var attack = function(attacker, target, skill) {
 /**
  * Add buff to Character, attacker or target
  */
-//加buff技能，返回成功验证码（buff类技能use方法调用该函数）
+//使用加buff技能，返回成功验证码（buff类技能use方法调用该函数）
 var addBuff = function(attacker, target, buff) {
 	//如果加buff的目标是自己，而且自己没有死
 	if (buff.target === 'attacker' && !attacker.died) {
-		buff.use(attacker);
+		buff.use(attacker);      //执行buff的use方法
 		//如果加buff的目标是别人，而且该目标没有死
 	} else if (buff.target === 'target' && !target.died) {
 		buff.use(target);
@@ -120,7 +120,8 @@ FightSkill.prototype.judge = function(attacker, target) {
 		return {result: consts.AttackResult.NOT_COOLDOWN};
 	}
 	//这个条件有问题？？？应该是attacker.mp<this.skillData.mp
-	if (this.mp < this.mp) {
+	//if (this.mp < this.mp) {
+	if (this.mp < this.skillData.mp) {	
 		return {result: consts.AttackResult.NO_ENOUGH_MP};
 	}
 	return {result: consts.AttackResult.SUCCESS};
@@ -128,7 +129,7 @@ FightSkill.prototype.judge = function(attacker, target) {
 
 
 //Get upgradePlayerLevel
-//还不明白这是算什么的？
+//获取第几级技能所需要的玩家等级
 FightSkill.prototype.getUpgradePlayerLevel = function(){
 	var upgradePlayerLevel = this.skillData.upgradePlayerLevel;
 	return (this.level-1)*upgradePlayerLevel + this.skillData.playerLevel;
@@ -167,7 +168,7 @@ var BuffSkill = function(opts) {
 util.inherits(BuffSkill, FightSkill);
 
 
-//buff技能的使用方法
+//buff技能的使用方法，执行addBuff函数
 BuffSkill.prototype.use = function(attacker, target) {
 	return addBuff(attacker, target, this.buff);
 };
