@@ -163,12 +163,15 @@ Player.prototype.setTotalAttackAndDefence = function() {
  * @param {Number} equipId
  * @api public
  */
-//穿戴装备
+//穿戴装备，如果身上指定位置本来没装备，返回背包位置-1；如果有装备，返回脱下装备到背包的位置index
+//(场景服务器的equipHandler.equip调用该函数）
+//（PS：并不需要返回角色属性给客户端，只需修改角色在服务器的属性方便调用，玩家离线会将属性同步数据库，而客户端根据现有属性去更改，结果跟服务器一致）
 Player.prototype.equip = function(kind, equipId) {
   var index = -1;
   var curEqId = this.equipments.get(kind);
   this.equipments.equip(kind, equipId);
 
+  //如果指定类型的装备身上有穿，则放回背包
   if (curEqId > 0) {
     index = this.bag.addItem({id: curEqId, type: 'equipment'});
   }
