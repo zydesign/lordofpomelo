@@ -12,7 +12,7 @@ var dataApi = require('../../../util/dataApi');
  * @param {Session} session
  * @api public
  */
-//客户端发起，穿装备。
+//客户端发起，穿装备。（PS：并不需要返回角色属性给客户端，只需修改角色在服务器的属性方便调用，而客户端可以根据现有属性去更改，结果跟服务器一致）
 handler.equip = function(msg, session, next) {
 	var player = session.area.getPlayer(session.get('playerId'));
   var status = false;
