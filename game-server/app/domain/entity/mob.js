@@ -42,7 +42,7 @@ var Mob = function(opts) {
   this.defenceValue = formula.calMobValue(this.characterData.defenceValue, this.level, this.characterData.upgradeParam);
 
   //怪物攻击范围
-  this.range = this.range||0;
+  this.range = this.range||0;    //怪物视野范围，单位瓦片
   //执行初始化怪物技能
   this._initFightSkill();
   //执行设置怪物总攻击和总防御
