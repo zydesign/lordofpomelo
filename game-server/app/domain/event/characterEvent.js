@@ -33,7 +33,7 @@ exp.addEventForCharacter = function(character) {
 		//Add move action to action manager
 		//在if条件中把动作加入actionManager动作管理器，方便update，更新实体坐标，更新实体在场景位置和观察者，并广播消息给aoi附近玩家（update移动动作只给自己发了消息而已）
 		if(area.timer.addAction(action)){
-			//aoi广播消息----------------------------------
+			//aoi广播消息给附近观察者（包括自己）----------------------------------
 			messageService.pushMessageByAOI(area, {
 				route: 'onMove',
 				entityId: character.entityId,
@@ -90,7 +90,7 @@ exp.addEventForCharacter = function(character) {
 				//目标玩家清空仇恨id组，目标玩家死亡为true
 				target.clearHaters();
 
-				target.died = true;
+				target.died = true;      //玩家的死亡状态为true
 
 				//Abort the move action of the player
 				//停止玩家的所有动作
@@ -104,7 +104,7 @@ exp.addEventForCharacter = function(character) {
 					map : area.map
 				}));
 
-				//增加一个死亡时间属性
+				//增加一个复活时间属性
 				msg.reviveTime = consts.PLAYER.reviveTime;
 
 				//发射储存事件，同步数据到数据库
@@ -112,7 +112,7 @@ exp.addEventForCharacter = function(character) {
 			}
 
 			attacker.target = null;
-			//aoi广播死亡消息...............................................
+			//aoi广播死亡消息...............................................伤害数据发给aoi附近的人包括自己
 			messageService.pushMessageByAOI(area, msg, attackerPos);
 			
 			//如果攻击结果没有致死，而是攻击成功的
@@ -121,11 +121,11 @@ exp.addEventForCharacter = function(character) {
 				logger.error('[onattack] attack result: target is null!	attackerId: ' + attacker.entityId + '	targetId: ' + target.entityId +' result: ' + result);
 				return;
 			}
-			//如果攻击目标为怪物，怪物加入aiManager，从巡逻状态转换为ai状态......................
+			//如果攻击目标为怪物，怪物进行反击，怪物加入aiManager，从巡逻状态转换为ai状态......................
 			if(target.type === EntityType.MOB) {
 				timer.enterAI(target.entityId);
 			}
-			//广播消失给aoi附近玩家------------------------------------------
+			//广播消失给aoi附近玩家------------------------------------------伤害数据发给aoi附近的人包括自己
 			messageService.pushMessageByAOI(area, msg, attackerPos);
 		}
 	});
