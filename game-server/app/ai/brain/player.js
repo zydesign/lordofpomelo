@@ -29,9 +29,9 @@ var Brain = function(blackboard) {
 		blackboard: blackboard
 	});
 
-	action.addChild(attack);
-	action.addChild(pick);
-	action.addChild(talkToNpc);
+	action.addChild(attack);        //Target类型为mob或player时--------------------------------------------
+	action.addChild(pick);          //Target类型为item时
+	action.addChild(talkToNpc);     //Target类型为npc时
 
 	//composite them together
 	this.action = action;
