@@ -19,6 +19,8 @@
  * @api public
  */
 
+//（Character.attack会调用这里攻击类技能的use方法，）
+
 //技能攻击。（攻击类技能use方法调用该函数）
 var attack = function(attacker, target, skill) {
 	//不能攻击自己
@@ -38,7 +40,7 @@ var attack = function(attacker, target, skill) {
 	target.hit(attacker, damageValue);
 	//攻击者扣除MP
 	attacker.reduceMp(skill.skillData.mp);
-	//攻击者实体和目标实体都同步数据库
+	//攻击者实体和目标实体都同步数据库--------------------------------------------------save
 	if (!!target.save) {
 		target.save();
 	}
@@ -47,20 +49,21 @@ var attack = function(attacker, target, skill) {
 	}
 
 	//If normal attack, use attack speed
-	//给技能参数添加冷却时间属性
+	//参数skill就是当前技能，也就是修改this.coolDownTime技能冷却时间
 	if(skill.skillId == 1){
 		skill.coolDownTime = Date.now() + Number(skill.skillData.cooltime/attacker.attackSpeed*1000);
 	}else{
 		skill.coolDownTime = Date.now() + Number(skill.skillData.cooltime)*1000;
 	}
 
-	//如果目标死亡，获取掉落的道具。返回杀死代码，伤害值，MP消耗，道具
+	//如果目标死亡，获取掉落的道具。返回杀死代码，伤害值，MP消耗，道具。（将结果信息发射给'attack'事件）
+	//PS：我自己的设定有用多种伤害类型，结果多个damageType：
 	if (target.died) {
 		//执行攻击者刷怪后，目标掉落道具 
 		var items = attacker.afterKill(target);
 		return {result: consts.AttackResult.KILLED, damage: damageValue, mpUse: skill.skillData.mp, items: items};
 	} else{
-	//如果技能攻击未致其死亡，返回攻击成功，伤害值，MP消耗	
+	//如果技能攻击未致其死亡，返回攻击成功，伤害值，MP消耗。（将结果信息发射给'attack'事件）	
 		return {result: consts.AttackResult.SUCCESS, damage: damageValue, mpUse: skill.skillData.mp};
 	}
 };
@@ -232,7 +235,7 @@ var create = function(skill) {
 	throw new Error('error skill type in create skill: ' + skill);
 };
 
- module.exports.create = create;                      //生成技能实例（Player.learnSkill函数，玩家学习技能执行该函数，生成实例）
+ module.exports.create = create;                    //生成技能实例（Player.learnSkill函数，玩家学习技能执行该函数，生成实例，并加入技能组）
  module.exports.FightSkill = FightSkill;              //技能基类
  module.exports.AttackSkill = AttackSkill;            //主动攻击技能   工厂函数（未实例）调用的时候要前面加new来实例
  module.exports.BuffSkill = BuffSkill;                //buff技能      工厂函数（未实例）
