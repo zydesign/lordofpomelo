@@ -123,7 +123,7 @@ Instance.prototype.initMobZones = function(mobZones) {
     var opts = mobZones[i]; //单个怪物对象数据
     opts.area = this;
     var zone = new MobZone(opts);  //通过tiledMap的单种怪物数据，生成怪物空间
-    this.zones[zone.zoneId] = zone;  //添加到怪物空间组
+    this.zones[zone.zoneId] = zone;  //添加到【怪物空间组】
   }
 };
 
@@ -133,7 +133,7 @@ Instance.prototype.initMobZones = function(mobZones) {
  */
 
 //场景添加实体，加入实体组，加入事件管理器，加入场景频道channel，加入ai大脑，加入aoi观察者等等，添加成功会返回true=========
-//（1.初始化npcs时；2.timer执行怪物空间zone.update时；3.characterEvent的‘attack’怪物死亡掉落物品时）
+//（1.初始化npcs时；2.timer执行怪物空间zone.update刷新5秒生成一个mob时；3.characterEvent的‘attack’怪物死亡掉落物品时）
 //（4.playerHandler.enterScene玩家进入场景时）
 Instance.prototype.addEntity = function(e) {
   var entities = this.entities;
