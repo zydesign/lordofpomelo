@@ -76,7 +76,7 @@ exp.addEventForCharacter = function(character) {
 			//如果攻击目标是怪物，场景删除该怪物，增加玩家经验，怪物掉落道具加入场景中
 			if(target.type === EntityType.MOB){
 				area.removeEntity(target.entityId);   //怪物死亡，场景删除目标怪物实体..........................
-				msg.exp = attacker.experience;
+				msg.exp = attacker.experience;        //杀死怪物，执行获取经验
 				for(var id in result.items){
 					area.addEntity(result.items[id]);   //怪物死亡，场景添加掉落的道具实体..................
 				}
