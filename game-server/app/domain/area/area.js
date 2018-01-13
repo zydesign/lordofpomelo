@@ -133,18 +133,19 @@ Instance.prototype.initMobZones = function(mobZones) {
  */
 
 //场景添加实体，加入实体组，加入事件管理器，加入场景频道channel，加入ai大脑，加入aoi观察者等等，添加成功会返回true=========
-//（场景启动时，初始化npcs时，timer执行怪物空间zone.update时，角色进入场景切换场景时，characterEvent的‘attack’怪物死亡掉落物品时，调用该函数）
+//（1.初始化npcs时；2.timer执行怪物空间zone.update时；3.characterEvent的‘attack’怪物死亡掉落物品时）
+//（4.playerHandler.enterScene玩家进入场景时）
 Instance.prototype.addEntity = function(e) {
   var entities = this.entities;
   var players = this.players;
   var users = this.users;
 
-  //判断实体是否存在
+  //如果参数不存在，返回false------------------------------------------------------------------------------0
   if(!e || !e.entityId) {
     return false;
   }
 
-  //判断是否已经添加过该角色
+  //如果角色已经在场景里，返回false--------------------------------------------------------------------------0
   if(!!players[e.id]) {
     logger.error('add player twice! player : %j', e);
     return false;
@@ -189,9 +190,9 @@ Instance.prototype.addEntity = function(e) {
     this.items[e.entityId] = e.entityId;
   }
 
-  //无论实体什么类型，要加入实体对象的aoi，以便观察者知道其位置
+  //无论实体什么类型，要加入实体对象的aoi，以便观察者知道其位置 ..............................aoi增加对象                           
   this.aoi.addObject({id:e.entityId, type:e.type}, {x: e.x, y: e.y});
-  return true;
+  return true;   //如果一切操作正常，返回true------------------------------------------------------------0
 };
 
 /**
@@ -366,10 +367,10 @@ Instance.prototype.removePlayerByUid = function(uid){
  * @param {Object} pos Given position, like {10,20}.
  * @param {Number} range The range of the view, is the circle radius.
  */
-//获取一个灯塔范围内的实体
+//获取获取指定灯塔范围内的实体（playerHandler.enterScene调用该函数）
 Instance.prototype.getAreaInfo = function(pos, range) {
-  var ids = this.aoi.getIdsByPos(pos, range);
-  return this.getEntities(ids);
+  var ids = this.aoi.getIdsByPos(pos, range);   //获取区域内的对象ids
+  return this.getEntities(ids);                 //通过实体ids获取实体
 };
 
 /**
