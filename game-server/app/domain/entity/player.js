@@ -419,7 +419,7 @@ Player.prototype.strip = function() {
  *	@return {Object}
  *	@api public
  */
-//获取玩家信息（玩家登录场景时执行该函数，获取角色信息、背包信息、装备信息、战斗技能、当前任务）
+//获取玩家信息（playerHandler.enterScene玩家登录场景时执行该函数，获取角色信息、背包信息、装备信息、战斗技能、当前任务）
 Player.prototype.getInfo = function() {
   var playerData = this.strip();
   playerData.bag = this.bag.getData();
