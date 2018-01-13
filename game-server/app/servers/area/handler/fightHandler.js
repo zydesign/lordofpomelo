@@ -15,7 +15,7 @@ var Code = require('../../../../../shared/code');
  * @param {Object} session
  * @api public
  */
-//客户端请求，发起攻击
+//客户端请求，发起攻击。服务器器处理完数据，伤害数据发给aoi附近的人包括自己，【返回空对象{}给客户端】，不需要单独操作。有aoi监听
 handler.attack = function(msg, session, next) {
 	var player = session.area.getPlayer(session.get('playerId'));
 	var target = session.area.getEntity(msg.targetId);
@@ -44,7 +44,7 @@ handler.attack = function(msg, session, next) {
  * @param {Object} session
  * @api public
  */
-//客户端发起，使用技能
+//客户端发起，使用技能。【无需返回消息给客户端】
 handler.useSkill = function(msg, session, next) {
 	var playerId = msg.playerId;
 	var skillId = msg.skillId;
