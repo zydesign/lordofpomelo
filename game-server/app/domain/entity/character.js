@@ -195,6 +195,7 @@ Character.prototype.recoverMp = function(mpValue) {
  * @api public
  */
 //角色移动。作用：生成寻路路径，并发射移动事件。cb的结果只有true或false（怪物巡逻系统、ai系统，客户端发移动指令调用该函数）
+//每一个移动坐标只生成一个寻路路径，发射一次‘move’事件，生成一个move动作，当该move动作完成这次寻路路径，动作就会被删除
 Character.prototype.move = function(targetX, targetY, useCache, cb) {
   useCache = useCache || false;
 
@@ -239,6 +240,7 @@ Character.prototype.move = function(targetX, targetY, useCache, cb) {
 //攻击函数（使用技能攻击）。player类、mob类继承了character类，能直接调用该函数，
 //(ai大脑添加了目标Target时，触发攻击行为时调用这个函数)-------返回技能攻击结果----------------------------------------
 Character.prototype.attack = function(target, skillId) {
+  //如果攻击者处于混乱状态（被晕眩了或混乱了不能攻击别人），返回状态码
   if (this.confused) {
     return {result: consts.AttackResult.ATTACKER_CONFUSED};
   }
@@ -256,7 +258,9 @@ Character.prototype.attack = function(target, skillId) {
   //先标记敌人到敌人组
   this.addEnemy(target.entityId);
 
-  //使用技能攻击该目标
+  //使用技能攻击该目标----------------------------------------------------------------------真正的攻击在这里
+  //使用技能返回的result：{result: consts.AttackResult.SUCCESS, damage: damageValue, mpUse: skill.skillData.mp}，杀死的多个item
+  //返回的result提供给attack事件、ai大脑
   var result = skill.use(this, target);
   //发射攻击事件...................................
   this.emit('attack', {
