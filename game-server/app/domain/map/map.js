@@ -399,7 +399,7 @@ Map.prototype.getBornPlace = function() {
  * @api public
  */
 
-//从出生地内部随机生成出生点（像素坐标）（角色进入地图，或复活时调用）
+//从出生地内部随机生成出生点（像素坐标）（场景服务器的playerHandler.enterScene角色进入场景调用该函数）
 Map.prototype.getBornPoint = function() {
 	var bornPlace = this.getBornPlace();
 
