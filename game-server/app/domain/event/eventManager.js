@@ -37,6 +37,7 @@ exp.addEvent = function(entity){
 //pomelo-sync的api:sync.exec(key,id,val,cb)---key为连接数据库的增删改查函数，id为要查询的表的第id条数据，val为提供给key的sql的值
 function addSaveEvent(player) {
 	var app = pomelo.app;
+	//（使用到同步：1.skill.use技能攻击；2.attack事件触发后，是怪物打死玩家的；3.玩家升级）
 	player.on('save', function() {
 		//'playerSync.updatePlayer'数据库连接查询函数，player.id查询的id位置，player.strip()为提供的sql的值
 		app.get('sync').exec('playerSync.updatePlayer', player.id, player.strip());
