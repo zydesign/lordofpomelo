@@ -30,7 +30,7 @@ var handler = module.exports;
  * @api public
  */
 
-//进入场景  （msg不需要）
+//进入场景  （客户端没有提供msg）
 handler.enterScene = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -43,8 +43,9 @@ handler.enterScene = function(msg, session, next) {
 	utils.myPrint("1 ~ EnterScene: playerId = ", playerId);
 	utils.myPrint("1 ~ EnterScene: teamId = ", teamId);
 
-	//得到角色信息全部信息
+	//通过玩家id，获取角色信息全部信息
   userDao.getPlayerAllInfo(playerId, function(err, player) {
+	  //如果发生错误或获取不到角色信息
     if (err || !player) {
       logger.error('Get user for userDao failed! ' + err.stack);
       next(new Error('fail to get user from dao'), {
@@ -54,7 +55,7 @@ handler.enterScene = function(msg, session, next) {
 
       return;
     }
-                //修改部分角色信息
+                //修改部分角色信息为当前session信息
     player.serverId = session.frontendId;
 		player.teamId = teamId;
 		player.isCaptain = isCaptain;
@@ -63,25 +64,28 @@ handler.enterScene = function(msg, session, next) {
 		areaId = player.areaId;
 		utils.myPrint("2 ~ GetPlayerAllInfo: player.instanceId = ", player.instanceId);
 
+	  //rpc让玩家加入聊天服务器
     pomelo.app.rpc.chat.chatRemote.add(session, session.uid,
 			player.name, channelUtil.getAreaChannelName(areaId), null);
 		var map = area.map;
 
     // temporary code
     //Reset the player's position if current pos is unreachable
-	  //如果玩家位置无效，重置玩家坐标
+	  //如果玩家坐标不可走，在出生地附近重置玩家坐标
 		if(!map.isReachable(player.x, player.y)) {
     // {
+			//通过map游戏地图生成出生点
 			var pos = map.getBornPoint();
 			player.x = pos.x;
 			player.y = pos.y;
 		}
     // temporary code
 
+	  //用于返回给客户端的信息
 		var data = {
-        entities: area.getAreaInfo({x: player.x, y: player.y}, player.range),
-        curPlayer: player.getInfo(),
-        map: {
+        entities: area.getAreaInfo({x: player.x, y: player.y}, player.range),  //玩家视野范围的实体
+        curPlayer: player.getInfo(),         //玩家状态信息（获取角色属性、背包信息、装备信息、战斗技能、当前任务）
+        map: {                               //地图信息
           name : map.name,
           width: map.width,
           height: map.height,
@@ -91,23 +95,27 @@ handler.enterScene = function(msg, session, next) {
         }
     };
 		// utils.myPrint("1.5 ~ GetPlayerAllInfo data = ", JSON.stringify(data));
-		next(null, data);
+		next(null, data);     //将基础数据传输给客户端
 
 		utils.myPrint("2 ~ GetPlayerAllInfo player.teamId = ", player.teamId);
 		utils.myPrint("2 ~ GetPlayerAllInfo player.isCaptain = ", player.isCaptain);
+	  //执行场景添加实体player
+	  //如果玩家添加到场景失败（player不存在或player已经加入场景），再次传输数据给客户端，错误码
 		if (!area.addEntity(player)) {
       logger.error("Add player to area faild! areaId : " + player.areaId);
       next(new Error('fail to add user into area'), {
        route: msg.route,
        code: consts.MESSAGE.ERR
       });
-      return;
+      return;    //如果场景不能加玩家，直接返回，不执行下面
     }
 
+	  //如果玩家有队伍，rpc到队伍服务器更新队伍信息
 		if (player.teamId > consts.TEAM.TEAM_ID_NONE) {
 			// send player's new info to the manager server(team manager)
 			var memberInfo = player.toJSON4TeamMember();
-			memberInfo.backendServerId = pomelo.app.getServerId();
+			//app.getServerId()在哪个服务器执行获取的就是那个服务器的id--------------------------------
+			memberInfo.backendServerId = pomelo.app.getServerId();   
 			pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
 				function(err, ret) {
 				});
@@ -132,9 +140,9 @@ handler.changeView = function(msg, session, next){
 	var width = msg.width;
 	var height = msg.height;
 
-	var radius = width>height ? width : height;
+	var radius = width>height ? width : height;  //半径取值
 
-	var range = Math.ceil(radius / 600);
+	var range = Math.ceil(radius / 600);         //转换为灯塔范围
 	var player = session.area.getPlayer(playerId);
 
 	if(range < 0 || !player){
@@ -143,6 +151,8 @@ handler.changeView = function(msg, session, next){
 	}
 
 	//更新玩家aoi对象位置，推送消息给自己，哪些实体看见与看不见
+	
+	//如果玩家自身的范围不等于客户端提供的范围，原地更新观察者视野
 	if(player.range !== range){
     timer.updateWatcher({id:player.entityId, type:player.type}, player, player, player.range, range);
 		player.range = range;
