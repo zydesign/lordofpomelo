@@ -41,7 +41,7 @@ var Player = function(opts) {
   }
   this.roleData = dataApi.role.findById(this.kindId);   //角色数据
   this.curTasks = opts.curTasks;   //角色当前任务
-  this.range = opts.range || 2;     //角色范围
+  this.range = opts.range || 2;     //角色视野范围，单位瓦片
   // player's team id, default 0(not in any team).
   this.teamId = consts.TEAM.TEAM_ID_NONE;    //团队ID
   // is the team captain, default false
