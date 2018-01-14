@@ -107,9 +107,9 @@ module.exports = {
   },
 
   AreaType : {
-    SCENE : 1,
-    SINGLE_INSTANCE : 2,
-    TEAM_INSTANCE : 3
+    SCENE : 1,                //普通场景
+    SINGLE_INSTANCE : 2,      //单人副本
+    TEAM_INSTANCE : 3         //组队副本
   },
 
   /**
