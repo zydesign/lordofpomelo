@@ -92,7 +92,9 @@ Map.prototype.init = function(opts) {
 //tiledmap对象层约定命名规则：出生地（birth）、障碍物（collision）、npc（npc）、怪物（mob）
 //障碍物可以用多边形和矩形来画，不能用圆形。而出生地、npc、怪物、道具都必须是用矩形画
 
-//只获取tiledMap地图数据的对象层，生成不同类型的对象数组：{birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}
+
+//只获取tiledMap地图数据的对象层objectgroup中的对象数组objects，生成不同类型的对象数组：
+// 得到的this.map为：            {birth:[{},{}...],mob:[{},{}...],collision:[{},{}...]}-----------------------------0
 Map.prototype.configMap = function(map){
 	this.map = {};          //地图对象数据
 	var layers = map.layers; //获取图层属性layers
