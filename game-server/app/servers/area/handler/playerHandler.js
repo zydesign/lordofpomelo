@@ -64,7 +64,7 @@ handler.enterScene = function(msg, session, next) {
 		areaId = player.areaId;
 		utils.myPrint("2 ~ GetPlayerAllInfo: player.instanceId = ", player.instanceId);
 
-	  //rpc让玩家加入聊天服务器
+	  //rpc到聊天服务器，让玩家加入聊天服务器
     pomelo.app.rpc.chat.chatRemote.add(session, session.uid,
 			player.name, channelUtil.getAreaChannelName(areaId), null);
 		var map = area.map;
@@ -174,7 +174,7 @@ handler.move = function(msg, session, next) {
   var area = session.area;
   var timer = area.timer;
 
-  var path = msg.path;
+  var path = msg.path;   //玩家坐标到点击位置坐标，生成的寻路路径
   var playerId = session.get('playerId');
   var player = area.getPlayer(playerId);
   var speed = player.walkSpeed;
@@ -256,22 +256,24 @@ handler.changeArea = function(msg, session, next) {
 	var target = msg.target;
 
 	utils.myPrint('areaId, target = ', areaId, target);
+	//如果所在场景为目标场景，返回false码
 	if (areaId === target) {
 		next(null, {success: false});
 		return;
 	}
 	utils.myPrint('playerId = ', playerId);
 	var player = session.area.getPlayer(playerId);
+	//如果所在场景获取不到玩家，返回false码
 	if (!player) {
 		next(null, {success: false});
 		return;
 	}
 
   // save player's data immediately
-  userDao.updatePlayer(player);
-  bagDao.update(player.bag);
-  equipmentsDao.update(player.equipments);
-  taskDao.tasksUpdate(player.curTasks);
+  userDao.updatePlayer(player);              //更新player数据库中数据
+  bagDao.update(player.bag);                 //更新bag数据库中数据
+  equipmentsDao.update(player.equipments);   //更新equipments数据库中数据
+  taskDao.tasksUpdate(player.curTasks);      //更新task数据库中数据
 
 	var teamId = player.teamId;
 	var isCaptain = player.isCaptain;
@@ -287,6 +289,7 @@ handler.changeArea = function(msg, session, next) {
 	utils.myPrint('teamId, isCaptain = ', teamId, isCaptain);
 	utils.myPrint('msg.triggerByPlayer = ', msg.triggerByPlayer);
   utils.myPrint('changeArea is running ...');
+	//通过场景服务切换场景
   areaService.changeArea(req, session, function(err) {
     var args = {areaId: areaId, target: target, success: true};
     next(null, args);
