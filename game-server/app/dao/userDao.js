@@ -12,6 +12,7 @@ var async = require('async');
 var utils = require('../util/utils');
 var consts = require('../consts/consts');
 
+//用户数据传输
 var userDao = module.exports;
 
 /**
@@ -255,6 +256,8 @@ userDao.deleteByName = function (username, cb){
  * @param {String} from Register source
  * @param {function} cb Call back function.
  */
+
+//生成一份用户数据（如果没有user表，会自动生成表，第一个用户id为1），通过用户数据实例一个用户，成功返回用户实例user
 userDao.createUser = function (username, password, from, cb){
 	var sql = 'insert into User (name,password,`from`,loginCount,lastLoginTime) values(?,?,?,?,?)';
 	var loginTime = Date.now();
@@ -278,6 +281,8 @@ userDao.createUser = function (username, password, from, cb){
  * @param {Number} roleId Player's roleId, decide which kind of player to create.
  * @param {function} cb Callback function
  */
+
+//创建一份角色数据（如果没有player表，会自动生成表，第一个角色id为1），通过角色数据生成player实体，成功返回player实体
 userDao.createPlayer = function (uid, name, roleId,cb){
 	var sql = 'insert into Player (userId, kindId, kindName, name, country, rank, level, experience, attackValue, defenceValue, hitRate, dodgeRate, walkSpeed, attackSpeed, hp, mp, maxHp, maxMp, areaId, x, y, skillPoint) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 	//var role = dataApi.role.findById(roleId);
@@ -328,6 +333,8 @@ userDao.createPlayer = function (uid, name, roleId,cb){
  * @param {Object} player The player need to update, all the propties will be update.
  * @param {function} cb Callback function.
  */
+
+//通过角色数据，更新角色库中的数据。更新成功返回true，更新失败返回false
 userDao.updatePlayer = function (player, cb){
 	var sql = 'update Player set x = ? ,y = ? , hp = ?, mp = ? , maxHp = ?, maxMp = ?, country = ?, rank = ?, level = ?, experience = ?, areaId = ?, attackValue = ?, defenceValue = ?, walkSpeed = ?, attackSpeed = ? , skillPoint = ? where id = ?';
 	var args = [player.x, player.y, player.hp, player.mp, player.maxHp, player.maxMp, player.country, player.rank, player.level, player.experience, player.areaId, player.attackValue, player.defenceValue, player.walkSpeed, player.attackSpeed, player.skillPoint, player.id];
@@ -352,6 +359,8 @@ userDao.updatePlayer = function (player, cb){
  * @param {Number} playerId
  * @param {function} cb Callback function.
  */
+
+//通过playerId，删除角色数据库中的数据，删除成功返回true，删除失败返回false
 userDao.deletePlayer = function (playerId, cb){
 	var sql = 'delete from	Player where id = ?';
 	var args = [playerId];
