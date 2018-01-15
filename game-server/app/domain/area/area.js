@@ -202,7 +202,8 @@ Instance.prototype.addEntity = function(e) {
  */
 
 //场景中删除实体，包括从频道中移除，从怪物空间中删除，从ai大脑组中移除，从巡逻组中移除，从aoi对象组中移除，停止该实体的动作等，删除成功返回true======
-//（玩家‘attack’攻击怪物致死亡；玩家‘pickItem’拾取道具，都会执行该函数）（玩家退出或切换场景）（item.died死亡，Timer.tick也执行该函数）
+//（玩家‘attack’攻击怪物致死亡；玩家‘pickItem’拾取道具，都会执行该函数）（玩家退出或切换场景时，area.removePlayer调用）
+//（item.died死亡，Timer.tick也执行该函数）
 Instance.prototype.removeEntity = function(entityId) {
   var zones = this.zones;
   var entities = this.entities;
