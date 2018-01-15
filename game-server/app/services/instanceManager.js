@@ -63,7 +63,7 @@ exp.getInstance = function(args, cb){
 
   //rpc invoke
   var params = {
-    namespace : 'user',
+    namespace : 'user',      //user是主动rpc类型，访问remote的脚本。sys是系统rpc类型，客户端请求hander的脚本
     service : 'areaRemote',
     method : 'create',
     args : [{
@@ -72,7 +72,6 @@ exp.getInstance = function(args, cb){
     }]
   };
 
-  //这里就是创建服务器了，等于发射‘events.ADD_SERVERS’事件---------------------------------------------11
   //由管理服务器发起的rpc，相当于app.rpc.area.remote.areaRemote.create（）
   app.rpcInvoke(serverId, params, function(err, result){
     if(!!err) {
