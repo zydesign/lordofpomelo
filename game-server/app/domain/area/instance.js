@@ -4,7 +4,8 @@ var Area = require('./area');
 var Instance = function(opts){
   this.id = opts.instanceId;
   this.area = new Area(opts);
-  this.lifeTime = opts.lifeTime || 1800000;  //副本没人后的，生命时间为30分钟
+  //副本没人后的，生命时间为30分钟。instancePool会一直检测副本活人，没活人的话30分钟删副本
+  this.lifeTime = opts.lifeTime || 1800000;  
 };
 
 module.exports = Instance;
