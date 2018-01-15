@@ -13,7 +13,7 @@ var maps = {};  //游戏地图组
 
 var exp = module.exports;
 
-//场景服务初始化。设置场景权重，为每个场景游戏地图map，Key为场景id（app启动立即调用该函数）
+//场景服务初始化。设置场景权重，为每个场景游戏地图map，Key为场景id（app启动立即调用该函数。这时是还没有场景的，只是提供了服务）
 exp.init = function(){
   var areas = dataApi.area.all(); //获取场景数据数组
 
@@ -116,7 +116,7 @@ exp.changeArea = function(args, session, cb) {
         utils.myPrint('playerId = ', player.id);
         player.isInTeamInstance = true;  //玩家在组队副本true
         //Get target instance
-        //rpc到副本脚本，生成目标场景（副本），并重置部分session
+        //rpc到副本脚本，生成目标场景（副本），并重置部分session-----------------------------------实例副本
         app.rpc.manager.instanceRemote.create(session, params, function(err, result){
           if(err){
             logger.error('get Instance error!');
