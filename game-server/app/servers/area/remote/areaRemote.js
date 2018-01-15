@@ -5,7 +5,8 @@ var logger = require('pomelo-logger').getLogger(__filename);
 //场景副本rpc
 var exp = module.exports;
 
-// 实例场景副本（服务instanceManager.getInstance调用该函数）
+// 实例场景副本（副本管理服务的instanceManager.getInstance调用该函数）
+//参数params：   {areaId : args.areaId, idinstanceId : instanceId} 目标场景id和副本id（副本id格式：1_1）
 exp.create = function(params, cb){
   var start = Date.now();
   var result = instancePool.create(params);
