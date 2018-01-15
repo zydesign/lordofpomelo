@@ -16,9 +16,10 @@ var instanceServers = [];    //副本服务器数组
 
 var exp = module.exports;
 
-//app开启了events.ADD_SERVERS服务器事件监听，如果管理服务器manager.remote.instanceRemote.create添加服务器执行，这里的addServers也会被执行
+
 //ps:参数servers是固定的，就是servers.json
 //添加所有副本类型场景服务器信息到数组
+//（app开启了events.ADD_SERVERS服务器事件监听，app创建manager服务器时，立即执行该函数）-----------------------服务器启动就调用了
 exp.addServers = function(servers){
   //遍历服务器表的所有服务器，将场景副本类的服务器数据加入instanceServers
   for(var i = 0; i < servers.length; i++){
@@ -31,6 +32,7 @@ exp.addServers = function(servers){
 };
 
 //删除副本服务器数组的所有服务器信息
+//（app关闭manager服务器时，执行该函数）----------------------------------------------------------
 exp.removeServers = function(servers){
   for(var i = 0; i < servers.length; i++){
     var server = servers[i];
