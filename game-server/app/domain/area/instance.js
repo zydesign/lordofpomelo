@@ -1,6 +1,7 @@
 var Area = require('./area');
 
 //场景副本类。就是实例的一个带生命周期的场景area（instancePool.create副本池创建新副本调用该函数）
+//这里的opt是instancePool.init（opts）中的opt：{"lifeTime" : 1800000,"interval" : 60000}
 var Instance = function(opts){
   this.id = opts.instanceId;
   this.area = new Area(opts);
