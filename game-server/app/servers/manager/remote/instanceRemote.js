@@ -4,7 +4,7 @@ var exp = module.exports;
 //管理服务器的副本rpc
 var logger = require('pomelo-logger').getLogger(__filename);
 
-//创建副本
+//创建副本（服务areaService.changeArea调用该函数）
 exp.create = function(params, cb){
   logger.error('create server params : %j', params);
   //通过副本管理服务，生产副本实例
