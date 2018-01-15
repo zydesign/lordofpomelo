@@ -122,7 +122,8 @@ app.configure('production|development', 'area', function () {
 //管理服务器配置，主要是增加，删除副本area服务器
 app.configure('production|development', 'manager', function () {
     
-    //监听增加，删除服务器事件(触发条件是，在manager服务器发起对外的rpc时)-------------------------------------
+    //监听增加，删除服务器事件
+    //(触发条件是，app创建manager服务器时，发射events.ADD_SERVERS。app关闭manager服务器时，发射events.REMOVE_SERVERS)----------------
     var events = pomelo.events;
     app.event.on(events.ADD_SERVERS, instanceManager.addServers);
     app.event.on(events.REMOVE_SERVERS, instanceManager.removeServers);
