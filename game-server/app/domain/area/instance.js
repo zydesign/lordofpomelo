@@ -1,6 +1,6 @@
 var Area = require('./area');
 
-//场景副本类。就是实例的一个带生命周期的场景area
+//场景副本类。就是实例的一个带生命周期的场景area（instancePool.create副本池创建新副本调用该函数）
 var Instance = function(opts){
   this.id = opts.instanceId;
   this.area = new Area(opts);
@@ -9,22 +9,23 @@ var Instance = function(opts){
 
 module.exports = Instance;
 
-//副本开启
+//副本开启。（执行area的开启函数）
 Instance.prototype.start = function(){
   this.area.start();
 };
 
-//副本关闭
+//副本关闭。（执行area的关闭函数）
 Instance.prototype.close = function(){
   this.area.close();
 };
 
-//获取场景
+//获取场景对象
 Instance.prototype.getArea = function(){
   return this.area;
 };
-//判断该副本是否还开着
+//判断副本是否有活人，有活人返回true，没活人返回false
 Instance.prototype.isAlive = function(){
+  //如果场景的玩家为空，返回true
   if(this.area.isEmpty()){
     //玩家数量为0开始计算的时间超过30分钟，变死区，需要关闭
     if((Date.now() - this.area.emptyTime) > this.lifeTime){
