@@ -76,7 +76,8 @@ exp.changeArea = function(args, session, cb) {
     player.x = pos.x;
     player.y = pos.y;
     utils.myPrint("1 ~ player.teamId = ", player.teamId);
-    //将玩家信息player同步到数据库。重置部分session【因为切换地图就是切换了后端服务器，需要修改session，是为了下次从前端指向正确的场景服务器】
+    //玩家进入普通副本。将玩家信息player同步到数据库。
+    //重置部分session【因为切换地图就是切换了后端服务器，需要修改session，是为了下次从前端指向正确的场景服务器】
     userDao.updatePlayer(player, function(err, success) {   
       if(err || !success) {
         err = err || 'update player failed!';
@@ -100,7 +101,7 @@ exp.changeArea = function(args, session, cb) {
   }else{
     //如果目标场景是单人副本或组队副本-----------------------------------------------------------------单人副本或组队副本
     var closure = this;   //闭包
-    //异步串行（顺序执行数组函数，将每一个函数结果存入数组中）
+    //异步串行（顺序执行数组函数，将每一个函数结果存入数组中）=======================================================================
     async.series([
       function(callback){
         //Construct params
@@ -116,7 +117,7 @@ exp.changeArea = function(args, session, cb) {
         utils.myPrint('playerId = ', player.id);
         player.isInTeamInstance = true;  //玩家在组队副本true
         //Get target instance
-        //rpc到副本脚本，生成目标场景（副本），并重置部分session-----------------------------------实例副本
+        //rpc到管理服务器，生成目标场景（副本）绑定到指定id的副本服务器中，并重置部分session--------------------------实例副本到副本服务器
         app.rpc.manager.instanceRemote.create(session, params, function(err, result){
           if(err){
             logger.error('get Instance error!');
@@ -148,13 +149,13 @@ exp.changeArea = function(args, session, cb) {
         });
       },
       function(cb){
-        area.removePlayer(playerId);
+        area.removePlayer(playerId);                //当前场景删除玩家实体，调用area.removeEntity(entityId)
 
-        var pos = closure.getBornPoint(target);
+        var pos = closure.getBornPoint(target);     //获取目标场景的出生点。
         player.x = pos.x;
         player.y = pos.y;
 
-        userDao.updatePlayer(player, function(err, success) {
+        userDao.updatePlayer(player, function(err, success) {    //玩家进入了场景副本，将玩家信息player同步到数据库。
           if(err || !success) {
             err = err || 'update player failed!';
             cb(err, 'update');
@@ -172,6 +173,6 @@ exp.changeArea = function(args, session, cb) {
           utils.invokeCallback(cb, null);     //如果没错误，cb的值为null
         }
       }
-    );
+    );     //到这来都是 async.series的内容========================================================================================
   }
 };
