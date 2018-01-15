@@ -69,11 +69,11 @@ Instance.prototype.start = function() {
   this.initNPCs();  //初始化NPC
 
   this.aiManager.start(); //开启ai服务,允许aiManager添加、删除、更新大脑实例
-  this.timer.run(); //开启定时器
+  this.timer.run(); //开启计时器
 };
 
 
-// 关闭定时器
+// 关闭场景。就是关闭计时器
 Instance.prototype.close = function(){
   this.timer.close();
 };
