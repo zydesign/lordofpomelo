@@ -9,7 +9,7 @@ var Instance = function(opts){
 
 module.exports = Instance;
 
-//副本开启。（执行area的开启函数）
+//副本开启。执行area的开启函数。（其实new Area的时候就会执行area.start了，这函数主要是close过后再开才会调用）
 Instance.prototype.start = function(){
   this.area.start();
 };
