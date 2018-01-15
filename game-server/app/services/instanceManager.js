@@ -5,17 +5,18 @@ var consts = require('../consts/consts');
 var logger = require('pomelo-logger').getLogger(__filename);
 var INSTANCE_SERVER = 'area';
 
+//副本管理
 //The instance map, key is instanceId, value is serverId
-//储存area场景的instance服务器id
-var instances = {};
+
+var instances = {};      //副本服务器id组
 
 //All the instance servers
-//储存instance服务器信息
-var instanceServers = [];
+
+var instanceServers = [];    //副本服务器数组
 
 var exp = module.exports;
 
-//app开启了服务器事件监听，如果manager.remote.instanceRemote.create执行，这里的addServers也会被执行
+//app开启了events.ADD_SERVERS服务器事件监听，如果管理服务器manager.remote.instanceRemote.create添加服务器执行，这里的addServers也会被执行
 //ps:参数是固定的，就是服务器列表
 exp.addServers = function(servers){
   for(var i = 0; i < servers.length; i++){
@@ -67,6 +68,7 @@ exp.getInstance = function(args, cb){
     }]
   };
 
+  //这里就是创建服务器了，等于发射‘events.ADD_SERVERS’事件---------------------------------------------11
   //相当于pomelo.app.rpc.area.remote.areaRemote.create（）
   app.rpcInvoke(serverId, params, function(err, result){
     if(!!err) {
@@ -84,7 +86,7 @@ exp.getInstance = function(args, cb){
   });
 
 };
-
+//删除副本。（管理服务器的instanceRemote.remove调用该函数）
 exp.remove = function(instanceId){
   if(instances[instanceId]) delete instances[instanceId];
 };
