@@ -43,6 +43,7 @@ app.configure('production|development', function () {
     if (app.serverType !== 'master') {
         var areas = app.get('servers').area;
         //将服务器areas的id存到areaIdMap里面，客户端指定一个值key为服务器数据的area属性（如：1），即得服务器id（如：area-server-1）
+        //普通场景的服务器id组
         var areaIdMap = {};
         for (var id in areas) {
             areaIdMap[areas[id].area] = areas[id].id;
@@ -101,10 +102,13 @@ app.configure('production|development', 'area', function () {
     //Load scene server and instance server
     //这里当前服务器app.curServer即为area路由到的area子服务器
     var server = app.curServer;
+    //如果场景服务器数据有instance属性，app.areaManager场景管理器为instancePool.....................................01
+    //(场景服务器开启3个副本服务器都没有场景)（开启了3个普通场景服务器带指定场景）
     if (server.instance) {
         instancePool.init(require('./config/instance.json'));
         app.areaManager = instancePool;
     } else {
+        //如果场景服务器是普通场景，app.areaManager场景管理器为scene.................................................02
         //场景配置的读取入口。[执行场景初始化代入场景数据]   (/config/data/area.json--场景数据，包含了对应地图路径，是地图读取入口）
         scene.init(dataApi.area.findById(server.area));
         //然后将初始化过的场景加入app上下文
