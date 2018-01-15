@@ -12,7 +12,7 @@ var instances;
 var intervel;
 var maps = {};
 
-//副本池初始化（app启动立即执行该函数）...........................1
+//副本池初始化（app启动立即执行该函数）opts的值：{"lifeTime" : 1800000,"interval" : 60000}...........................1
 exp.init = function(opts){
   instances = {};   //场景副本组
   intervel = opts.intervel||60000;   //时间间隔
@@ -31,7 +31,7 @@ exp.create = function(params){
   if(instances[id]) return false;
 
   //get area map
-  //获取该场景副本数据
+  //获取该场景副本数据作为opts
   var opts = dataApi.area.findById(areaId);
   //如果地图组没有该游戏地图，生成一个游戏地图实例
   if(!maps[areaId]){
@@ -43,7 +43,7 @@ exp.create = function(params){
 
   //Create instance
   //实例副本场景
-  var instance = new Instance(opts);
+  var instance = new Instance(opts);  //用的是副本池的参数
 
   //将副本场景加入副本组中
   instances[id] = instance;
