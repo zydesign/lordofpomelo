@@ -12,7 +12,7 @@ var instances;
 var intervel;
 var maps = {};
 
-//服务器运行，立即执行该函数...........................1
+//副本池初始化（app启动立即执行该函数）...........................1
 exp.init = function(opts){
   instances = {};   //场景副本组
   intervel = opts.intervel||60000;   //时间间隔
@@ -21,8 +21,8 @@ exp.init = function(opts){
 };
 
 
-//创建场景副本，然后启动该场景副本，并加入副本组，如果创建成功返回true-------------------------增
-//玩家创建单人副本，多人副本时调用该函数
+//创建场景副本。获取场景数据，加入游戏地图，然后实例副本Instance，并加入副本组，如果创建成功返回true-------------------------增
+//（场景服务器的areaRemote.create调用该函数 ）
 exp.create = function(params){
   var id = params.instanceId;
   var areaId = params.areaId;
@@ -33,7 +33,7 @@ exp.create = function(params){
   //get area map
   //获取该场景副本数据
   var opts = dataApi.area.findById(areaId);
-  //如果地图组没有该地图，生成一个地图实例
+  //如果地图组没有该游戏地图，生成一个游戏地图实例
   if(!maps[areaId]){
     //从场景数据读取地图路径的tiledmap表单，生成游戏地图
     maps[areaId] = new Map(opts);
@@ -71,13 +71,13 @@ exp.getArea = function(instanceId){
 };
 
 
-//开启服务器，就立即定时执行............................2
+//（app启动就立即【定时执行】）...........................................每6秒检查一次.............2
 function check(){
   var app = pomelo.app;
   for(var id in instances){
     var instance = instances[id];
 
-    //重启场景副本，如果该场景被关闭了（玩家退出副本），关闭该场景副本，并从副本组中删除
+    //重启场景副本，如果该场景没有活动玩家（玩家退出副本），关闭该场景副本，并从副本组中删除
     if(!instance.isAlive()){
       app.rpc.manager.instanceRemote.remove(null, id, onClose);
     }
