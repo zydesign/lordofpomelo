@@ -76,14 +76,14 @@ exp.changeArea = function(args, session, cb) {
     player.x = pos.x;
     player.y = pos.y;
     utils.myPrint("1 ~ player.teamId = ", player.teamId);
-    //将玩家信息player同步到数据库。重置部分session
+    //将玩家信息player同步到数据库。重置部分session【因为切换地图就是切换了后端服务器，需要修改session，是为了下次从前端指向正确的场景服务器】
     userDao.updatePlayer(player, function(err, success) {   
       if(err || !success) {
         err = err || 'update player failed!';
         utils.invokeCallback(cb, err);
       } else {
         session.set('areaId', target);
-        session.set('serverId', app.get('areaIdMap')[target]);
+        session.set('serverId', app.get('areaIdMap')[target]);   //session的后端服务器id，这个是关键，决定切换到哪个后端服务器-------0
         session.set('teamId', player.teamId);
         session.set('isCaptain', player.isCaptain);
         session.set('isInTeamInstance', player.isInTeamInstance);
@@ -123,7 +123,7 @@ exp.changeArea = function(args, session, cb) {
             callback(err, 'getInstance');
           }else{
             session.set('instanceId', result.instanceId);
-            session.set('serverId', result.serverId);
+            session.set('serverId', result.serverId);      //session的后端服务器id，这个是关键，决定切换到哪个后端服务器-------0
             session.set('teamId', player.teamId);
             session.set('isCaptain', player.isCaptain);
             session.set('isInTeamInstance', player.isInTeamInstance);
