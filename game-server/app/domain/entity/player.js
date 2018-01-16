@@ -48,7 +48,7 @@ var Player = function(opts) {
   this.isCaptain = consts.TEAM.NO;      //是否团队队长
   // game copy flag
   this.isInTeamInstance = false;   //是否在团队里
-  this.instanceId = 0;   //实例ID
+  this.instanceId = 0;   //场景副本id
 
   this.setTotalAttackAndDefence();    //设置总攻击和防御
 };
