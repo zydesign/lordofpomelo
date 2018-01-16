@@ -101,9 +101,10 @@ Instance.prototype.initNPCs = function() {
   }
 };
 
+//this.getChannel 场景获取频道，返回this.channel。
 Instance.prototype.getChannel = function() {
   if(!this.channel){
-    var channelName = channelUtil.getAreaChannelName(this.areaId);
+    var channelName = channelUtil.getAreaChannelName(this.areaId);     //通过areaId获取频道名称name
     utils.myPrint('channelName = ', channelName);
     this.channel = pomelo.app.get('channelService').getChannel(channelName, true);
   }
