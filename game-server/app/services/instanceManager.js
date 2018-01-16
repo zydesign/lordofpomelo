@@ -74,7 +74,8 @@ exp.getInstance = function(args, cb){
     }]
   };
 
-  //由管理服务器发起的rpc，相当于app.rpc.area.remote.areaRemote.create（）
+  //由manager服务器发起rpc到area服务器，相当于app.rpc.area.remote.areaRemote.create（），
+  //这个serverId就是路由到指定的【场景副本服务器】进行处理逻辑了.......................................................
   app.rpcInvoke(serverId, params, function(err, result){
     if(!!err) {
       console.error('create instance error!');
@@ -102,6 +103,7 @@ exp.remove = function(instanceId){
 
 //Get the server to create the instance
 //通过副本服务器数据组，顺序获取空闲的【副本服务器id】
+//PS:单人副本是可以随便空闲服务器创建场景，多人副本就必须要同一个服务器处理逻辑了，因为Channel不能跨服务器使用
 var count = 0;
 function getServerId(){
   if(count >= instanceServers.length) count = 0;
