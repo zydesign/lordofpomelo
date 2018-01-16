@@ -77,7 +77,7 @@ function check(){
   for(var id in instances){
     var instance = instances[id];
 
-    //重启场景副本，如果该场景没有活动玩家（玩家退出副本），关闭该场景副本，并从副本组中删除
+    //删除场景副本，如果该场景没有活动玩家（玩家退出副本），关闭该场景副本，并从副本组中删除
     if(!instance.isAlive()){
       app.rpc.manager.instanceRemote.remove(null, id, onClose);
     }
