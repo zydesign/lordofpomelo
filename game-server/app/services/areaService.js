@@ -51,7 +51,7 @@ exp.getBornPoint = function(sceneId){
  * @param cb {funciton} Call back funciton
  * @api public
  */
-//切换场景。（playerHandler.changeArea调用该函数，客户端发起切换场景使用）
+//切换场景。服务器处理完逻辑后，返回cb（null）（playerHandler.changeArea调用该函数，客户端发起切换场景使用）
 exp.changeArea = function(args, session, cb) {
   var app = pomelo.app;
   var area = session.area;
@@ -66,7 +66,7 @@ exp.changeArea = function(args, session, cb) {
 
   //如果目标场景为普通场景。当前场景删除玩家，获取目标场景出生点，玩家属性直线目标场景---------------------------------普通场景
   if(targetInfo.type === AreaType.SCENE){
-    area.removePlayer(playerId);
+    area.removePlayer(playerId);            //当前场景删除玩家实体，调用area.removeEntity(entityId)
 
     var pos = this.getBornPoint(target); //获取目标场景出生点
 
@@ -118,6 +118,7 @@ exp.changeArea = function(args, session, cb) {
         player.isInTeamInstance = true;  //玩家在组队副本true
         //Get target instance
         //rpc到管理服务器，生成目标场景（副本）绑定到指定id的副本服务器中，并重置部分session--------------------------实例副本到副本服务器
+        //rpc返回的result：{副本服务器id，副本id}
         app.rpc.manager.instanceRemote.create(session, params, function(err, result){
           if(err){
             logger.error('get Instance error!');
@@ -155,7 +156,7 @@ exp.changeArea = function(args, session, cb) {
         player.x = pos.x;
         player.y = pos.y;
 
-        userDao.updatePlayer(player, function(err, success) {    //玩家进入了场景副本，将玩家信息player同步到数据库。
+        userDao.updatePlayer(player, function(err, success) {    //将玩家信息player同步到数据库。
           if(err || !success) {
             err = err || 'update player failed!';
             cb(err, 'update');
@@ -173,6 +174,6 @@ exp.changeArea = function(args, session, cb) {
           utils.invokeCallback(cb, null);     //如果没错误，cb的值为null
         }
       }
-    );     //到这来都是 async.series的内容========================================================================================
+    );     //到这来都是 async.series的内容，也是切换目标场景为副本的内容==========================================================
   }
 };
