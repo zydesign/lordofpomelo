@@ -56,7 +56,7 @@ handler.enterScene = function(msg, session, next) {
       return;
     }
                 //修改部分角色信息为当前session信息
-    player.serverId = session.frontendId;
+    player.serverId = session.frontendId;      //场景添加玩家实体的getChannel().add(e.userId, e.serverId)用到。
 		player.teamId = teamId;
 		player.isCaptain = isCaptain;
 		player.isInTeamInstance = isInTeamInstance;
@@ -101,6 +101,7 @@ handler.enterScene = function(msg, session, next) {
 		utils.myPrint("2 ~ GetPlayerAllInfo player.isCaptain = ", player.isCaptain);
 	  //执行场景添加实体player
 	  //如果玩家添加到场景失败（player不存在或player已经加入场景），再次传输数据给客户端，错误码
+	  //执行场景添加玩家实体...........................................................................场景添加玩家实体
 		if (!area.addEntity(player)) {
       logger.error("Add player to area faild! areaId : " + player.areaId);
       next(new Error('fail to add user into area'), {
