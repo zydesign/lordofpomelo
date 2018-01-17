@@ -223,7 +223,9 @@ Instance.prototype.removeEntity = function(entityId) {
   //If the entity is a player, remove it
   //如果删除的实体类型为player.......................................................
   if(e.type === 'player') {
-    this.getChannel().leave(e.userId, pomelo.app.getServerId());             //该玩家退出频道
+    //this.getChannel().leave(e.userId, pomelo.app.getServerId());   ...修改理由：这个api获取的是当前服务器的id，是后端id，是错误的  
+    
+    this.getChannel().leave(e.userId, e.serverId);                            //该玩家退出频道
     this.aiManager.removeCharacter(e.entityId);                              //ai系统删除该角色大脑
     this.patrolManager.removeCharacter(e.entityId);                          //巡逻系统删除该角色动作
     this.aoi.removeObject({id:e.entityId, type: e.type}, {x: e.x, y: e.y});  //aoi系统灯塔点删除该【对象】
