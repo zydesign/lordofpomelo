@@ -234,8 +234,8 @@ Player.prototype.learnSkill = function(skillId, callback) {
   }
   //生成战斗技能实例
   var fightSkill = fightskill.create({skillId: skillId, level: 1, playerId: this.id, type:'attack'});
-  this.fightSkills[skillId] = fightSkill;
-  fightskillDao.add(fightSkill, callback);
+  this.fightSkills[skillId] = fightSkill;      //加入战斗技能组
+  fightskillDao.add(fightSkill, callback);    //新技能添加到数据库
   return true;
 };
 
@@ -246,13 +246,16 @@ Player.prototype.learnSkill = function(skillId, callback) {
  * @return {Boolean}
  * @api public
  */
+//玩家升级技能。（playerHandler.upgradeSkill调用该函数）
 Player.prototype.upgradeSkill = function(skillId) {
-  var fightSkill = this.fightSkills[skillId];
+  var fightSkill = this.fightSkills[skillId];  //是已有技能，所有从技能组获取
 
+  //如果获取不到技能，或者技能点为0，或者不够等级升级，返回false
   if (!fightSkill || this.skillPoint <= 0 || this.level < fightSkill.skillData.playerLevel * 1 + fightSkill.level * 5) {
     return false;
   }
-  fightSkill.level += 1;
+  //满足升级条件，技能等级+1，点数-1，更新到数据库，返回true
+  fightSkill.level += 1;   
   this.skillPoint--;
   fightskillDao.update(fightSkill);
   return true;
