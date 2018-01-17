@@ -5,16 +5,16 @@ var Team = require('../domain/entity/team');
 var consts = require('../consts/consts');
 var utils = require('../util/utils');
 var logger = require('pomelo-logger').getLogger(__filename);
-
+//团队管理器
 var exp = module.exports;
 
 // global team container(teamId:teamObj)  
-var gTeamObjDict = {};  // 全局队伍容器
+var gTeamObjDict = {};  //团队组
 // global team id    
 var gTeamId = 0;  //全局队伍id
 
 // create new team, add the player(captain) to the team
-// 先新建一个队伍实例，然后增加玩家队长到队伍中，（manager服务器teamRemote.js使用这个函数，参数data是area服务器teamHandler.js提供的{添加队员参数}）
+// 新建队伍实例。然后增加玩家队长到队伍中，（manager服务器teamRemote.js使用这个函数，参数data是area服务器teamHandler.js提供的{添加队员参数}）
 exp.createTeam = function(data) {
   var teamObj = new Team(++gTeamId);  //队伍对象为一个{新建的队伍实例}
   var result = teamObj.addPlayer(data, true); //队伍实例通过参数增加一个玩家，参数true就表示创建的玩家是队长。
