@@ -585,6 +585,7 @@ Player.prototype.toJSON4Team = function() {
  * @return {Object}
  * @api public
  */
+//生成队员数据（playerHandler.enterScene玩家进入场景调用该函数）
 Player.prototype.toJSON4TeamMember = function() {
   return {
     playerId: this.id,
