@@ -10,44 +10,45 @@ var Event = require('../../consts/consts').Event;
 // max member num in a team
 // 队伍成员最大数
 var MAX_MEMBER_NUM = 3;
-///////////////////////////////////////////////////////
-//通过队伍id来实例化这个工厂函数
+
+//通过队伍id可以实例队伍（services/teamManager.createTeam调用该函数）
 function Team(teamId){
   this.teamId = 0;
-  this.teamName = consts.TEAM.DEFAULT_NAME; //默认队伍名为空
+  this.teamName = consts.TEAM.DEFAULT_NAME; //默认队伍名为null
   this.playerNum = 0;  //玩家数量
   this.captainId = 0;  //队长id
   this.playerDataArray = new Array(MAX_MEMBER_NUM); //3个队员的数组
   // team channel, push msg within the team
   this.channel = null;  //该队伍频道
 
-  var _this = this;
+  var _this = this; //闭包。实例不能引用init的_this
   
   // constructor
-  //初始化就是给工厂函数属性填数值
+  //初始化。实例时立即执行
   var init = function()	{
-    //参数写入this.teamId
-    _this.teamId = teamId;
-    var arr = _this.playerDataArray;
+    //teamId是参数
+    _this.teamId = teamId;  //得到this.teamId
+    var arr = _this.playerDataArray;  //可以存3个对象的数组
     //给队伍配置，空队员信息
     for(var i = 0; i < arr.length; ++i) {
       arr[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
         userId: consts.TEAM.USER_ID_NONE, serverId: consts.TEAM.SERVER_ID_NONE,
         backendServerId: consts.TEAM.SERVER_ID_NONE, playerData: consts.TEAM.PLAYER_INFO_NONE};
     }
-    _this.createChannel();
+    _this.playerDataArray = arr;        //这行是我加的，不然上面遍历都白干了-------------------------------------------修改
+    _this.createChannel();  //执行创建队伍函数
   };
 
   init();
 }
 
-//创建队伍频道
+//创建队伍频道。得到this.channel
 Team.prototype.createChannel = function() {
   if(this.channel) {
     return this.channel;
   }
-  var channelName = channelUtil.getTeamChannelName(this.teamId);
-  this.channel = pomelo.app.get('channelService').getChannel(channelName, true);
+  var channelName = channelUtil.getTeamChannelName(this.teamId);  //频道工具获取队伍频道名
+  this.channel = pomelo.app.get('channelService').getChannel(channelName, true);   //创建一个频道
   if(this.channel) {
     return this.channel;
   }
@@ -219,7 +220,7 @@ Team.prototype.isPlayerInTeam = function(playerId) {
 // push the team members' info to everyone
 // 推送队伍更新信息给每一位队员
 Team.prototype.updateTeamInfo = function() {
-  var infoObjDict = {};  //要推送的玩家数据组
+  var infoObjDict = {};  //队员数据组
   var arr = this.playerDataArray;  //获取队员数组
   
   //遍历队员数组，如果是空位，继续遍历下一个。如果是实位，推送对象添加该玩家数据
@@ -235,7 +236,7 @@ Team.prototype.updateTeamInfo = function() {
 
   //队伍频道推送消息给队员们
   if(Object.keys(infoObjDict).length > 0) {
-    this.channel.pushMessage('onUpdateTeam', infoObjDict, null);
+    this.channel.pushMessage('onUpdateTeam', infoObjDict, null);  //给队伍频道推送队员数据
   }
 };
 
