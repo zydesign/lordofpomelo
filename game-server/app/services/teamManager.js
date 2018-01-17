@@ -162,7 +162,7 @@ exp.updateMemberInfo = function(args) {
     return {result: result};
   }
   var teamId = args.playerData.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];   //通过队伍id从队伍组获取队伍
   if (teamObj && teamObj.updateMemberInfo(args)) {
     result = consts.TEAM.OK;
   }
