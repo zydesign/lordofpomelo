@@ -290,9 +290,11 @@ handler.changeArea = function(msg, session, next) {
 	utils.myPrint('teamId, isCaptain = ', teamId, isCaptain);
 	utils.myPrint('msg.triggerByPlayer = ', msg.triggerByPlayer);
   utils.myPrint('changeArea is running ...');
-	//通过场景服务切换场景
+	//通过场景服务切换场景，处理完逻辑返回cb（null）
+	//(1.如果是切换到普通场景，让原场景服务器area.removeEntity删除玩家，session添加目标场景服务器id。）
+	//(2.如果是切换到副本场景，让原场景服务器area.removeEntity删除玩家，session添加目标场景服务器id，并rpc到指定的副本服务器生成新场景)
   areaService.changeArea(req, session, function(err) {
-    var args = {areaId: areaId, target: target, success: true};
+    var args = {areaId: areaId, target: target, success: true};   //最终返回客户端的msg
     next(null, args);
   });
 };
@@ -345,7 +347,7 @@ handler.pickItem = function(msg, session, next) {
 };
 
 //Player  learn skill
-//客户端发起，玩家学习技能
+//客户端发起，玩家学习技能。通过技能id生成新技能，加入技能组，并添加到数据库
 handler.learnSkill = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
   var status = player.learnSkill(msg.skillId);
@@ -354,7 +356,7 @@ handler.learnSkill = function(msg, session, next) {
 };
 
 //Player upgrade skill
-//客户端发起，玩家升级技能
+//客户端发起，玩家升级技能（是已有技能，从技能组获取，如果满足升级条件，技能等级+1，点数-1，更新到数据库，返回true）
 handler.upgradeSkill = function(msg, session, next) {
   var player = session.area.getPlayer(session.get('playerId'));
   var status = player.upgradeSkill(msg.skillId);
