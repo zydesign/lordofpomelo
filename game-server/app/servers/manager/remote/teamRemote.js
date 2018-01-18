@@ -8,7 +8,8 @@ module.exports = function(){
 var TeamRemote = function(){
 };
 
-// can a player create a game copy 允许玩家创建游戏副本
+// can a player create a game copy 
+//允许玩家创建游戏副本
 TeamRemote.prototype.canCreateGameCopy = function(args, cb){
   var playerId = args.playerId;
   var teamId = args.teamId;
@@ -22,7 +23,7 @@ TeamRemote.prototype.canCreateGameCopy = function(args, cb){
   utils.invokeCallback(cb, null, result);
 };
 
-// create a new team 创建一个新队伍（ 由teamHandler.js访问这个函数）
+// create a new team 创建一个新队伍（ 由area服务器handler/teamHandler.createTeam执行rpc到该函数）
 TeamRemote.prototype.createTeam = function(args, cb) {
   utils.myPrint('TeamRemote ~ createTeam is running ...typeof args = ', typeof args);
   utils.myPrint('args = ', args);
@@ -43,6 +44,7 @@ TeamRemote.prototype.disbandTeamById = function(args, cb){
 };
 
 // leave a team
+// 玩家离开队伍（客户端掉线时area/remote/playerRemote.playerLeave执行rpc到该函数，让玩家脱离队伍）
 TeamRemote.prototype.leaveTeamById = function(args, cb){
   var playerId = args.playerId;
   var teamId = args.teamId;
@@ -86,9 +88,10 @@ TeamRemote.prototype.acceptInviteJoinTeam = function(args, cb){
 };
 
 // update team member's new info
+//更新队员信息。args为player生成的玩家数据。（area/handler/playerHandler.enterScene执行rpc调用该函数）
 TeamRemote.prototype.updateMemberInfo = function(args, cb){
   utils.myPrint('UpdateMemberInfo is running ... args = ', JSON.stringify(args));
-  var ret = teamManager.updateMemberInfo(args);
+  var ret = teamManager.updateMemberInfo(args);    //执行服务teamManager
   utils.myPrint('UpdateMemberInfo ~ ret = ', JSON.stringify(ret));
   utils.invokeCallback(cb, null, ret);
 };
