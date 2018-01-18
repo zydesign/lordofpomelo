@@ -7,6 +7,7 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 var defaultLimit = 10;
 
+//空间管理类
 /**
  * The mob zone for generate mobs
  */
