@@ -26,25 +26,27 @@ var exp = module.exports;
 exp.playerLeave = function(args, cb){
   //玩家id为客户端发来参数的玩家id
   var playerId = args.playerId;
-  //通过区域管理器获取区域
-  var area = pomelo.app.areaManager.getArea(args.instanceId);
-  //再通过区域来获取玩家信息
+  //副本id获取副本
+  var area = pomelo.app.areaManager.getArea(args.instanceId);  //如果是副本app.areaManager就是instancePool副本池管理
+  //副本中获取玩家
   var player = area.getPlayer(playerId);
 
   utils.myPrint('1 ~ areaId = ', area.areaId);
   utils.myPrint('2 ~ instanceId = ', args.instanceId);
   utils.myPrint('3 ~ args = ', JSON.stringify(args));
+  //如果获取不到，说明不在副本
   if(!player){
     logger.warn('player not in the area ! %j', args);
+    utils.invokeCallback(cb);     //我把下面那行放这里，因为return前要有cb
     return;
   }
-  //玩家登录的场景id
+  //普通场景id
   var sceneId = player.areaId;
 
-  if(!player) {
-    utils.invokeCallback(cb);
-    return;
-  }
+//  if(!player) {
+//    utils.invokeCallback(cb);
+//    return;
+//  }
 
   var params = {playerId: playerId, teamId: player.teamId};
   //管理服务器让玩家退出团队
@@ -53,12 +55,12 @@ exp.playerLeave = function(args, cb){
     });
 
   if(player.hp === 0){
-    //玩家死了，默认为半条血
+    //玩家死了，复活为半血
     player.hp = Math.floor(player.maxHp/2);
   }
 
   //If player is in a instance, move to the scene
-  //如果玩家在地图实例中，则移动到该地图出生地
+  //如果地图类型不是普通场景，玩家回到普通场景的出生点
   if(area.type !== consts.AreaType.SCENE){
     var pos = areaService.getBornPoint(sceneId);
     player.x = pos.x;
@@ -70,9 +72,9 @@ exp.playerLeave = function(args, cb){
   bagDao.update(player.bag);
   equipmentsDao.update(player.equipments);
   taskDao.tasksUpdate(player.curTasks);
-  //区域地图移除玩家
+  //副本删除玩家
   area.removePlayer(playerId);
-  //区域地图广播信息给该地图的其他玩家，该玩家已经离线
+  //副本推送消息给队员，该玩家已经离线
   area.channel.pushMessage({route: 'onUserLeave', code: consts.MESSAGE.RES, playerId: playerId});
   utils.invokeCallback(cb);
 };
