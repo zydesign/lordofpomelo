@@ -43,7 +43,7 @@ handler.enterScene = function(msg, session, next) {
 	utils.myPrint("1 ~ EnterScene: playerId = ", playerId);
 	utils.myPrint("1 ~ EnterScene: teamId = ", teamId);
 
-	//通过玩家id，在数据库中获取角色信息全部信息
+	//通过玩家id，在数据库中获取角色信息全部信息-----------------------------------------------数据库获取player信息
   userDao.getPlayerAllInfo(playerId, function(err, player) {
 	  //如果发生错误或获取不到角色信息
     if (err || !player) {
@@ -55,7 +55,7 @@ handler.enterScene = function(msg, session, next) {
 
       return;
     }
-    //player是数据库获取的原来的玩家数据，有一部分数据新数据在切换场景时，存入到session中，修改部分角色信息为当前session信息
+    //player是数据库获取发玩家数据，有一部分数据新数据在切换场景时，存入到session中，修改部分角色信息为当前session信息--------
     player.serverId = session.frontendId;      //场景添加玩家实体的getChannel().add(e.userId, e.serverId)用到。
 		player.teamId = teamId;        //像队伍这类数据是临时的，不需要存数据库的，断开连接就没有了，每次登陆都要重新获取
 		player.isCaptain = isCaptain;
@@ -64,7 +64,7 @@ handler.enterScene = function(msg, session, next) {
 		areaId = player.areaId;
 		utils.myPrint("2 ~ GetPlayerAllInfo: player.instanceId = ", player.instanceId);
 
-	  //rpc到聊天服务器，让玩家加入聊天服务器
+	  //rpc到聊天服务器，让玩家加入聊天服务器---------------------------------------------------加入聊天服务器
     pomelo.app.rpc.chat.chatRemote.add(session, session.uid,
 			player.name, channelUtil.getAreaChannelName(areaId), null);
 		var map = area.map;
@@ -115,9 +115,9 @@ handler.enterScene = function(msg, session, next) {
 	  //如果玩家有队伍，rpc到队伍服务器更新队伍信息
 		if (player.teamId > consts.TEAM.TEAM_ID_NONE) {
 			// send player's new info to the manager server(team manager)
-			var memberInfo = player.toJSON4TeamMember();             //生成一份队员数据  
+			var memberInfo = player.toJSON4TeamMember();             //生成玩家数据  
 			//app.getServerId()在哪个服务器执行获取的就是那个服务器的id--------------------------------
-			memberInfo.backendServerId = pomelo.app.getServerId();    //队员数据添加属性：后端id
+			memberInfo.backendServerId = pomelo.app.getServerId();    //玩家数据添加属性：后端id
 			//rpc到管理服务器，更新队伍信息
 			pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
 				function(err, ret) {
@@ -272,7 +272,7 @@ handler.changeArea = function(msg, session, next) {
 		return;
 	}
 
-  // save player's data immediately
+  // save player's data immediately    切换地图之前先备份数据到数据库---------------------------------------备份数据
   userDao.updatePlayer(player);              //更新player数据库中数据
   bagDao.update(player.bag);                 //更新bag数据库中数据
   equipmentsDao.update(player.equipments);   //更新equipments数据库中数据
