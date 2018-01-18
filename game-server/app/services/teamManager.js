@@ -57,13 +57,16 @@ exp.try2DisbandTeam = function(teamObj) {
   }
 };
 
+//离开队伍。（管理服务器manager/remote/teamRemote.leaveTeamById调用该函数）
 exp.leaveTeamById = function(playerId, teamId, cb) {
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组中获取指定id的队伍
+  //如果队伍不存在，cb
   if(!teamObj) {
     utils.invokeCallback(cb, null, {result: consts.TEAM.FAILED});
     return;
   }
 
+  // 执行队伍删除队员
   var needDisband = teamObj.removePlayer(playerId, function(err, ret) {
     utils.invokeCallback(cb, null, ret);
   });
@@ -156,13 +159,17 @@ exp.acceptInviteJoinTeam = function(args) {
   return {result: result, teamName: teamName};
 };
 
+//更新队员信息。args为player生成的玩家数据。（管理服务器manager/remote/teamRemote.updateMemberInfo执行该函数）
 exp.updateMemberInfo = function(args) {
   var result = consts.TEAM.FAILED;
+  //如果参数不存在
   if (!args || !args.playerData.teamId) {
     return {result: result};
   }
+  
   var teamId = args.playerData.teamId;
   var teamObj = gTeamObjDict[teamId];   //通过队伍id从队伍组获取队伍
+  //执行队伍更新队员信息--------------------------------------------------------------这里开始更新队员信息
   if (teamObj && teamObj.updateMemberInfo(args)) {
     result = consts.TEAM.OK;
   }
