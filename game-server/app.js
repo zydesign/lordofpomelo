@@ -41,13 +41,14 @@ app.configure('production|development', function () {
 
     //Set areasIdMap, a map from area id to serverId.
     if (app.serverType !== 'master') {
-        var areas = app.get('servers').area;
-        //将服务器areas的id存到areaIdMap里面，客户端指定一个值key为服务器数据的area属性（如：1），即得服务器id（如：area-server-1）
-        //普通场景的服务器id组
-        var areaIdMap = {};
+        var areas = app.get('servers').area;  //获取area场景服务器组
+        //将普通场景服务器id存到areaIdMap里面，key为场景id，值为服务器id（如：area-server-1）
+        //普通场景服务器id组-----------------------------------------------------------------主要用于rpc
+        var areaIdMap = {};  //值储存带场景id的普通场景服务器id，不存副本
         for (var id in areas) {
             areaIdMap[areas[id].area] = areas[id].id;
         }
+        //（connector服务器的entryHandler.entry会get这个areaIdMap获取玩家连接的场景服务器）
         app.set('areaIdMap', areaIdMap);
     }
     // proxy configures  代理配置
