@@ -38,6 +38,7 @@ pro.entry = function(msg, session, next) {
 
 	//先声明要获取的变量
 	var uid, players, player;
+	//顺序执行并传值
 	async.waterfall([
 		function(cb) {
 			// auth token   解析token后，并获取code、user信息
@@ -78,11 +79,11 @@ pro.entry = function(msg, session, next) {
 			player = players[0];
 
 		        // 将客户端发来的areaId，存入session，方便后面的每次访问路由到这个areaId的服务器
-		        // areaIdMap存的是area服务器配置的尾部的id值
+		        // areaIdMap的key为场景id，值为场景服务器id
 			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);
 			session.set('playername', player.name);
 			session.set('playerId', player.id);
-			session.on('closed', onUserLeave.bind(null, self.app));
+			session.on('closed', onUserLeave.bind(null, self.app));  //监听客户端掉线的
 			session.pushAll(cb);
 		},
         function(cb) {
@@ -109,7 +110,8 @@ var onUserLeave = function (app, session, reason) {
 	}
 
 	utils.myPrint('1 ~ OnUserLeave is running ...');
-	//让玩家退出场景服务器 ，（instanceId是个无用的属性，多余的）
+	//让玩家退出场景副本服务器 ，（instanceId是副本id，如果没有get得的是null）
+	//先让area服务器处理场景删除玩家等操作，然后让manager服务器处理踢出队伍等操作
 	app.rpc.area.playerRemote.playerLeave(session, {playerId: session.get('playerId'), instanceId: session.get('instanceId')}, function(err){
 		if(!!err){
 			logger.error('user leave error! %j', err);
