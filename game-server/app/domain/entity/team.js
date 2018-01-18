@@ -7,6 +7,8 @@ var utils = require('../../util/utils');
 var channelUtil = require('../../util/channelUtil');
 var Event = require('../../consts/consts').Event;
 
+//团队类。（该类的实例和所有函数的调用都是services/teamManager.js）
+
 // max member num in a team
 // 队伍成员最大数
 var MAX_MEMBER_NUM = 3;
@@ -21,26 +23,23 @@ function Team(teamId){
   // team channel, push msg within the team
   this.channel = null;  //该队伍频道
 
-  var _this = this; //闭包。实例不能引用init的_this
-  
-  // constructor
-  //初始化。实例时立即执行
-  var init = function()	{
+  init(teamId);   //立即执行初始化，赋值this.teamId、this.channel、this.playerDataArray
+}
+
+
+//初始化函数
+Team.prototype.init = function(opt)	{
     //teamId是参数
-    _this.teamId = teamId;  //得到this.teamId
-    var arr = _this.playerDataArray;  //可以存3个对象的数组
-    //给队伍配置，空队员信息
-    for(var i = 0; i < arr.length; ++i) {
-      arr[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
+    this.teamId = opt;  //得到this.teamId
+    //配置队伍空位信息。（属性有：playerId、areaId、userId、serverId、backendServerId、playerData）
+    for(var i = 0; i < this.playerDataArray.length; ++i) {
+      this.playerDataArray[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
         userId: consts.TEAM.USER_ID_NONE, serverId: consts.TEAM.SERVER_ID_NONE,
         backendServerId: consts.TEAM.SERVER_ID_NONE, playerData: consts.TEAM.PLAYER_INFO_NONE};
     }
-    _this.playerDataArray = arr;        //这行是我加的，不然上面遍历都白干了-------------------------------------------修改
-    _this.createChannel();  //执行创建队伍函数
+    this.createChannel();  //执行创建队伍函数
   };
 
-  init();
-}
 
 //创建队伍频道。得到this.channel
 Team.prototype.createChannel = function() {
@@ -80,39 +79,37 @@ Team.prototype.removePlayerFromChannel = function(data) {
   return false;
 };
 
-//声明一个添加玩家的函数，返回true或false （data为{添加队员参数}，playerInfo才是队员信息，playerData为该玩家数据《hp、MP、等级等》）
-function doAddPlayer(teamObj, data, isCaptain) {
+//添加队员函数。返回true或false （data为玩家数据，playerInfo才是队员信息，playerData为该玩家数据《hp、MP、等级等》）
+function doAddPlayer(data, isCaptain) {
   isCaptain = isCaptain || false;
-  //队员数组
-  var arr = teamObj.playerDataArray;
-  //遍历队员数组，如果遍历到空位，则赋值，并返回ture，不会继续遍历下去；只添加一个队员。如果遍历完数组都没有true，那么返回false
-  for(var i in arr) {
-    if(arr[i].playerId === consts.TEAM.PLAYER_ID_NONE && arr[i].areaId === consts.TEAM.AREA_ID_NONE) {
-      //参数的玩家数据的playerData的teamId赋值
-      data.playerInfo.playerData.teamId = teamObj.teamId;
+  //遍历队员数组，如果遍历到空位，则赋值，并返回ture，不会继续遍历下去；只添加一个队员。如果遍历完数组空位，那么返回false
+  for(var i in this.playerDataArray) {
+    if(this.playerDataArray[i].playerId === consts.TEAM.PLAYER_ID_NONE && this.playerDataArray[i].areaId === consts.TEAM.AREA_ID_NONE) {
+      //玩家数据的playerData添加teamId属性
+      data.playerInfo.playerData.teamId = this.teamId;
       
-      //如果加入的玩家是队长的话
+      //如果加入的玩家是队长
       if (isCaptain) {
         //给队伍配置【队伍名】
-        teamObj.teamName = data.teamName;
-        //参数的队员信息的玩家数据的isCaptain属性为yes
+        this.teamName = data.teamName;
+        //玩家数据的playerData添加isCaptain属性
         data.playerInfo.playerData.isCaptain = consts.TEAM.YES;
       }
       utils.myPrint('data.playerInfo = ', JSON.stringify(data.playerInfo));
       //赋值一个【队员数据】到队伍，这个是加入队伍后的队员信息
-      arr[i] = {playerId: data.playerId, areaId: data.areaId, userId: data.userId,
+      this.playerDataArray[i] = {playerId: data.playerId, areaId: data.areaId, userId: data.userId,
         serverId: data.serverId, backendServerId: data.backendServerId,
         playerData: data.playerInfo.playerData};
-      utils.myPrint('arr[i] = ', JSON.stringify(arr[i]));
+      utils.myPrint('this.playerDataArray[i] = ', JSON.stringify(this.playerDataArray[i]));
       return true;
     }
   }
   return false;
 }
 
-//队伍加入一个玩家，并确定是不是队长，并队伍频道推送消息给队员们（data参数是area服务器teamHandler.js提供）（data为{添加队员参数}）
+//添加一个名队员。队伍频道推送消息给队员们（data参数是area服务器teamHandler.js提供）（data为队员数据，是obj）
 Team.prototype.addPlayer = function(data, isCaptain) {
-  isCaptain = isCaptain || false;
+  isCaptain = isCaptain || false;  //改参数
   //判断参数data是否为对象
   if (!data || typeof data !== 'object') {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
@@ -124,27 +121,27 @@ Team.prototype.addPlayer = function(data, isCaptain) {
     }
   }
 
-  //判断队伍还有空位
+  //如果队伍没空位
   if(!this.isTeamHasPosition()) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.NO_POSITION;
   }
 
-  //判断该玩家是否已经有队伍了
+  //如果该玩家已经有队伍
   if(this.isPlayerInTeam(data.playerId)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.ALREADY_IN_TEAM;
   }
 
-  //执行添加玩家函数，并用返回结果作为判断条件
-  if(!doAddPlayer(this, data, isCaptain)) {
+  //如果【执行添加玩家】失败-----------------------------------------------------这里加入队伍
+  if(!doAddPlayer(data, isCaptain)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
-  //在执行添加玩家操作后，判断玩家是否加入队伍了
+  //在执行添加玩家操作后，如果该玩家不在队伍中
   if(!this.isPlayerInTeam(data.playerId)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
-  //执行添加玩家后，是否也加入到队伍频道了
+  //如果执行添加玩家到队伍频道失败----------------------------------------------这里加入队伍频道
   if(!this.addPlayer2Channel(data)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
@@ -154,7 +151,7 @@ Team.prototype.addPlayer = function(data, isCaptain) {
     this.playerNum++;
   }
 
-  //更新队伍信息，并推送信息给每一个队员
+  //更新队伍信息，并推送信息给每一个队员-----------------------------------------广播消息给队员
   this.updateTeamInfo();
 
   //最后返回成功码
@@ -294,10 +291,11 @@ Team.prototype.disbandTeam = function() {
 };
 
 // remove a player from the team
+//删除一个队员
 Team.prototype.removePlayer = function(playerId, cb) {
   var arr = this.playerDataArray;
   var tmpData = null;
-  for(var i in arr) {
+  for(var i in this.playerDataArray) {
     if(arr[i].playerId !== consts.TEAM.PLAYER_ID_NONE && arr[i].playerId === playerId) {
       tmpData = utils.clone(arr[i]);
       arr[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
@@ -383,21 +381,24 @@ Team.prototype.dragMember2gameCopy = function(args, cb) {
   utils.invokeCallback(cb);
 };
 
+//更新队伍信息。data是player生成的玩家数据。
 Team.prototype.updateMemberInfo = function(data) {
   utils.myPrint('data = ', data);
   utils.myPrint('playerData = ', data.playerData);
+  //如果团队id不匹配玩家的团队id，返回false
   if (this.teamId !== data.playerData.teamId) {
     return false;
   }
-  var arr = this.playerDataArray;
-  for(var i in arr) {
-    if(arr[i].playerId === data.playerId) {
+  for(var i in this.playerDataArray) {
+    if(this.playerDataArray[i].playerId === data.playerId) {
+      //如果有后端id这个参数
       if (!!data.backendServerId) {
-        arr[i].backendServerId = data.backendServerId;
+        this.playerDataArray[i].backendServerId = data.backendServerId;
       }
-      arr[i].areaId = data.areaId;
-      arr[i].playerData = data.playerData;
-      utils.myPrint('arr[i] = ', JSON.stringify(arr[i]));
+      this.playerDataArray[i].areaId = data.areaId;
+      this.playerDataArray[i].playerData = data.playerData;
+      utils.myPrint('this.playerDataArray[i] = ', JSON.stringify(this.playerDataArray[i]));
+      //如果需要通知所有人
       if (data.needNotifyElse) {
         this.updateTeamInfo();
       }
