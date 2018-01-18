@@ -54,26 +54,26 @@ Team.prototype.createChannel = function() {
   return null;
 };
 
-//添加玩家to队伍频道中，返回true或false
+//添加玩家to队伍频道中，返回true或false（data是player生成的玩家数据）
 Team.prototype.addPlayer2Channel = function(data) {
   if(!this.channel) {
     return false;
   }
   if(data) {
-    this.channel.add(data.userId, data.serverId);
+    this.channel.add(data.userId, data.serverId);   //队伍频道添加玩家
     return true;
   }
   return false;
 };
 
-//从队伍频道中移除玩家， 返回true或false
+//从队伍频道中移除玩家， 返回true或false（data是player生成的玩家数据）
 Team.prototype.removePlayerFromChannel = function(data) {
   if(!this.channel) {
     return false;
   }
   if(data) {
     utils.myPrint('data.userId, data.serverId = ', data.userId, data.serverId);
-    this.channel.leave(data.userId, data.serverId);
+    this.channel.leave(data.userId, data.serverId);   //队伍频道删除玩家
     return true;
   }
   return false;
@@ -107,7 +107,7 @@ function doAddPlayer(data, isCaptain) {
   return false;
 }
 
-//添加一个名队员。队伍频道推送消息给队员们（data参数是area服务器teamHandler.js提供）（data为队员数据，是obj）
+//添加一个名队员。队伍频道推送消息给队员们（data是player生成的玩家数据）
 Team.prototype.addPlayer = function(data, isCaptain) {
   isCaptain = isCaptain || false;  //改参数
   //判断参数data是否为对象
@@ -166,7 +166,7 @@ Team.prototype.setCaptainId = function(captainId) {
 };
 
 // is the player the captain of the team
-// 判断通过玩家id判断是否队长id
+// 玩家id是否队长id
 Team.prototype.isCaptainById = function(playerId) {
   return playerId === this.captainId;
 };
@@ -178,25 +178,28 @@ Team.prototype.getPlayerNum = function() {
 };
 
 // is there a empty position in the team
-// 判断队伍是否还有空位
+// 队伍是否有空位
 Team.prototype.isTeamHasPosition = function() {
   return this.getPlayerNum() < MAX_MEMBER_NUM;
 };
 
 // is there any member in the team
-// 判断队伍是否有人
+// 判断队伍是否有人，队员数量大于0
 Team.prototype.isTeamHasMember = function() {
   return this.getPlayerNum() > 0;
 };
 
 // the first real player_id in the team
+//获取第一个队员的playerId
 Team.prototype.getFirstPlayerId = function() {
   var arr = this.playerDataArray;
+  //如果遍历到队伍位置不为空，就是第一个队员
   for(var i in arr) {
     if(arr[i].playerId !== consts.TEAM.PLAYER_ID_NONE && arr[i].areaId !== consts.TEAM.AREA_ID_NONE) {
       return arr[i].playerId;
     }
   }
+  //如果遍历整支队伍都是空位，返回空队员码
   return consts.TEAM.PLAYER_ID_NONE;
 };
 
@@ -206,6 +209,7 @@ Team.prototype.isPlayerInTeam = function(playerId) {
   var arr = this.playerDataArray;
   utils.myPrint('arr = ', JSON.stringify(arr));
   utils.myPrint('playerId = ', playerId);
+  //遍历队伍，如果有队员playerId跟参数一样，返回true
   for(var i in arr) {
     if(arr[i].playerId !== consts.TEAM.PLAYER_ID_NONE && arr[i].playerId === playerId) {
       return true;
@@ -220,13 +224,13 @@ Team.prototype.updateTeamInfo = function() {
   var infoObjDict = {};  //队员数据组
   var arr = this.playerDataArray;  //获取队员数组
   
-  //遍历队员数组，如果是空位，继续遍历下一个。如果是实位，推送对象添加该玩家数据
+  //遍历队员数组，如果是空位，继续遍历下一个。如果是实位，队员数据加入infoObjDict组，推送对象添加该玩家数据
   for (var i in arr) {
     var playerId = arr[i].playerId;
     if(playerId === consts.TEAM.PLAYER_ID_NONE) {
       continue;
     }
-    infoObjDict[playerId] = arr[i].playerData;
+    infoObjDict[playerId] = arr[i].playerData;  //队员数据组添加队员数据--------------------------------
     utils.myPrint('infoObjDict[playerId] = ', JSON.stringify(infoObjDict[playerId]));
     utils.myPrint('playerId, kindId = ', playerId, infoObjDict[playerId].kindId);
   }
@@ -238,17 +242,20 @@ Team.prototype.updateTeamInfo = function() {
 };
 
 // notify the members of the left player
+// 队伍推送消息队员离开
 Team.prototype.pushLeaveMsg2All = function(leavePlayerId, cb) {
-  var ret = {result: consts.TEAM.OK};
+  var res = {result: consts.TEAM.OK};
+  //如果频道不存在
   if(!this.channel) {
-    cb(null, ret);
+    cb(null, res);
     return;
   }
+  //发给客户端的msg
   var msg = {
     playerId: leavePlayerId
   };
-  this.channel.pushMessage('onTeammateLeaveTeam', msg, function(err, _) {
-    cb(null, ret);
+  this.channel.pushMessage('onTeammateLeaveTeam', msg, function(err, req) {
+    cb(null, res);
   });
 };
 
