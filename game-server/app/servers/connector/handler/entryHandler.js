@@ -59,7 +59,7 @@ pro.entry = function(msg, session, next) {
 			}
 
 			uid = user.id;
-			userDao.getPlayersByUid(user.id, cb);
+			userDao.getPlayersByUid(user.id, cb);   //数据库获取玩家数据，如果有才能获取到，如果没有创建角色返回null
 		},
         function(res, cb) {
 			// generate session and register chat status
@@ -80,7 +80,7 @@ pro.entry = function(msg, session, next) {
 
 		        // 将客户端发来的areaId，存入session，方便后面的每次访问路由到这个areaId的服务器
 		        // areaIdMap的key为场景id，值为场景服务器id
-			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);
+			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);  //绑定后端id，rpc处理逻辑使用
 			session.set('playername', player.name);
 			session.set('playerId', player.id);
 			session.on('closed', onUserLeave.bind(null, self.app));  //监听客户端掉线的
@@ -97,7 +97,7 @@ pro.entry = function(msg, session, next) {
 		}
 		console.log('entry success!!!!');
 
-		//返回单条player信息给客户端
+//返回单条player信息给客户端（这个返回玩家数据，如果有角色返回 players[0]，如果没创建角色返回null）-----------------判断有没有角色
 		next(null, {code: Code.OK, player: players ? players[0] : null});
 	});
 };
