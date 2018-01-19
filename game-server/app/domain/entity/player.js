@@ -615,10 +615,12 @@ Player.prototype.joinTeam = function(teamId) {
 };
 
 // player leaves the team
+//玩家离队。（area/remote/playerRemote.leaveTeam调用该函数）
 Player.prototype.leaveTeam = function() {
   if(this.teamId === consts.TEAM.TEAM_ID_NONE) {
     return false;
   }
+  //离队就是把this.teamId的值归零
   this.teamId = consts.TEAM.TEAM_ID_NONE;
   return true;
 };
