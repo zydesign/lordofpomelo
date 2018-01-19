@@ -9,7 +9,7 @@ var exp = module.exports;
 exp.pushMessageByUids = function (uids, route, msg) {
 	pomelo.app.get('channelService').pushMessageByUids(route, msg, uids, errHandler);
 };
-//单用户推送消息uid
+//单用户推送消息,参数uid：{uid:e.userId,sid:e.serverId}
 exp.pushMessageToPlayer = function (uid, route, msg) {
   exp.pushMessageByUids([uid], route, msg);
 };
