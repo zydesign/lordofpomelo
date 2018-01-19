@@ -35,12 +35,14 @@ TeamRemote.prototype.createTeam = function(args, cb) {
 };
 
 // disband a team
+//通过id解散队伍（area/handler/teamHandler.disbandTeam调用该函数）
 TeamRemote.prototype.disbandTeamById = function(args, cb){
   var playerId = args.playerId;
   var teamId = args.teamId;
+  //执行解散队伍逻辑，返回ret：{result: consts.TEAM.OK}
   var ret = teamManager.disbandTeamById(playerId, teamId);
   utils.myPrint('TeamRemote ~ DisbandTeamById is running ~ ret = ', ret);
-  utils.invokeCallback(cb, null, ret);
+  utils.invokeCallback(cb, null, ret);  
 };
 
 // leave a team
