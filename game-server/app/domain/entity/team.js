@@ -254,7 +254,7 @@ Team.prototype.pushLeaveMsg2All = function(leavePlayerId, cb) {
   var msg = {
     playerId: leavePlayerId
   };
-  this.channel.pushMessage('onTeammateLeaveTeam', msg, function(err, req) {
+  this.channel.pushMessage('onTeammateLeaveTeam', msg, function(err, _) {
     cb(null, res);
   });
 };
