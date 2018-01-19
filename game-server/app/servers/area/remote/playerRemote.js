@@ -80,10 +80,12 @@ exp.playerLeave = function(args, cb){
 };
 
 
-//退出团队
+//退出团队（Team.disbandTeam调用该函数，）
+//args参数为：[{ playerId: playerId, instanceId: arr[i].playerData.instanceId}]玩家id、副本id
 exp.leaveTeam = function(args, cb){
   var playerId = args.playerId;
-  var area = pomelo.app.areaManager.getArea(args.instanceId);
+  //场景管理获取场景（如果当前是普通场景服务器是scene.getArea；如果当前是副本场景服务器则是instancePool.getArea）
+  var area = pomelo.app.areaManager.getArea(args.instanceId);  
   var player = area.getPlayer(playerId);
 
   utils.myPrint('LeaveTeam ~ areaId = ', area.areaId);
@@ -97,6 +99,8 @@ exp.leaveTeam = function(args, cb){
   }
   utils.myPrint('1 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
+  //执行player离队函数--------------------------------------------------------------离队函数
+  //就是将该玩家的player.teamId归零
   if (!player.leaveTeam()) {
     err = 'Player leave team error!';
     utils.invokeCallback(cb, err);
@@ -105,7 +109,7 @@ exp.leaveTeam = function(args, cb){
 
   utils.myPrint('2 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
-  //通过灯塔广播消息给同队伍里面的附近玩家
+  //广播aoi消息。通知附近的玩家，该玩家离队
   messageService.pushMessageByAOI(area,
     {
       route: 'onTeamMemberStatusChange',
