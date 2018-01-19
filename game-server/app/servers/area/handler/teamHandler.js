@@ -113,6 +113,7 @@ Handler.prototype.createTeam = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，解散队伍
 Handler.prototype.disbandTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -124,6 +125,7 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
     return;
   }
 
+  //如果玩家没有队伍，获取参数的队伍id跟玩家的队伍id不一致
   if(player.teamId <= consts.TEAM.TEAM_ID_NONE || msg.teamId !== player.teamId) {
     logger.warn('The request(disbandTeam) is illegal, the teamId is wrong : msg = %j.', msg);
     next();
@@ -131,11 +133,14 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
   }
 
   utils.myPrint('playerId, IsInTeamInstance = ', playerId, player.isInTeamInstance);
+  
+  //如果玩家在副本里面，不能解散
   if (player.isInTeamInstance) {
     next();
     return;
   }
 
+  //如果玩家不是队长，不能解散
   if (!player.isCaptain) {
     logger.warn('The request(disbandTeam) is illegal, the player is not the captain : msg = %j.', msg);
     next();
@@ -145,14 +150,17 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
   var result = consts.TEAM.FAILED;
 
   var args = {playerId: playerId, teamId: player.teamId};
+  //rpc到管理服务器解散队伍，通过id--------------------------------------------------------------解散队伍
+  //返回ret：{result: consts.TEAM.OK}
   this.app.rpc.manager.teamRemote.disbandTeamById(session, args,
     function(err, ret) {
       result = ret.result;
       utils.myPrint("1 ~ result = ", result);
       if(result === consts.TEAM.OK) {
         if (player.isCaptain) {
-          player.isCaptain = consts.TEAM.NO;
+          player.isCaptain = consts.TEAM.NO;   //队长属性归零
           var ignoreList = {};
+          //aoi推送消息，通知周围玩家
           messageService.pushMessageByAOI(area,
             {
               route: 'onTeamCaptainStatusChange',
