@@ -43,12 +43,12 @@ var Player = function(opts) {
   this.curTasks = opts.curTasks;   //角色当前任务
   this.range = opts.range || 2;     //角色视野范围，单位瓦片
   // player's team id, default 0(not in any team).
-  this.teamId = consts.TEAM.TEAM_ID_NONE;    //团队ID
+  this.teamId = consts.TEAM.TEAM_ID_NONE;    //团队ID。初始的TEAM_ID_NONE就是没有队伍
   // is the team captain, default false
-  this.isCaptain = consts.TEAM.NO;      //是否团队队长
+  this.isCaptain = consts.TEAM.NO;      //是否团队队长。初始不是队长
   // game copy flag
-  this.isInTeamInstance = false;   //是否在团队里
-  this.instanceId = 0;   //场景副本id
+  this.isInTeamInstance = false;   //是否在团队里。初始不在队伍
+  this.instanceId = 0;   //场景副本id。初始没有副本
 
   this.setTotalAttackAndDefence();    //设置总攻击和防御
 };
