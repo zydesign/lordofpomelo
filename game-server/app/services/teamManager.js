@@ -5,25 +5,23 @@ var Team = require('../domain/entity/team');
 var consts = require('../consts/consts');
 var utils = require('../util/utils');
 var logger = require('pomelo-logger').getLogger(__filename);
-//团队管理服务（这里所有函数都由manager服务器调用）
+//团队管理服务，team的管理类（这里所有函数都由manager服务器调用）
 var exp = module.exports;
 
 // global team container(teamId:teamObj)  
-var gTeamObjDict = {};  //团队组
-// global team id    
-var gTeamId = 0;  //全局队伍id
+var gTeamObjDict = {};  // 团队组{teamId:teamObj,teamId:teamObj...}
+
+var gTeamId = 0;        // 队伍数量
 
 // create new team, add the player(captain) to the team
-// 新建队伍实例。然后增加玩家队长到队伍中
+// 创建队伍。（参数data：用于生成完整队员信息的队员数据）-----------------------------------------------------【创建队伍，添加队员】
 exp.createTeam = function(data) {
-  var teamObj = new Team(++gTeamId);  //实例队伍
-  var result = teamObj.addPlayer(data, true); //队伍增加一个玩家，参数true就表示该玩家是队长。
+  var teamObj = new Team(++gTeamId);  //生成一支空队伍（都是空位）
+  var result = teamObj.addPlayer(data, true); //队伍增加一个队员，参数true就表示该玩家是队长。
   
-  //result返回的结果做条件判断，如果队伍实例添加玩家队长成功，队伍实例设置队长id，全局队伍添加这支队伍
+  //如果队伍添加队员成功，队伍设置队长id，将队伍加入队伍组
   if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
-    //队伍实例【设置队长id】
-    teamObj.setCaptainId(data.playerId);
-    //全局队伍添加这支队伍
+    teamObj.setCaptainId(data.playerId);   
     gTeamObjDict[teamObj.teamId] = teamObj;
   }
   //返回结果给area服务器teamHandler.js
@@ -63,7 +61,7 @@ exp.try2DisbandTeam = function(teamObj) {
 //离开队伍。（1.客户端掉线 2.玩家主动离队）
 exp.leaveTeamById = function(playerId, teamId, cb) {
   var teamObj = gTeamObjDict[teamId];  //队伍组中获取指定id的队伍
-  //如果队伍不存在，cb
+  //如果队伍不存在，cb离队失败
   if(!teamObj) {
     utils.invokeCallback(cb, null, {result: consts.TEAM.FAILED});
     return;
@@ -73,7 +71,7 @@ exp.leaveTeamById = function(playerId, teamId, cb) {
   var needDisband = teamObj.removePlayer(playerId, function(err, ret) {
     utils.invokeCallback(cb, null, ret);
   });
-  //如果没有队员了，就要解散队伍，队伍组删除该队伍
+  //解散需求为true（离队队员为队长）
   if (needDisband) {
     utils.myPrint('delete gTeamObjDict[teamId] ...');
     delete gTeamObjDict[teamId];
