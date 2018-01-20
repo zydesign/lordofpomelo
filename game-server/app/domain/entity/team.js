@@ -289,7 +289,7 @@ Team.prototype.disbandTeam = function() {
     utils.myPrint('playerId = ', playerId);
     utils.myPrint('arr[i].backendServerId = ', arr[i].backendServerId);
     utils.myPrint('params = ', JSON.stringify(params));
-    //从队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam。每个队员执行一次leaveTeam离队函数
+    //从队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam。每个队员的player.teamId归零
     pomelo.app.rpcInvoke(arr[i].backendServerId, params, function(err, _){
       if(!!err) {
         console.warn(err);
@@ -307,7 +307,7 @@ Team.prototype.disbandTeam = function() {
 };
 
 // remove a player from the team
-//删除一个队员。（1.队长踢掉 2.玩家掉线）
+//删除一个队员。返回解散需求true或false，并把是否删除成功存入cb （1.队长踢掉 2.玩家掉线）
 Team.prototype.removePlayer = function(playerId, cb) {
   var tmpData = null;  //备份队员信息
   for(var i in this.playerDataArray) {
@@ -333,9 +333,9 @@ Team.prototype.removePlayer = function(playerId, cb) {
   //推送队员离开的消息通知队友
   this.pushLeaveMsg2All(playerId, function(err, ret) {
     // if the captain leaves the team, disband the team
-    //如果离队的队员是队长，执行解散队伍
+    //如果离队的队员是队长，不能离队。ret的值为解散队伍的{result: consts.TEAM.OK}
     if (_this.isCaptainById(playerId)) {
-      ret = _this.disbandTeam();
+     ret = _this.disbandTeam();   //解散成功为{result: consts.TEAM.OK}
     } else {
       //如果不是队长，频道删除该玩家
       _this.removePlayerFromChannel(tmpData);
@@ -363,7 +363,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }]
   };
   utils.myPrint('params = ', JSON.stringify(params));
-  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家离开队伍
+  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家的player.teamId归零
   pomelo.app.rpcInvoke(tmpData.backendServerId, params, function(err, _){
     if(!!err) {
       console.warn(err);
@@ -371,6 +371,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }
   });
 
+  //如果离队的是队长，解散需求为true
   if (_this.isCaptainById(playerId)) {
     return true;
   } else {
