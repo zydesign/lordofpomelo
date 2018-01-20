@@ -23,13 +23,13 @@ TeamRemote.prototype.canCreateGameCopy = function(args, cb){
   utils.invokeCallback(cb, null, result);
 };
 
-// create a new team 创建一个新队伍（ 由area服务器handler/teamHandler.createTeam执行rpc到该函数）
+//创建队伍（ 由area服务器handler/teamHandler.createTeam执行rpc到该函数）
 TeamRemote.prototype.createTeam = function(args, cb) {
   utils.myPrint('TeamRemote ~ createTeam is running ...typeof args = ', typeof args);
   utils.myPrint('args = ', args);
   utils.myPrint('playerInfo = ', JSON.stringify(args.playerInfo));
   
-  var ret = teamManager.createTeam(args);
+  var ret = teamManager.createTeam(args);  
 
   utils.invokeCallback(cb, null, ret);
 };
