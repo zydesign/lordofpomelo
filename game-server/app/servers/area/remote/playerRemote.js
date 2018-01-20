@@ -99,7 +99,7 @@ exp.leaveTeam = function(args, cb){
   }
   utils.myPrint('1 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
-  //执行player离队函数--------------------------------------------------------------离队函数
+  //执行player离队函数--------------------------------------------------------------掉线造成的离队
   //就是将该玩家的player.teamId归零
   if (!player.leaveTeam()) {
     err = 'Player leave team error!';
