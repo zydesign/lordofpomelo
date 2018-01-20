@@ -46,7 +46,9 @@ TeamRemote.prototype.disbandTeamById = function(args, cb){
 };
 
 // leave a team
-// 玩家离开队伍（客户端掉线时area/remote/playerRemote.playerLeave执行rpc到该函数，让玩家脱离队伍）
+// 玩家离开队伍，通过id
+//（客户端掉线时area/remote/playerRemote.playerLeave执行rpc到该函数，让玩家脱离队伍）
+//（玩家主动离队area/handler/teamHandler.leaveTeam执行rpc到该函数，让玩家脱离队伍）
 TeamRemote.prototype.leaveTeamById = function(args, cb){
   var playerId = args.playerId;
   var teamId = args.teamId;
