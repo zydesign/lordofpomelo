@@ -222,9 +222,9 @@ Team.prototype.isPlayerInTeam = function(playerId) {
 };
 
 // push the team members' info to everyone
-// 推送队伍更新信息给每一位队员
+// 推送队伍刷新信息
 Team.prototype.updateTeamInfo = function() {
-  var infoObjDict = {};  //队员数据组
+  var infoObjDict = {};  //队员信息组
   var arr = this.playerDataArray;  //获取队员数组
   
   //遍历队员数组，如果是空位，继续遍历下一个。如果是实位，队员数据加入infoObjDict组，推送对象添加该玩家数据
@@ -238,7 +238,7 @@ Team.prototype.updateTeamInfo = function() {
     utils.myPrint('playerId, kindId = ', playerId, infoObjDict[playerId].kindId);
   }
 
-  //队伍频道推送消息给队员们
+  //生成实位队员playerId组，频道推送消息
   if(Object.keys(infoObjDict).length > 0) {
     this.channel.pushMessage('onUpdateTeam', infoObjDict, null);  //给队伍频道推送队员数据
   }
@@ -311,7 +311,7 @@ Team.prototype.disbandTeam = function() {
 Team.prototype.removePlayer = function(playerId, cb) {
   var tmpData = null;  //备份队员信息
   for(var i in this.playerDataArray) {
-    //让指定队员位置变为空位
+    //让指定队员位置变为空位------------------------------------------------------------------------------1 变空位
     if(this.playerDataArray[i].playerId !== consts.TEAM.PLAYER_ID_NONE && this.playerDataArray[i].playerId === playerId) {
       tmpData = utils.clone(this.playerDataArray[i]);
       this.playerDataArray[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
@@ -337,7 +337,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     if (_this.isCaptainById(playerId)) {
      ret = _this.disbandTeam();   //解散成功为{result: consts.TEAM.OK}
     } else {
-      //如果不是队长，频道删除该玩家
+      //如果不是队长，频道删除该玩家---------------------------------------------------------------------2 退出队伍频道
       _this.removePlayerFromChannel(tmpData);
     }
 
@@ -347,8 +347,9 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }
 
     utils.myPrint('_this.playerNum = ', _this.playerNum);
+    //队员数量-1后，队员数量大于0
     if(_this.playerNum > 0) {
-      _this.updateTeamInfo();   //更新队伍信息
+      _this.updateTeamInfo();   //推送队伍刷新信息
     }
     utils.invokeCallback(cb, null, ret);
   });
@@ -363,7 +364,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }]
   };
   utils.myPrint('params = ', JSON.stringify(params));
-  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家的player.teamId归零
+  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家的player.teamId归零----------------3 改teamId值
   pomelo.app.rpcInvoke(tmpData.backendServerId, params, function(err, _){
     if(!!err) {
       console.warn(err);
