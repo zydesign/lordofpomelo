@@ -23,6 +23,7 @@ var exp = module.exports;
  * @param {Function} cb
  * @api public
  */
+//掉线造成的被动离队
 exp.playerLeave = function(args, cb){
   //玩家id为客户端发来参数的玩家id
   var playerId = args.playerId;
