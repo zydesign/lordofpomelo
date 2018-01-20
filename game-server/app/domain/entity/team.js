@@ -28,10 +28,11 @@ function Team(teamId){
 
 
 //初始化函数
-Team.prototype.init = function(opt)	{
+Team.prototype.init = function(teamId)	{
     //teamId是参数
-    this.teamId = opt;  //得到this.teamId
+    this.teamId = teamId;  //得到this.teamId
     //配置队伍空位信息。（属性有：playerId、areaId、userId、serverId、backendServerId、playerData）
+    //ps：instanceId副本id、teamId团队id、isCaptain队长值是存在playerData中的
     for(var i = 0; i < this.playerDataArray.length; ++i) {
       this.playerDataArray[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
         userId: consts.TEAM.USER_ID_NONE, serverId: consts.TEAM.SERVER_ID_NONE,
@@ -87,18 +88,18 @@ function doAddPlayer(data, isCaptain) {
   for(var i in this.playerDataArray) {
     //如果有空位
     if(this.playerDataArray[i].playerId === consts.TEAM.PLAYER_ID_NONE && this.playerDataArray[i].areaId === consts.TEAM.AREA_ID_NONE) {
-      //参数的队员信息的playerData添加teamId属性
+      //参数的玩家属性添加teamId属性-------------------------------添加teamId属性（队员属性）
       data.playerInfo.playerData.teamId = this.teamId;
       
-      //如果加入的玩家是队长。玩家数据添加队长属性
+      //如果加入的是队长。那这支队伍就是新的空队伍，给空队伍添加teamName
       if (isCaptain) {
-        //给队伍配置【队伍名】
+        //给队伍配置队伍名----------------------------------------添加队伍名
         this.teamName = data.teamName;
-        //参数的队员信息的playerData添加isCaptain属性
+        ///参数的玩家属性添加isCaptain属性-------------------------添加队长属性（队员属性）
         data.playerInfo.playerData.isCaptain = consts.TEAM.YES;
       }
       utils.myPrint('data.playerInfo = ', JSON.stringify(data.playerInfo));
-      //赋值一个【完整队员信息】到队伍，这个是加入队伍后的队员信息
+      //赋值一个【完整队员信息】到队伍，这个是加入队伍后的队员信息------------------------------生成完整队员信息
       this.playerDataArray[i] = {playerId: data.playerId, areaId: data.areaId, userId: data.userId,
         serverId: data.serverId, backendServerId: data.backendServerId,
         playerData: data.playerInfo.playerData};
@@ -109,7 +110,7 @@ function doAddPlayer(data, isCaptain) {
   return false;
 }
 
-//添加一个名队员。队伍频道推送消息给队员们------------------------------------------------------------------添加队员
+//添加一个名队员。队伍频道推送消息给队员们-------------------------------------------------------------------------【添加队员】
 //（data是area/handler/teamHandler.createTeam生成的玩家数据,data.playerInfo是player生成的不完整队员信息，playerData为玩家属性）
 Team.prototype.addPlayer = function(data, isCaptain) {
   isCaptain = isCaptain || false;  //创建队伍的玩家是队长，
@@ -139,12 +140,12 @@ Team.prototype.addPlayer = function(data, isCaptain) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
-  //在执行添加玩家操作后，如果该玩家不在队伍中
+  //在执行添加玩家后，如果该玩家不在队伍中
   if(!this.isPlayerInTeam(data.playerId)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
 
-  //如果执行添加玩家到队伍频道失败----------------------------------------------这里加入队伍频道
+  //如果执行添加玩家到队伍频道失败----------------------------------------------队员加入队伍频道
   if(!this.addPlayer2Channel(data)) {
     return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
   }
@@ -154,7 +155,7 @@ Team.prototype.addPlayer = function(data, isCaptain) {
     this.playerNum++;
   }
 
-  //更新队伍信息，并推送信息给每一个队员-----------------------------------------广播消息给队员
+  //更新队伍信息，并推送信息给每一个队员-----------------------------------------新队员加入要告诉其他队员
   this.updateTeamInfo();
 
   //最后返回成功码
@@ -163,7 +164,7 @@ Team.prototype.addPlayer = function(data, isCaptain) {
 
 
 // the captain_id is just a player_id
-// 【设置队长id】
+// 【设置队长id】--------------------------------------------------------------------【给队伍设置队长playerId】
 Team.prototype.setCaptainId = function(captainId) {
   this.captainId = captainId;
 };
@@ -222,9 +223,9 @@ Team.prototype.isPlayerInTeam = function(playerId) {
 };
 
 // push the team members' info to everyone
-// 推送队伍刷新信息
+// 推送所有队员属性到客户端--------------------------------------------------------------------------【让客户端刷新队员属性】
 Team.prototype.updateTeamInfo = function() {
-  var infoObjDict = {};  //队员信息组
+  var infoObjDict = {};  //队员属性组
   var arr = this.playerDataArray;  //获取队员数组
   
   //遍历队员数组，如果是空位，继续遍历下一个。如果是实位，队员数据加入infoObjDict组，推送对象添加该玩家数据
@@ -233,7 +234,7 @@ Team.prototype.updateTeamInfo = function() {
     if(playerId === consts.TEAM.PLAYER_ID_NONE) {
       continue;
     }
-    infoObjDict[playerId] = arr[i].playerData;  //队员数据组添加队员数据--------------------------------
+    infoObjDict[playerId] = arr[i].playerData;  //存入所有队员属性--------------------------------
     utils.myPrint('infoObjDict[playerId] = ', JSON.stringify(infoObjDict[playerId]));
     utils.myPrint('playerId, kindId = ', playerId, infoObjDict[playerId].kindId);
   }
@@ -245,7 +246,7 @@ Team.prototype.updateTeamInfo = function() {
 };
 
 // notify the members of the left player
-// 队伍推送消息队员离开------------------------------------------------------------------------------玩家离开，队伍频道通知
+// 队伍推送消息队员离开---------------------------------------------------------------玩家离开，队伍频道通知
 Team.prototype.pushLeaveMsg2All = function(leavePlayerId, cb) {
   var res = {result: consts.TEAM.OK};
   //如果频道不存在
@@ -263,7 +264,7 @@ Team.prototype.pushLeaveMsg2All = function(leavePlayerId, cb) {
 };
 
 // disband the team
-//解散队伍，只有队长才有资格解散队伍。让队伍所有成员离队。
+//解散队伍，只有队长才有资格解散队伍。让队伍所有成员离队。---------------------------------------------------------------【解散队伍】
 Team.prototype.disbandTeam = function() {
   var playerIdArray = [];  //队员id数组
   var arr = this.playerDataArray;
@@ -307,11 +308,11 @@ Team.prototype.disbandTeam = function() {
 };
 
 // remove a player from the team
-//删除一个队员。返回解散需求true或false，并把是否删除成功存入cb （1.队长踢掉 2.玩家掉线）
+//删除一个队员。返回解散需求true或false，并把是否删除成功存入cb （1.队长踢掉 2.玩家掉线）------------------------------【删除一个队员】
 Team.prototype.removePlayer = function(playerId, cb) {
   var tmpData = null;  //备份队员信息
   for(var i in this.playerDataArray) {
-    //让指定队员位置变为空位------------------------------------------------------------------------------1 变空位
+    //让指定队员位置变为空位-------------------------------------------------------------------1 变空位
     if(this.playerDataArray[i].playerId !== consts.TEAM.PLAYER_ID_NONE && this.playerDataArray[i].playerId === playerId) {
       tmpData = utils.clone(this.playerDataArray[i]);
       this.playerDataArray[i] = {playerId: consts.TEAM.PLAYER_ID_NONE, areaId: consts.TEAM.AREA_ID_NONE,
@@ -337,7 +338,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     if (_this.isCaptainById(playerId)) {
      ret = _this.disbandTeam();   //解散成功为{result: consts.TEAM.OK}
     } else {
-      //如果不是队长，频道删除该玩家---------------------------------------------------------------------2 退出队伍频道
+      //如果不是队长，频道删除该玩家---------------------------------------------------------2 退出队伍频道
       _this.removePlayerFromChannel(tmpData);
     }
 
@@ -364,7 +365,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }]
   };
   utils.myPrint('params = ', JSON.stringify(params));
-  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家的player.teamId归零----------------3 改teamId值
+  //通过队员信息获取后端id作为路由，rpc到area.playerRemote.leaveTeam，让该玩家的player.teamId归零--------3 改teamId值
   pomelo.app.rpcInvoke(tmpData.backendServerId, params, function(err, _){
     if(!!err) {
       console.warn(err);
@@ -381,48 +382,52 @@ Team.prototype.removePlayer = function(playerId, cb) {
 };
 
 // push msg to all of the team members 
+//队伍频道推送队伍聊天信息，成功返回true
 Team.prototype.pushChatMsg2All = function(content) {
   if(!this.channel) {
     return false;
   }
   var playerId = content.playerId;
   utils.myPrint('1 ~ content = ', JSON.stringify(content));
+  //如果玩家不在队伍
   if(!this.isPlayerInTeam(playerId)) {
     return false;
   }
   utils.myPrint('2 ~ content = ', JSON.stringify(content));
+  //队伍推送聊天消息-------------------------------------
   this.channel.pushMessage(Event.chat, content, null);
   return true;
 };
 
+//将队员拉进副本----------------------------------------------------------------------------------------------【拉队员进副本】
 Team.prototype.dragMember2gameCopy = function(args, cb) {
   if(!this.channel) {
     utils.invokeCallback(cb, 'Team without channel! %j', {teamId: this.teamId, captainId: this.captainId});
     return;
   }
   utils.myPrint('3 ~ DragMember2gameCopy ~ args = ', JSON.stringify(args));
-  this.channel.pushMessage('onDragMember2gameCopy', args, null);
+  this.channel.pushMessage('onDragMember2gameCopy', args, null); //拉进副本消息推送，让客户端操作
   utils.invokeCallback(cb);
 };
 
-//更新队伍信息。data是player生成的玩家数据。
+//更新队员信息，data是队员信息。如果更新成功，返回true--------------------------------------------------------------【更新队员信息】
 Team.prototype.updateMemberInfo = function(data) {
   utils.myPrint('data = ', data);
   utils.myPrint('playerData = ', data.playerData);
-  //如果团队id不匹配玩家的团队id，返回false
+  //如果团队id不匹配参数的队员teamId，返回false
   if (this.teamId !== data.playerData.teamId) {
     return false;
   }
   for(var i in this.playerDataArray) {
     if(this.playerDataArray[i].playerId === data.playerId) {
-      //如果有后端id这个参数
+      //如果参数队员有后端id，更新队伍中这个队员的后端id
       if (!!data.backendServerId) {
-        this.playerDataArray[i].backendServerId = data.backendServerId;
+        this.playerDataArray[i].backendServerId = data.backendServerId;   //更新后端id
       }
-      this.playerDataArray[i].areaId = data.areaId;
-      this.playerDataArray[i].playerData = data.playerData;
+      this.playerDataArray[i].areaId = data.areaId;                       //更新areaId
+      this.playerDataArray[i].playerData = data.playerData;               //更新角色属性playerData
       utils.myPrint('this.playerDataArray[i] = ', JSON.stringify(this.playerDataArray[i]));
-      //如果需要通知所有人
+      //如果需要通知所有人，推送消息，让客户端更新队伍信息
       if (data.needNotifyElse) {
         this.updateTeamInfo();
       }
