@@ -8,26 +8,27 @@ var utils = require('../../../util/utils');
 var dataApi = require('../../../util/dataApi');
 
 
-//队伍协议入口模块, 负责处理队伍相关操作的前期判断和后期通知
+//队伍逻辑脚本
 module.exports = function(app) {
   return new Handler(app);
 };
 
 var Handler = function(app) {
   this.app = app;
-  this.teamNameArr = dataApi.team.all(); //队伍名称列表
-  this.teamNameArr.length = Object.keys(this.teamNameArr).length; //队伍名称列表行数
+  this.teamNameArr = dataApi.team.all(); //队名数据组
+  this.teamNameArr.length = Object.keys(this.teamNameArr).length; //队名数量
   // utils.myPrint('teamNameArr = ', JSON.stringify(this.teamNameArr));
 };
 
 /**
  * Player create a team, and response the result information : success(1)/failed(0)
- * 玩家创建队伍，并返回成功与否，成功1  失败0
  * @param {Object} msg
  * @param {Object} session
  * @param {Function} next
  * @api public
  */
+
+//客户端发起，创建队伍-----------------------------------------------------------------------------------------【创建队伍】
 Handler.prototype.createTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -49,23 +50,21 @@ Handler.prototype.createTeam = function(msg, session, next) {
     return;
   }
 
-  // 队伍id，队伍列表里面任意id
+  // 队名id，队名数据组里面任意id
   var tmpIdx = Math.floor((Math.random() * this.teamNameArr.length) + 1);
-  //通过队伍id获取队伍名称
+  // 生成队伍名
   var teamName = this.teamNameArr[tmpIdx] ? this.teamNameArr[tmpIdx].teamName : consts.TEAM.DEFAULT_NAME;
-  //获取当前服务器id
+  // 获取当前服务器id，即后端id
   var backendServerId = this.app.getServerId();
-  var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR; //加入队伍的系统错误码
-  var playerInfo = player.toJSON4TeamMember();  //通过玩家模块获取玩家队伍信息
+  var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR; 
+  var playerInfo = player.toJSON4TeamMember();  //通过player获取的不完整的队员信息
   
-  
-  //用于访问manager服务器的参数args，其实是队员信息，传递给team实例的addPlayer（）使用
-  //args为{添加队员参数}，包含的playerInfo为{队员信息}，playerInfo又包含有playerData为{玩家信息}
+  // 生成队员数据（队员数据可以生成完整队员信息）
   var args = {teamName: teamName, playerId: playerId, areaId: area.areaId, userId: player.userId,
     serverId: player.serverId, backendServerId: backendServerId, playerInfo: playerInfo};
   
   
-  //rpc到manager服务器，创建一支队伍（建队and添加玩家队长）
+  //rpc到manager服务器，作为队长创建队伍。（ret：{result: result, teamId: teamObj.teamId}）
   this.app.rpc.manager.teamRemote.createTeam(session, args,
     function(err, ret) {
       utils.myPrint("ret.result = ", ret.result);
@@ -75,21 +74,21 @@ Handler.prototype.createTeam = function(msg, session, next) {
       utils.myPrint("result = ", result);
       utils.myPrint("teamId = ", teamId);
     
-    //判断RPC返回的结果是否建队成功
+    //如果建队成功，执行玩家加入队伍
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && teamId > consts.TEAM.TEAM_ID_NONE) {
-        //判断teamId是否为真，并让player实例执行添加teamId属性
+        //执行给player添加teamId属性---------------------------------------------------player添加teamId属性
         if(!player.joinTeam(teamId)) {
           result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
         }
       }
       utils.myPrint("player.teamId = ", player.teamId);
     
-    //RPC返回成功，而且player实例也添加了teamId属性
+    //RPC返回成功，而且playe添加了teamId属性
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && player.teamId > consts.TEAM.TEAM_ID_NONE) {
-        //player实例添加队长属性
+        //player添加isCaptain属性----------------------------------------------------player添加isCaptain属性
         player.isCaptain = consts.TEAM.YES;
         var ignoreList = {};
-        //广播消息给灯塔内的玩家观察者
+        //aoi推送消息给附近玩家（包括自己）。让周围玩家和自己客户端操作
         messageService.pushMessageByAOI(area,
           {
             route: 'onTeamCaptainStatusChange',
@@ -510,15 +509,17 @@ Handler.prototype.leaveTeam = function(msg, session, next) {
     return;
   }
 
-  //rpc到管理服务器处理离队逻辑，
+  //rpc到管理服务器处理离队逻辑，返回的ret为离队成功与否信息
   var args = {playerId: playerId, teamId: player.teamId};
   this.app.rpc.manager.teamRemote.leaveTeamById(session, args,
     function(err, ret) {
       result = ret.result;
       utils.myPrint("1 ~ result = ", result);
+    //如果manager处理结果为离队成功，而且玩家teamId已经归零了（PS:如果已经归零，就aoi推送过消息。不然就要在这里归零，然后aoi推送消息）
       if(result === consts.TEAM.OK && !player.leaveTeam()) {
         result = consts.TEAM.FAILED;
       }
+    //aoi推送消息
       if (result === consts.TEAM.OK) {
         var route = 'onTeamMemberStatusChange';
         if(player.isCaptain) {
