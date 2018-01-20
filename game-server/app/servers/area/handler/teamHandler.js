@@ -475,11 +475,13 @@ Handler.prototype.kickOut = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，玩家主动离开队伍
 Handler.prototype.leaveTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
   var player = area.getPlayer(playerId);
 
+  //如果玩家不在场景中，返回
   if(!player) {
     logger.warn('The request(leaveTeam) is illegal, the player is null: msg = %j.', msg);
     next();
@@ -487,6 +489,7 @@ Handler.prototype.leaveTeam = function(msg, session, next) {
   }
 
   utils.myPrint('playerId, IsInTeamInstance = ', playerId, player.isInTeamInstance);
+  //如果玩家在副本里，不能离队
   if (player.isInTeamInstance) {
     next();
     return;
@@ -500,12 +503,14 @@ Handler.prototype.leaveTeam = function(msg, session, next) {
   utils.myPrint("msg.teamId = ", msg.teamId);
   utils.myPrint("typeof msg.teamId = ", typeof msg.teamId);
 
+  //如果玩家没有队伍，或者跟客户端发来的teamId不匹配
   if(player.teamId <= consts.TEAM.TEAM_ID_NONE || player.teamId !== msg.teamId) {
     logger.warn('The request(leaveTeam) is illegal, the teamId is wrong: msg = %j.', msg);
     next();
     return;
   }
 
+  //rpc到管理服务器处理离队逻辑，
   var args = {playerId: playerId, teamId: player.teamId};
   this.app.rpc.manager.teamRemote.leaveTeamById(session, args,
     function(err, ret) {
