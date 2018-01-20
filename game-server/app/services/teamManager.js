@@ -60,7 +60,7 @@ exp.try2DisbandTeam = function(teamObj) {
   }
 };
 
-//离开队伍。客户端掉线，玩家离开队伍
+//离开队伍。（1.客户端掉线 2.玩家主动离队）
 exp.leaveTeamById = function(playerId, teamId, cb) {
   var teamObj = gTeamObjDict[teamId];  //队伍组中获取指定id的队伍
   //如果队伍不存在，cb
@@ -69,10 +69,11 @@ exp.leaveTeamById = function(playerId, teamId, cb) {
     return;
   }
 
-  // 执行队伍删除队员
+  // 执行队伍删除队员。调用teamObj.removePlayer（msg，cb）的cb的值作为解散需求的判定条件
   var needDisband = teamObj.removePlayer(playerId, function(err, ret) {
     utils.invokeCallback(cb, null, ret);
   });
+  //如果没有队员了，就要解散队伍，队伍组删除该队伍
   if (needDisband) {
     utils.myPrint('delete gTeamObjDict[teamId] ...');
     delete gTeamObjDict[teamId];
