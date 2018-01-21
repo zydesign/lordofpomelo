@@ -23,7 +23,7 @@ var exp = module.exports;
  * @param {Function} cb
  * @api public
  */
-//掉线造成的被动离队
+//掉线造成的被动离队--------------------------------------------------------------------------【掉线离队】
 exp.playerLeave = function(args, cb){
   //玩家id为客户端发来参数的玩家id
   var playerId = args.playerId;
@@ -81,7 +81,8 @@ exp.playerLeave = function(args, cb){
 };
 
 
-//退出团队（Team.disbandTeam调用该函数，）
+//退出团队，player.teamId归零  （1.队伍解散 2.玩家主动离队 3.掉线离队）-----------------------------------【player.teamId归零】
+//（Team.disbandTeam调用该函数）（Team.removePlayer调用该函数）
 //args参数为：[{ playerId: playerId, instanceId: arr[i].playerData.instanceId}]玩家id、副本id
 exp.leaveTeam = function(args, cb){
   var playerId = args.playerId;
@@ -100,8 +101,7 @@ exp.leaveTeam = function(args, cb){
   }
   utils.myPrint('1 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
-  //执行player离队函数--------------------------------------------------------------掉线造成的离队
-  //就是将该玩家的player.teamId归零
+  //执行player离队函数-----------------------------------------------------------player.teamId归零
   if (!player.leaveTeam()) {
     err = 'Player leave team error!';
     utils.invokeCallback(cb, err);
@@ -110,10 +110,10 @@ exp.leaveTeam = function(args, cb){
 
   utils.myPrint('2 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
-  //广播aoi消息。通知附近的玩家，该玩家离队
+  //广播aoi消息。通知附近的玩家，该玩家离队（显示：xxx离开了队伍）
   messageService.pushMessageByAOI(area,
     {
-      route: 'onTeamMemberStatusChange',
+      route: 'onTeamMemberStatusChange',   //队员状态改变
       playerId: playerId,
       teamId: player.teamId,
       isCaptain: player.isCaptain,
