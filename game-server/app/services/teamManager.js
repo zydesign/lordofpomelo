@@ -33,7 +33,7 @@ exp.getTeamById = function(teamId) {
   var teamObj = gTeamObjDict[teamId];
   return teamObj || null;
 };
-//通过id解散队伍。先让所有队员离开队伍，然后删除该队伍-----------------------------------------------------解散队伍
+//通过id解散队伍。先让所有队员离开队伍，然后删除该队伍-------------------------------------------------------------【解散队伍】
 //返回值：{result: consts.TEAM.OK}
 exp.disbandTeamById = function(playerId, teamId) {
   var teamObj = gTeamObjDict[teamId];
@@ -60,7 +60,7 @@ exp.try2DisbandTeam = function(teamObj) {
   }
 };
 
-//离开队伍。（1.客户端掉线 2.玩家主动离队）
+//离开队伍。（1.客户端掉线 2.玩家主动离队）--------------------------------------------------------------【离开队伍】
 exp.leaveTeamById = function(playerId, teamId, cb) {
   var teamObj = gTeamObjDict[teamId];  //队伍组中获取指定id的队伍
   //如果队伍不存在，cb离队失败
@@ -129,14 +129,17 @@ exp.acceptApplicantJoinTeam = function(args) {
   return {result: result, teamName: teamName};
 };
 
+//队员邀请加入队伍-------------------------------------------------------------------------------【队员邀请加入队伍】
+//（参数args：{captainId: captainId, teamId: msg.teamId}）
 exp.inviteJoinTeam = function(args) {
   var result = consts.TEAM.FAILED;
   if (!args || !args.teamId) {
     return {result: result};
   }
   var teamId = args.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组获取指定teamId的队伍
   if (teamObj) {
+    //如果队伍有空位而且邀请人是该队伍的队长
     if (teamObj.isTeamHasPosition() && teamObj.isCaptainById(args.captainId)) {
       result = consts.TEAM.OK;
     }
@@ -145,6 +148,7 @@ exp.inviteJoinTeam = function(args) {
   return {result: result};
 };
 
+//接受队伍邀请
 exp.acceptInviteJoinTeam = function(args) {
   var result = consts.TEAM.FAILED;
   var teamName = consts.TEAM.DEFAULT_NAME;
@@ -152,12 +156,12 @@ exp.acceptInviteJoinTeam = function(args) {
     return {result: result};
   }
   var teamId = args.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组获取指定teamId的队伍
   if (teamObj) {
     if(!teamObj.isCaptainById(args.captainId)) {
       return {result: result};
     }
-    result = teamObj.addPlayer(args);
+    result = teamObj.addPlayer(args);   //队伍添加玩家
     teamName = teamObj.teamName;
   }
   return {result: result, teamName: teamName};
