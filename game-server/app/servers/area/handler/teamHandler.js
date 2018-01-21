@@ -64,7 +64,7 @@ Handler.prototype.createTeam = function(msg, session, next) {
     serverId: player.serverId, backendServerId: backendServerId, playerInfo: playerInfo};
   
   
-  //rpc到manager服务器，作为队长创建队伍。（ret：{result: result, teamId: teamObj.teamId}）
+  //rpc到manager服务器，作为队长创建队伍。（返回ret：{result: result, teamId: teamObj.teamId}）
   this.app.rpc.manager.teamRemote.createTeam(session, args,
     function(err, ret) {
       utils.myPrint("ret.result = ", ret.result);
@@ -74,7 +74,7 @@ Handler.prototype.createTeam = function(msg, session, next) {
       utils.myPrint("result = ", result);
       utils.myPrint("teamId = ", teamId);
     
-    //如果建队成功，执行玩家加入队伍
+    //如果建队成功，执行player添加teamId属性
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && teamId > consts.TEAM.TEAM_ID_NONE) {
         //执行给player添加teamId属性---------------------------------------------------player添加teamId属性
         if(!player.joinTeam(teamId)) {
@@ -83,15 +83,15 @@ Handler.prototype.createTeam = function(msg, session, next) {
       }
       utils.myPrint("player.teamId = ", player.teamId);
     
-    //RPC返回成功，而且playe添加了teamId属性
+    //如果建队成功，而且playe添加了teamId属性。执行player添加isCaptain属性
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK && player.teamId > consts.TEAM.TEAM_ID_NONE) {
         //player添加isCaptain属性----------------------------------------------------player添加isCaptain属性
         player.isCaptain = consts.TEAM.YES;
         var ignoreList = {};
-        //aoi推送消息给附近玩家（包括自己）。让周围玩家和自己客户端操作
+        //aoi推送消息给附近玩家（包括自己）。让周围玩家和自己客户端操作（xxx创建了队伍teamName）
         messageService.pushMessageByAOI(area,
           {
-            route: 'onTeamCaptainStatusChange',
+            route: 'onTeamCaptainStatusChange',      //队长状态改变
             playerId: playerId,
             teamId: player.teamId,
             isCaptain: player.isCaptain,
@@ -112,7 +112,7 @@ Handler.prototype.createTeam = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
-//客户端发起，解散队伍
+//客户端发起，解散队伍----------------------------------------------------------------------------------【解散队伍】
 Handler.prototype.disbandTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -124,7 +124,7 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
     return;
   }
 
-  //如果玩家没有队伍，获取参数的队伍id跟玩家的队伍id不一致
+  //如果玩家没有队伍，或者参数要解散的队伍id跟玩家的队伍id不一致。
   if(player.teamId <= consts.TEAM.TEAM_ID_NONE || msg.teamId !== player.teamId) {
     logger.warn('The request(disbandTeam) is illegal, the teamId is wrong : msg = %j.', msg);
     next();
@@ -149,7 +149,7 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
   var result = consts.TEAM.FAILED;
 
   var args = {playerId: playerId, teamId: player.teamId};
-  //rpc到管理服务器解散队伍，通过id--------------------------------------------------------------解散队伍
+  //rpc到管理服务器解散队伍，通过角色playerId和角色的teamId------------------------------------------解散队伍
   //返回ret：{result: consts.TEAM.OK}
   this.app.rpc.manager.teamRemote.disbandTeamById(session, args,
     function(err, ret) {
@@ -157,12 +157,12 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
       utils.myPrint("1 ~ result = ", result);
       if(result === consts.TEAM.OK) {
         if (player.isCaptain) {
-          player.isCaptain = consts.TEAM.NO;   //队长属性归零
+          player.isCaptain = consts.TEAM.NO;   //player去掉isCaptain属性----------------------player去掉isCaptain属性
           var ignoreList = {};
-          //aoi推送消息，通知周围玩家
+          //aoi推送消息，通知周围玩家（包括自己）。（显示：xxx解散了队伍）
           messageService.pushMessageByAOI(area,
             {
-              route: 'onTeamCaptainStatusChange',
+              route: 'onTeamCaptainStatusChange',    //队长状态改变
               playerId: playerId,
               teamId: player.teamId,
               isCaptain: player.isCaptain,
@@ -474,7 +474,7 @@ Handler.prototype.kickOut = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
-//客户端发起，玩家主动离开队伍
+//客户端发起，玩家主动离队----------------------------------------------------------------------------【玩家主动离队】
 Handler.prototype.leaveTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -515,13 +515,13 @@ Handler.prototype.leaveTeam = function(msg, session, next) {
     function(err, ret) {
       result = ret.result;
       utils.myPrint("1 ~ result = ", result);
-    //如果manager处理结果为离队成功，而且玩家teamId已经归零了（PS:如果已经归零，就aoi推送过消息。不然就要在这里归零，然后aoi推送消息）
+    //如果离队成功，而且player.teamId已经归零（PS:如果已经归零，就aoi推送过消息。不然就要在这里归零，然后aoi推送消息）
       if(result === consts.TEAM.OK && !player.leaveTeam()) {
         result = consts.TEAM.FAILED;
       }
     //aoi推送消息
       if (result === consts.TEAM.OK) {
-        var route = 'onTeamMemberStatusChange';
+        var route = 'onTeamMemberStatusChange';   //队员状态改变
         if(player.isCaptain) {
           route = 'onTeamCaptainStatusChange';
           player.isCaptain = consts.TEAM.NO;
