@@ -116,7 +116,7 @@ Team.prototype.addPlayer = function(data, isCaptain) {
   isCaptain = isCaptain || false;  //创建队伍的玩家是队长，
   //判断参数data是否为对象
   if (!data || typeof data !== 'object') {
-    return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
+    return consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;    //系统错误码
   }
   //判断参数data每一个属性是否有值
   for (var i in data) {
@@ -127,12 +127,12 @@ Team.prototype.addPlayer = function(data, isCaptain) {
 
   //如果队伍没空位
   if(!this.isTeamHasPosition()) {
-    return consts.TEAM.JOIN_TEAM_RET_CODE.NO_POSITION;
+    return consts.TEAM.JOIN_TEAM_RET_CODE.NO_POSITION;     //没空位码
   }
 
   //如果该玩家已经有队伍
   if(this.isPlayerInTeam(data.playerId)) {
-    return consts.TEAM.JOIN_TEAM_RET_CODE.ALREADY_IN_TEAM;
+    return consts.TEAM.JOIN_TEAM_RET_CODE.ALREADY_IN_TEAM;  //已有队伍码
   }
 
   //如果【执行添加玩家】失败-----------------------------------------------------这里加入队伍
@@ -159,7 +159,7 @@ Team.prototype.addPlayer = function(data, isCaptain) {
   this.updateTeamInfo();
 
   //最后返回成功码
-  return consts.TEAM.JOIN_TEAM_RET_CODE.OK;
+  return consts.TEAM.JOIN_TEAM_RET_CODE.OK;   //加入成功码
 };
 
 
