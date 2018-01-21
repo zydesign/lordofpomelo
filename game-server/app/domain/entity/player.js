@@ -570,6 +570,7 @@ Player.prototype.toJSON = function() {
  * @return {Object}
  * @api public
  */
+//生成队长队伍信息（area/handler/teamHandler.inviteJoinTeam 队长邀请玩家加入队伍调用该函数。生成队长队伍信息）
 Player.prototype.toJSON4Team = function() {
   return {
     id: this.id,
@@ -585,7 +586,7 @@ Player.prototype.toJSON4Team = function() {
  * @return {Object}
  * @api public
  */
-//生成队员数据（playerHandler.enterScene玩家进入场景调用该函数）
+//生成队员信息（playerHandler.enterScene玩家进入场景调用该函数）
 Player.prototype.toJSON4TeamMember = function() {
   return {
     playerId: this.id,
@@ -606,6 +607,7 @@ Player.prototype.toJSON4TeamMember = function() {
 };
 
 // player joins a team
+//玩家加入队伍，添加player.teamId属性
 Player.prototype.joinTeam = function(teamId) {
   if(!teamId || teamId === consts.TEAM.TEAM_ID_NONE) {
     return false;
