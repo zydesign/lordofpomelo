@@ -77,6 +77,7 @@ TeamRemote.prototype.acceptApplicantJoinTeam = function(args, cb){
 };
 
 // captain invite a player to join the team
+//队长邀请加入队伍（参数args：{captainId: captainId, teamId: msg.teamId}）
 TeamRemote.prototype.inviteJoinTeam = function(args, cb){
   utils.myPrint('InviteJoinTeam is running ... args = ', JSON.stringify(args));
   var ret = teamManager.inviteJoinTeam(args);
@@ -84,6 +85,7 @@ TeamRemote.prototype.inviteJoinTeam = function(args, cb){
 };
 
 // accept captain's invitation join team
+//接受队伍邀请，args为队员数据，用于生成完整队员信息
 TeamRemote.prototype.acceptInviteJoinTeam = function(args, cb){
   utils.myPrint('AcceptInviteJoinTeam is running ... args = ', JSON.stringify(args));
   var ret = teamManager.acceptInviteJoinTeam(args);
