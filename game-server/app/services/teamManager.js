@@ -11,10 +11,11 @@ var exp = module.exports;
 // global team container(teamId:teamObj)  
 var gTeamObjDict = {};  // 团队组{teamId:teamObj,teamId:teamObj...}
 
-var gTeamId = 0;        // 队伍数量
+var gTeamId = 0;        // 队伍id
 
 // create new team, add the player(captain) to the team
 // 创建队伍。（参数data：用于生成完整队员信息的队员数据）-----------------------------------------------------【创建队伍，添加队员】
+// 返回值：{result: result, teamId: teamObj.teamId}
 exp.createTeam = function(data) {
   var teamObj = new Team(++gTeamId);  //生成一支空队伍（都是空位）
   var result = teamObj.addPlayer(data, true); //队伍增加一个队员，参数true就表示该玩家是队长。
@@ -33,6 +34,7 @@ exp.getTeamById = function(teamId) {
   return teamObj || null;
 };
 //通过id解散队伍。先让所有队员离开队伍，然后删除该队伍-----------------------------------------------------解散队伍
+//返回值：{result: consts.TEAM.OK}
 exp.disbandTeamById = function(playerId, teamId) {
   var teamObj = gTeamObjDict[teamId];
   if(!teamObj || !teamObj.isCaptainById(playerId)) {
@@ -42,7 +44,7 @@ exp.disbandTeamById = function(playerId, teamId) {
   //队伍实例执行解散队伍。就是让每一个队员离开队伍。返回ret：{result: consts.TEAM.OK}
   var ret = teamObj.disbandTeam();
   
-  //从队伍数组中删除该队伍
+  //从队伍数组中删除该队伍-------------------------------队伍组删队伍
   if(ret.result) {
     delete gTeamObjDict[teamId];
   }
@@ -71,7 +73,7 @@ exp.leaveTeamById = function(playerId, teamId, cb) {
   var needDisband = teamObj.removePlayer(playerId, function(err, ret) {
     utils.invokeCallback(cb, null, ret);
   });
-  //解散需求为true（离队队员为队长）
+  //解散需求为true（离队队员为队长）-------------------------队伍组删队伍
   if (needDisband) {
     utils.myPrint('delete gTeamObjDict[teamId] ...');
     delete gTeamObjDict[teamId];
