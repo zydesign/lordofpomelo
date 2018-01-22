@@ -50,32 +50,34 @@ exp.playerLeave = function(args, cb){
 //  }
 
   var params = {playerId: playerId, teamId: player.teamId};
-  //管理服务器让玩家退出团队
+  //rpc到管理服务器让玩家退出队伍---------------------------------------------------------退出队伍
   pomelo.app.rpc.manager.teamRemote.leaveTeamById(null, params,
     function(err, ret) {
     });
 
+  //修改player.hp属性------------------------------------------------------------------修改player.hp属性
   if(player.hp === 0){
     //玩家死了，复活为半血
     player.hp = Math.floor(player.maxHp/2);
   }
 
   //If player is in a instance, move to the scene
-  //如果地图类型不是普通场景，玩家回到普通场景的出生点
+  //如果地图类型不是普通场景，玩家回到普通场景的出生点（玩家在副本里面掉线）
   if(area.type !== consts.AreaType.SCENE){
     var pos = areaService.getBornPoint(sceneId);
     player.x = pos.x;
     player.y = pos.y;
   }
 
-  //将修改过的玩家信息更新到数据库里面：玩家信息、背包、装备、任务
+  //更新玩家数据库：玩家信息、背包、装备、任务----------------------------------------------更新玩家数据库
   userDao.updatePlayer(player);
   bagDao.update(player.bag);
   equipmentsDao.update(player.equipments);
   taskDao.tasksUpdate(player.curTasks);
-  //副本删除玩家
+  //玩家所在场景（或副本）删除玩家----------------------------------------------------------玩家所在场景（或副本）删除玩家
   area.removePlayer(playerId);
-  //副本推送消息给队员，该玩家已经离线
+  //场景（或副本）推送消息给队员，该玩家掉线-----------------------------------------------通知场景（或副本）内的所有玩家，该玩家掉线
+  //也是被rpc到当前场景服务器进行频道消息
   area.channel.pushMessage({route: 'onUserLeave', code: consts.MESSAGE.RES, playerId: playerId});
   utils.invokeCallback(cb);
 };
