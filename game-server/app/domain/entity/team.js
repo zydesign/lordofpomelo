@@ -42,7 +42,7 @@ Team.prototype.init = function(teamId)	{
   };
 
 
-//创建队伍频道。得到this.channel
+//创建队伍频道。得到this.channel（这个channel是在manager服务器线程创建的）
 Team.prototype.createChannel = function() {
   if(this.channel) {
     return this.channel;
