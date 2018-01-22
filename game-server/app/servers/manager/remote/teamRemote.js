@@ -46,7 +46,7 @@ TeamRemote.prototype.disbandTeamById = function(args, cb){
 };
 
 // leave a team
-// 玩家离开队伍，通过id
+// 玩家离开队伍，通过id(参数args：{playerId: playerId, teamId: player.teamId}）
 //（客户端掉线时area/remote/playerRemote.playerLeave执行rpc到该函数，让玩家脱离队伍）
 //（玩家主动离队area/handler/teamHandler.leaveTeam执行rpc到该函数，让玩家脱离队伍）
 TeamRemote.prototype.leaveTeamById = function(args, cb){
@@ -62,6 +62,7 @@ TeamRemote.prototype.dragMember2gameCopy = function(args, cb) {
 };
 
 // applicant apply to join the team
+//申请入队（参数args:{applicantId: applicantId, teamId: msg.teamId}）
 TeamRemote.prototype.applyJoinTeam = function(args, cb){
   utils.myPrint('ApplyJoinTeam is running ... args = ', JSON.stringify(args));
   var ret = teamManager.applyJoinTeam(args);
@@ -69,6 +70,7 @@ TeamRemote.prototype.applyJoinTeam = function(args, cb){
 };
 
 // accept applicant join team
+//接受入队申请（参数args：用于生成完整队员信息的玩家数据）
 TeamRemote.prototype.acceptApplicantJoinTeam = function(args, cb){
   utils.myPrint('AcceptApplicantJoinTeam is running ... args = ', JSON.stringify(args));
   var ret = teamManager.acceptApplicantJoinTeam(args);
@@ -110,6 +112,7 @@ TeamRemote.prototype.chatInTeam = function(args, cb){
 };
 
 // leave a team
+//踢出队员（参数args：{captainId: captainId, teamId: msg.teamId, kickedPlayerId: msg.kickedPlayerId}）
 TeamRemote.prototype.kickOut = function(args, cb){
   teamManager.kickOut(args, cb);
 };
