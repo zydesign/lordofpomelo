@@ -531,7 +531,7 @@ Handler.prototype.kickOut = function(msg, session, next) {
 Handler.prototype.leaveTeam = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
-  var player = area.getPlayer(playerId);
+  var player = area.getPlayer(playerId);     //玩家实体
 
   //如果玩家不在场景中，返回
   if(!player) {
@@ -555,38 +555,42 @@ Handler.prototype.leaveTeam = function(msg, session, next) {
   utils.myPrint("msg.teamId = ", msg.teamId);
   utils.myPrint("typeof msg.teamId = ", typeof msg.teamId);
 
-  //如果玩家没有队伍，或者跟客户端发来的teamId不匹配
+  //如果玩家没有队伍，或者跟客户端发来的teamId不匹配。不能离队
   if(player.teamId <= consts.TEAM.TEAM_ID_NONE || player.teamId !== msg.teamId) {
     logger.warn('The request(leaveTeam) is illegal, the teamId is wrong: msg = %j.', msg);
     next();
     return;
   }
-
-  //rpc到管理服务器处理离队逻辑，返回的ret为离队成功与否信息
+ 
   var args = {playerId: playerId, teamId: player.teamId};
+  //rpc到管理服务器，主动离队-------------------------------------------------------------------主动离队
+  //rpc返回ret：{result: consts.TEAM.FAILED}或{result: consts.TEAM.OK}
   this.app.rpc.manager.teamRemote.leaveTeamById(session, args,
     function(err, ret) {
       result = ret.result;
       utils.myPrint("1 ~ result = ", result);
-    //如果离队成功，而且player.teamId已经归零（PS:如果已经归零，就aoi推送过消息。不然就要在这里归零，然后aoi推送消息）
+    //如果离队成功，而且player.teamId已经归零，不需要aoi消息（如果player.teamId未归零，就需要aoi推送消息）-------检查是否player.teamId归零
+    //PS：在rpc到area/remote/playerRemote.leaveTeam时，是进行player.teamId归零，并aoi推送消息的
+    //一般这里的aoi推送不需要的，因为player.teamId肯定归零了
       if(result === consts.TEAM.OK && !player.leaveTeam()) {
         result = consts.TEAM.FAILED;
       }
-    //aoi推送消息
+    //aoi推送消息，（显示：xxx离开了队伍。如果是队长，多一个xxx解散了队伍）
       if (result === consts.TEAM.OK) {
         var route = 'onTeamMemberStatusChange';   //队员状态改变
+        //如果离队的是队长
         if(player.isCaptain) {
-          route = 'onTeamCaptainStatusChange';
-          player.isCaptain = consts.TEAM.NO;
+          route = 'onTeamCaptainStatusChange';    //队长状态改变
+          player.isCaptain = consts.TEAM.NO;      //修改player.isCaptain归零
         }
         var ignoreList = {};
         messageService.pushMessageByAOI(area,
           {
-            route: route,
-            playerId: playerId,
-            teamId: player.teamId,
-            isCaptain: player.isCaptain,
-            teamName: consts.TEAM.DEFAULT_NAME
+            route: route,                         //路由
+            playerId: playerId,                   //离队人playerId
+            teamId: player.teamId,                //离队人teamId
+            isCaptain: player.isCaptain,          //离队人isCaptain
+            teamName: consts.TEAM.DEFAULT_NAME    //默认队伍名（空）
           },
           {x: player.x, y: player.y}, ignoreList);
       }
