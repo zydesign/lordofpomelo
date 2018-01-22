@@ -88,14 +88,14 @@ Handler.prototype.createTeam = function(msg, session, next) {
         //player添加isCaptain属性----------------------------------------------------player添加isCaptain属性
         player.isCaptain = consts.TEAM.YES;
         var ignoreList = {};
-        //aoi推送消息给附近玩家（包括自己）。让周围玩家和自己客户端操作（xxx创建了队伍teamName）
+        //aoi推送消息给附近玩家（包括自己）。 （显示：队长xxx创建了队伍teamName）
         messageService.pushMessageByAOI(area,
           {
             route: 'onTeamCaptainStatusChange',      //队长状态改变
-            playerId: playerId,
-            teamId: player.teamId,
-            isCaptain: player.isCaptain,
-            teamName: teamName
+            playerId: playerId,                      //队长playerId 
+            teamId: player.teamId,                   //队长teamId
+            isCaptain: player.isCaptain,             //队长isCaptain
+            teamName: teamName                       //队伍名
           },
           {x: player.x, y: player.y}, ignoreList);
       }
@@ -159,14 +159,14 @@ Handler.prototype.disbandTeam = function(msg, session, next) {
         if (player.isCaptain) {
           player.isCaptain = consts.TEAM.NO;   //player去掉isCaptain属性----------------------player去掉isCaptain属性
           var ignoreList = {};
-          //aoi推送消息，通知周围玩家（包括自己）。（显示：xxx解散了队伍）
+          //aoi推送消息，通知周围玩家（包括自己）。（显示：队长xxx解散了队伍）
           messageService.pushMessageByAOI(area,
             {
               route: 'onTeamCaptainStatusChange',    //队长状态改变
-              playerId: playerId,
-              teamId: player.teamId,
-              isCaptain: player.isCaptain,
-              teamName: consts.TEAM.DEFAULT_NAME
+              playerId: playerId,                    //队长playerId
+              teamId: player.teamId,                 //队长teamId
+              isCaptain: player.isCaptain,           //队长isCaptain
+              teamName: consts.TEAM.DEFAULT_NAME     //默认队伍名（空）
             },
             {x: player.x, y: player.y}, ignoreList);
         }
@@ -229,7 +229,7 @@ Handler.prototype.inviteJoinTeam = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
-//客户端发起，被邀请人接受队伍邀请-------------------------------------------------------------------------------【接受队伍邀请】
+//客户端发起，被邀请人接受（或拒绝）队伍邀请----------------------------------------------------------【接受（或拒绝）队伍邀请】
 Handler.prototype.inviteJoinTeamReply = function(msg, session, next) {
   var area = session.area;
   var inviteeId = session.get('playerId');
@@ -257,7 +257,9 @@ Handler.prototype.inviteJoinTeamReply = function(msg, session, next) {
   }
 
   var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
-  var backendServerId = this.app.getServerId();               //后端id
+  var backendServerId = this.app.getServerId();            //后端id
+  
+  //如果【参数reply值】为：接受邀请-----------------------------------------------------《《《如果【参数reply值】为：接受邀请时》》》
   if(msg.reply === consts.TEAM.JOIN_TEAM_REPLY.ACCEPT) {
     var inviteeInfo = inviteeObj.toJSON4TeamMember();         //被邀请人player生成不完整队员信息
     
@@ -266,43 +268,48 @@ Handler.prototype.inviteJoinTeamReply = function(msg, session, next) {
       playerId: inviteeId, areaId: area.areaId, userId: inviteeObj.userId,
       serverId: inviteeObj.serverId, backendServerId: backendServerId,
       playerInfo: inviteeInfo};
-    //rpc到管理服务器，接受邀请，加入队伍-----------------------------------------------------接受队伍邀请，加入队伍
+    //rpc到管理服务器，接受邀请，加入队伍---------------------------------------------------------接受队伍邀请，加入队伍
     //rpc返回cb：{result: result, teamName: teamName}
     this.app.rpc.manager.teamRemote.acceptInviteJoinTeam(session, args, function(err, ret) {
       utils.myPrint('AcceptInviteJoinTeam ~ ret = ', JSON.stringify(ret));
       result = ret.result;
-      //如果加入队伍成功--------------------------------------------------------如果加入队伍成功，发aoi通知
+      
+      //如果受邀加入队伍成功-----------------------------------------------------------------------如果受邀加入队伍成功，发aoi通知
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
-        //让被邀请人添加player.teamId属性，如果msg.teamId不存在，无法加入队伍，通知队长
+        //执行player.joinTeam，添加player.teamId属性--------------------------添加player.teamId属性
+        //如果msg.teamId不存在，无法加入队伍，通知‘队长’：无法入队
         if(!inviteeObj.joinTeam(msg.teamId)) {
           result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
-          //通知队长，已经接受队伍邀请-
+          //通知队长
           messageService.pushMessageToPlayer({uid: captainObj.userId, sid: captainObj.serverId},
             'onInviteJoinTeamReply', {reply: result});
         } else {
           //如果被邀请人添加player.teamId属性成功，就算正式加入队伍了
-          inviteeObj.isCaptain = consts.TEAM.NO;  //不是队长，即队员
+          inviteeObj.isCaptain = consts.TEAM.NO;  //不是队长，即队员-----------添加player.isCaptain属性
           var ignoreList = {};
-          //aoi通知附近玩家（包括被邀请人自己）。xxx加入了xxx队伍--------------------------------成功加入，aoi通知
+          //aoi通知附近玩家（包括被邀请人自己）。（显示：队员xxx加入了xxx队伍）----------------队员接受队长邀请加入队伍，aoi通知
           messageService.pushMessageByAOI(area,
             {
               route: 'onTeamMemberStatusChange',  //队员状态变化
-              playerId: inviteeId,                //playerId
-              teamId: inviteeObj.teamId,          //teamId
-              isCaptain: inviteeObj.isCaptain,    //是队员
-              teamName: ret.teamName              //teamName
+              playerId: inviteeId,                //被邀请人playerId
+              teamId: inviteeObj.teamId,          //被邀请人teamId
+              isCaptain: inviteeObj.isCaptain,    //被邀请人isCaptain
+              teamName: ret.teamName              //队伍名
             },
             {x: inviteeObj.x, y: inviteeObj.y}, ignoreList);
         }
         utils.myPrint('invitee teamId = ', inviteeObj.teamId);
       } else {
+        
+        // 如果受邀加入队伍失败，通知队长----------------------------------------------------------如果受邀加入队伍失败，通知队长
         messageService.pushMessageToPlayer({uid: captainObj.userId, sid: captainObj.serverId},
           'onInviteJoinTeamReply', {reply: result});
       }
     });
   } else {
     // push msg to the inviter(the captain) that the invitee reject to join the team
-    // 如果加入队伍失败，通知队长----------------------------------------------------如果加入队伍失败，通知队长
+    //如果【参数reply值】为：拒绝邀请--------------------------------------------------《《《如果【参数reply值】为：拒绝邀请时》》》
+    //通知队长：邀请被拒绝了
     messageService.pushMessageToPlayer({uid: captainObj.userId, sid: captainObj.serverId},
       'onInviteJoinTeamReply', {reply: result});
   }
@@ -317,11 +324,12 @@ Handler.prototype.inviteJoinTeamReply = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，申请入队----------------------------------------------------------------------------------【申请入队】
 Handler.prototype.applyJoinTeam = function(msg, session, next) {
   utils.myPrint('ApplyJoinTeam ~ msg = ', JSON.stringify(msg));
   var area = session.area;
   var applicantId = session.get('playerId');
-  var applicantObj = area.getPlayer(applicantId);
+  var applicantObj = area.getPlayer(applicantId);   //申请人实体
 
   if(!applicantObj) {
     logger.warn('The request(applyJoinTeam) is illegal, the player is null : msg = %j.', msg);
@@ -334,7 +342,7 @@ Handler.prototype.applyJoinTeam = function(msg, session, next) {
     return;
   }
 
-  var captainObj = area.getPlayer(msg.captainId);
+  var captainObj = area.getPlayer(msg.captainId);  //队长实体
   if(!captainObj) {
     logger.warn('The request(applyJoinTeam) is illegal, the captain is null : msg = %j.', msg);
     next();
@@ -348,11 +356,15 @@ Handler.prototype.applyJoinTeam = function(msg, session, next) {
   }
   // send the application to the captain
   var args = {applicantId: applicantId, teamId: msg.teamId};
+  //rpc到管理服务器，申请入队------------------------------------------------------------------申请入队
+  //rpc返回ret：{result: consts.TEAM.FAILED}或{result: consts.TEAM.OK}
   this.app.rpc.manager.teamRemote.applyJoinTeam(session, args, function(err, ret) {
     var result = ret.result;
     utils.myPrint("result = ", result);
+    //如果申请ok
     if(result === consts.TEAM.OK) {
-      var applicantInfo = applicantObj.toJSON4Team();
+      var applicantInfo = applicantObj.toJSON4Team();  //申请人player生成不完整队员信息
+      //通知队长，有人申请入队。（显示：xxx申请入队）--------------------------------------------通知队长，有人申请入队
       messageService.pushMessageToPlayer({uid: captainObj.userId, sid: captainObj.serverId},
         'onApplyJoinTeam', applicantInfo);
     }
@@ -368,10 +380,11 @@ Handler.prototype.applyJoinTeam = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，队长接受（或拒绝）入队申请-------------------------------------------------------------------【接受（或拒绝）入队申请】
 Handler.prototype.applyJoinTeamReply = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
-  var player = area.getPlayer(playerId);
+  var player = area.getPlayer(playerId);      //队长实体
 
   if(!player) {
     logger.warn('The request(applyJoinTeamReply) is illegal, the player is null : msg = %j.', msg);
@@ -379,61 +392,77 @@ Handler.prototype.applyJoinTeamReply = function(msg, session, next) {
     return;
   }
 
+  //如果玩家不是队长或玩家的teamId跟参数的不一致
   if (!player.isCaptain || player.teamId !== msg.teamId) {
     logger.warn('The request(applyJoinTeamReply) is illegal, the teamId is wrong : msg = %j.', msg);
     next();
     return;
   }
 
-  var applicantObj = area.getPlayer(msg.applicantId);
+  var applicantObj = area.getPlayer(msg.applicantId);  //申请人实体
   if(!applicantObj) {
     logger.warn('The request(applyJoinTeamReply) is illegal, the applicantObj is null : msg = %j.', msg);
     next();
     return;
   }
 
+  //如果申请人有队伍
   if(applicantObj.isInTeam()) {
     next();
     return;
   }
 
+  //如果【参数reply值】为：接受入队申请------------------------------------------------------《《《【参数reply值】为：接受入队申请时》》》
   if(msg.reply === consts.TEAM.JOIN_TEAM_REPLY.ACCEPT) {
     var result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
-    var applicantInfo = applicantObj.toJSON4TeamMember();
-    var backendServerId = this.app.getServerId();
+    var applicantInfo = applicantObj.toJSON4TeamMember();  //申请人player生成不完整队员信息
+    var backendServerId = this.app.getServerId();          //后端id
+    
+    //生成队员数据，提供生成完整队员信息
     var args = {captainId: playerId, teamId: msg.teamId,
       playerId: msg.applicantId, areaId: area.areaId, userId: applicantObj.userId,
       serverId: applicantObj.serverId, backendServerId: backendServerId,
       playerInfo: applicantInfo};
+    //rpc到管理服务器，接受入队申请------------------------------------------------------------------接受入队申请
+    //rpc返回ret：{result: result, teamName: teamName}
     this.app.rpc.manager.teamRemote.acceptApplicantJoinTeam(session, args, function(err, ret) {
       utils.myPrint('ApplyJoinTeamReply ~ ret = ', JSON.stringify(ret));
       result = ret.result;
+      
+      //如果添加队员成功-------------------------------------------------------------------------如果添加队员成功，发aoi通知
       if(result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
+        //执行player.joinTeam，添加player.teamId属性----------------------------添加player.teamId属性
+        //如果msg.teamId不存在，通知‘申请人’：无法入队
         if(!applicantObj.joinTeam(msg.teamId)) {
           result = consts.TEAM.JOIN_TEAM_RET_CODE.SYS_ERROR;
           messageService.pushMessageToPlayer({uid: applicantObj.userId, sid: applicantObj.serverId},
             'onApplyJoinTeamReply', {reply: result});
         } else {
-          applicantObj.isCaptain = consts.TEAM.NO;
+          //如果申请人添加player.teamId属性成功，就算正式加入队伍了
+          applicantObj.isCaptain = consts.TEAM.NO;  //不是队长，即队员-----------添加player.isCaptain属性
           var ignoreList = {};
+           //aoi通知附近玩家（包括队长自己）。（显示：队员xxx加入了xxx队伍）--------------------队长接受了队员加入队伍，aoi通知
           messageService.pushMessageByAOI(area,
             {
-              route: 'onTeamMemberStatusChange',
-              playerId: msg.applicantId,
-              teamId: applicantObj.teamId,
-              isCaptain: applicantObj.isCaptain,
-              teamName: ret.teamName
+              route: 'onTeamMemberStatusChange',  //队员状态变化
+              playerId: msg.applicantId,          //申请人playerId
+              teamId: applicantObj.teamId,        //申请人teamId
+              isCaptain: applicantObj.isCaptain,  //申请人isCaptain
+              teamName: ret.teamName              //队伍名
             },
             {x: applicantObj.x, y: applicantObj.y}, ignoreList);
         }
         utils.myPrint('applicantObj teamId = ', applicantObj.teamId);
       } else {
+        //如果添加队员失败-------------------------------------------------------------------------如果添加队员失败，发aoi通知
         messageService.pushMessageToPlayer({uid: applicantObj.userId, sid: applicantObj.serverId},
           'onApplyJoinTeamReply', {reply: ret.result});
       }
     });
   } else {
     // push tmpMsg to the applicant that the captain rejected
+    //如果【参数reply值】为：拒绝入队-------------------------------------------------《《《【参数reply值】为：接受入队时》》》
+    //通知申请人：被拒绝入队了
     messageService.pushMessageToPlayer({uid: applicantObj.userId, sid: applicantObj.serverId},
       'onApplyJoinTeamReply', {reply: consts.TEAM.JOIN_TEAM_REPLY.REJECT});
   }
@@ -448,10 +477,11 @@ Handler.prototype.applyJoinTeamReply = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//踢出队员。只要队长才有资格踢队员。-----------------------------------------------------------------------------【踢出队员】
 Handler.prototype.kickOut = function(msg, session, next) {
   var area = session.area;
   var captainId = session.get('playerId');
-  var captainObj = area.getPlayer(captainId);
+  var captainObj = area.getPlayer(captainId);   //队长实体
 
   if(!captainObj) {
     logger.warn('The request(kickOut) is illegal, the captainObj is null : msg = %j.', msg);
@@ -459,12 +489,14 @@ Handler.prototype.kickOut = function(msg, session, next) {
     return;
   }
 
+  //如果被动踢人队长自己，不能踢
   if(captainId === msg.kickedPlayerId) {
     logger.warn('The request(kickOut) is illegal, the kickedPlayerId is captainId : msg = %j.', msg);
     next();
     return;
   }
 
+  //如果队长没有player.teamId，或参数的teamId跟队长的不一致，不能踢人
   if(captainObj.teamId <= consts.TEAM.TEAM_ID_NONE || msg.teamId !== captainObj.teamId) {
     logger.warn('The request(kickOut) is illegal, the teamId is wrong : msg = %j.', msg);
     next();
@@ -472,12 +504,15 @@ Handler.prototype.kickOut = function(msg, session, next) {
   }
 
   utils.myPrint('captainId, IsInTeamInstance = ', captainId, captainObj.isInTeamInstance);
+  //如果队长在副本里，不能踢人
   if (captainObj.isInTeamInstance) {
     next();
     return;
   }
 
   var args = {captainId: captainId, teamId: msg.teamId, kickedPlayerId: msg.kickedPlayerId};
+  //rpc到管理服务器，踢出队员-------------------------------------------------------------踢出队员
+  //rpc返回ret： {result: consts.TEAM.FAILED}或 {result: consts.TEAM.OK}
   this.app.rpc.manager.teamRemote.kickOut(session, args,
     function(err, ret) {
     });
