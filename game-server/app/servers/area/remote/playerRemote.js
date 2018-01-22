@@ -77,7 +77,6 @@ exp.playerLeave = function(args, cb){
   //玩家所在场景（或副本）删除玩家----------------------------------------------------------玩家所在场景（或副本）删除玩家
   area.removePlayer(playerId);
   //场景（或副本）推送消息给队员，该玩家掉线-----------------------------------------------通知场景（或副本）内的所有玩家，该玩家掉线
-  //也是被rpc到当前场景服务器进行频道消息
   area.channel.pushMessage({route: 'onUserLeave', code: consts.MESSAGE.RES, playerId: playerId});
   utils.invokeCallback(cb);
 };
@@ -90,7 +89,7 @@ exp.leaveTeam = function(args, cb){
   var playerId = args.playerId;
   //场景管理获取场景（如果当前是普通场景服务器是scene.getArea；如果当前是副本场景服务器则是instancePool.getArea）
   var area = pomelo.app.areaManager.getArea(args.instanceId);  
-  var player = area.getPlayer(playerId);
+  var player = area.getPlayer(playerId);    //队员实体
 
   utils.myPrint('LeaveTeam ~ areaId = ', area.areaId);
   utils.myPrint('LeaveTeam ~ instanceId = ', args.instanceId);
@@ -115,11 +114,11 @@ exp.leaveTeam = function(args, cb){
   //广播aoi消息。通知附近的玩家，该玩家离队（显示：xxx离开了队伍）
   messageService.pushMessageByAOI(area,
     {
-      route: 'onTeamMemberStatusChange',   //队员状态改变
-      playerId: playerId,
-      teamId: player.teamId,
-      isCaptain: player.isCaptain,
-      teamName: consts.TEAM.DEFAULT_NAME
+      route: 'onTeamMemberStatusChange',    //队员状态改变
+      playerId: playerId,                   //队员playerId
+      teamId: player.teamId,                //队员teamId
+      isCaptain: player.isCaptain,          //队员isCaptain
+      teamName: consts.TEAM.DEFAULT_NAME    //默认队伍名（空）
     },
     {x: player.x, y: player.y}, {});
 
