@@ -308,7 +308,7 @@ Team.prototype.disbandTeam = function() {
 };
 
 // remove a player from the team
-//队员离队。返回解散需求true或false，并把是否删除成功存入cb （1.玩家主动离队 2.玩家掉线）--------------------【队员离队】
+//队员离队。返回解散需求true或false，并把是否删除成功存入cb （1.玩家主动离队 2.玩家掉线 3.队长踢出队员）------------------【队员离队】
 //返回值true或false用于解散需求，cb用于是否离队成功（cb：{result: consts.TEAM.FAILED}或{result: consts.TEAM.OK}）
 Team.prototype.removePlayer = function(playerId, cb) {
   var tmpData = null;  //备份队员信息
@@ -323,7 +323,7 @@ Team.prototype.removePlayer = function(playerId, cb) {
     }
   }
 
-  //变空位后，还在队伍里，返回false
+  //变空位后，还在队伍里，返回false。返回cb：{result: consts.TEAM.FAILED}
   if(this.isPlayerInTeam(playerId)) {
     var ret = {result: consts.TEAM.FAILED};
     utils.invokeCallback(cb, null, ret);
