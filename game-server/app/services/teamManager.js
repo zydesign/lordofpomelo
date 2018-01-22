@@ -95,13 +95,15 @@ exp.dragMember2gameCopy = function(args, cb) {
   teamObj.dragMember2gameCopy(args, cb);
 };
 
+//申请入队。（参数args:{applicantId: applicantId, teamId: msg.teamId}）----------------------------------【申请入队】
 exp.applyJoinTeam = function(args) {
   var result = consts.TEAM.FAILED;
   if (!args || !args.teamId) {
     return {result: result};
   }
   var teamId = args.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组获取指定teamId队伍
+  //如果队伍有空位而且申请人没有队伍，result的值为ok
   if (teamObj) {
     if (teamObj.isTeamHasPosition() && !teamObj.isPlayerInTeam(args.applicantId)) {
       result = consts.TEAM.OK;
@@ -111,6 +113,7 @@ exp.applyJoinTeam = function(args) {
   return {result: result};
 };
 
+//接受入队申请（参数args：用于生成完整队员信息的玩家数据）---------------------------------------------------【接受入队申请】
 exp.acceptApplicantJoinTeam = function(args) {
   var result = consts.TEAM.FAILED;
   var teamName = consts.TEAM.DEFAULT_NAME;
@@ -118,11 +121,13 @@ exp.acceptApplicantJoinTeam = function(args) {
     return {result: result};
   }
   var teamId = args.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];   //队伍组获取指定teamId队伍
   if (teamObj) {
+    //如果接受人不是队伍的队长，返回添加队员失败
     if(!teamObj.isCaptainById(args.captainId)) {
       return {result: result};
     }
+    //接受人是队长，队伍添加队员
     result = teamObj.addPlayer(args);
     teamName = teamObj.teamName;
   }
@@ -202,14 +207,16 @@ exp.chatInTeam = function(args) {
 };
 
 
+//踢出队员。（参数args：{captainId: captainId, teamId: msg.teamId, kickedPlayerId: msg.kickedPlayerId}）
 exp.kickOut = function(args, cb) {
   if (!args || !args.teamId) {
     utils.invokeCallback(cb, null, {result: consts.TEAM.FAILED});
     return;
   }
   var teamId = args.teamId;
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组获取指定teamId队伍
   if (teamObj) {
+    //参数提供的队长id不是队伍的队长id
     if(!teamObj.isCaptainById(args.captainId)) {
       logger.warn('The request(kickOut) is illegal, the captainId is wrong : args = %j.', args);
       utils.invokeCallback(cb, null, {result: consts.TEAM.FAILED});
