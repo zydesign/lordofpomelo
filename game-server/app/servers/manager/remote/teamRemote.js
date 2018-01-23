@@ -56,6 +56,8 @@ TeamRemote.prototype.leaveTeamById = function(args, cb){
 };
 
 // drag the team members to the game copy
+//队长将队员拉进副本（services/areaService.changeArea队长进入团队副本调用该函数）
+//（参数args：{teamId: player.teamId, target: target}）
 TeamRemote.prototype.dragMember2gameCopy = function(args, cb) {
   utils.myPrint('1 ~ DragMember2gameCopy ~ args = ', JSON.stringify(args));
   teamManager.dragMember2gameCopy(args, cb);
