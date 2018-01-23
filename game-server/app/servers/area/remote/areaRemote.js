@@ -5,7 +5,8 @@ var logger = require('pomelo-logger').getLogger(__filename);
 //场景副本rpc
 var exp = module.exports;
 
-// 实例场景副本并加入副本池（副本管理服务的instanceManager.getInstance调用该函数）
+//玩家切换场景，rpc到manager服务器，在生成副本服务器id作为路由，rpc到这里生成副本------------------------------------生成场景副本
+// 生成副本（副本管理服务的instanceManager.getInstance调用该函数）
 //参数params：   {areaId : args.areaId, instanceId : instanceId} 目标场景id和副本id（副本id格式：1_1）
 exp.create = function(params, cb){
   var start = Date.now();
