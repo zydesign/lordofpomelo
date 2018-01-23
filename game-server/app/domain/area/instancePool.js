@@ -10,7 +10,7 @@ var exp = module.exports;
 
 var instances;
 var intervel;
-var maps = {};
+var maps = {};   //副本地图组
 
 //副本池初始化（app启动立即执行该函数）opts的值：{"lifeTime" : 1800000,"interval" : 60000}...........................1
 exp.init = function(opts){
@@ -23,17 +23,18 @@ exp.init = function(opts){
 
 //创建场景副本。获取场景数据，加入游戏地图，然后实例副本Instance，并加入副本组，如果创建成功返回true-------------------------增
 //（场景服务器的areaRemote.create调用该函数 ）
+//参数params：{areaId : args.areaId, instanceId : instanceId}
 exp.create = function(params){
   var id = params.instanceId;
   var areaId = params.areaId;
 
-  //如果场景副本组中有了该副本，返回失败
+  //如果场景副本组中有了该副本，返回false..........................................已有，不创建
   if(instances[id]) return false;
 
   //get area map
   //获取该场景副本数据作为opts
   var opts = dataApi.area.findById(areaId);
-  //如果地图组没有该游戏地图，生成一个游戏地图实例
+  //如果副本地图组没有该游戏地图，生成地图实例
   if(!maps[areaId]){
     //从场景数据读取地图路径的tiledmap表单，生成游戏地图
     maps[areaId] = new Map(opts);
@@ -42,7 +43,7 @@ exp.create = function(params){
   opts.map = maps[areaId];
 
   //Create instance
-  //实例副本场景（实例时就已经启动了场景的计时器和instance.start()）
+  //实例副本场景（实例时就已经启动了场景的计时器和instance.start()）-------------------创建副本
   var instance = new Instance(opts);  //用的是生成的场景数据
 
   //将副本场景加入副本组中
