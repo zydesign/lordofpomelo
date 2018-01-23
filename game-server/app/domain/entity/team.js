@@ -400,14 +400,15 @@ Team.prototype.pushChatMsg2All = function(content) {
   return true;
 };
 
-//将队员拉进副本----------------------------------------------------------------------------------------------【拉队员进副本】
+//队长将队员拉进副本-------------------------------------------------------------------------------------------【队长拉队员进副本】
 Team.prototype.dragMember2gameCopy = function(args, cb) {
   if(!this.channel) {
     utils.invokeCallback(cb, 'Team without channel! %j', {teamId: this.teamId, captainId: this.captainId});
     return;
   }
   utils.myPrint('3 ~ DragMember2gameCopy ~ args = ', JSON.stringify(args));
-  this.channel.pushMessage('onDragMember2gameCopy', args, null); //拉进副本消息推送，让客户端操作
+  //队伍频道推送‘拉进副本消息’，让队员发请求area.playerHandler.changeArea------------------------------------推送消息，让队员发请求
+  this.channel.pushMessage('onDragMember2gameCopy', args, null); 
   utils.invokeCallback(cb);
 };
 
