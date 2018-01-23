@@ -80,6 +80,8 @@ exp.leaveTeamById = function(playerId, teamId, cb) {
   }
 };
 
+//队长将队员拉进副本---------------------------------------------------------------------------------【队长将队员拉进副本】
+//（参数args：{teamId: player.teamId, target: target}）target是目标areaId
 exp.dragMember2gameCopy = function(args, cb) {
   utils.myPrint('2 ~ DragMember2gameCopy ~ args = ', JSON.stringify(args));
   var teamId = args.teamId;
@@ -87,7 +89,7 @@ exp.dragMember2gameCopy = function(args, cb) {
     utils.invokeCallback(cb, 'No teamId! %j', args);
     return;
   }
-  var teamObj = gTeamObjDict[teamId];
+  var teamObj = gTeamObjDict[teamId];  //队伍组获取指定teamId队伍
   if(!teamObj) {
     utils.invokeCallback(cb, 'No teamObj! %j', args);
     return;
