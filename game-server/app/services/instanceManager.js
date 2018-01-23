@@ -8,7 +8,7 @@ var INSTANCE_SERVER = 'area';
 //副本管理服务
 //The instance map, key is instanceId, value is serverId
 
-var instances = {};      //副本服务器id组
+var instances = {};      //副本id信息组...副本id和副本服务器id。{{instanceId : instanceId,serverId : serverId},...} 
 
 //All the instance servers
 
@@ -45,13 +45,16 @@ exp.removeServers = function(servers){
   logger.info('remove servers : %j', servers);
 };
 
-//获取或创建副本。返回{副本服务器id，副本id}（管理服务器的instanceRemote.create调用该函数）
+//获取或创建副本。返回{副本服务器id，副本id}（管理服务器的instanceRemote.create调用该函数）---------------------------【获取或创建副本】
+//参数args：单人副本{areaId : args.target, id : playerId} 或 组队副本{areaId : args.target, id : teamId}
 exp.getInstance = function(args, cb){
   //The key of instance
-  var instanceId = args.areaId + '_' + args.id;    //areaId_playerId 格式：1_1  (副本id)
+  //副本id(格式：1_1)。如果是‘单人副本’就是areaId_playerId ；如果是‘组队副本’就是areaId_teamId
+  //有问题？ playerId与teamId的值相同会覆盖掉，必须这两个id格式要分开-----------------------------------------------------？？？？
+  var instanceId = args.areaId + '_' + args.id;    
 
   //If the instance exist, return the instance
-  //如果能获取指定id的【副本服务器id】，cb为该【副本服务器id】---------------------------------------------
+  //如果能获取指定id的【副本服务器id】，cb为{instanceId : instanceId,serverId : serverId}--------如果已有副本，返回副本id信息
   if(instances[instanceId]){
     utils.invokeCallback(cb, null, instances[instanceId]);
     return;
@@ -70,11 +73,11 @@ exp.getInstance = function(args, cb){
     method : 'create',
     args : [{
       areaId : args.areaId,     //目标场景id
-      instanceId : instanceId   //副本id
+      instanceId : instanceId   //副本id (是通过目标场景id生成的)
     }]
   };
 
-  //由manager服务器发起rpc到area服务器，相当于app.rpc.area.remote.areaRemote.create（），
+  //由manager服务器发起rpc到指定后端id的area服务器，相当于app.rpc.area.remote.areaRemote.create（），
   //这个serverId就是路由到指定的【场景副本服务器】进行处理逻辑了.......................................................
   app.rpcInvoke(serverId, params, function(err, result){
     if(!!err) {
@@ -83,7 +86,7 @@ exp.getInstance = function(args, cb){
       return;
     }
 
-    instances[instanceId] = {
+    instances[instanceId] = {      //生成副本id信息，并添加到id组
       instanceId : instanceId,
       serverId : serverId
     };
