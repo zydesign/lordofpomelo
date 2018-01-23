@@ -42,13 +42,13 @@ exp.create = function(params){
   opts.map = maps[areaId];
 
   //Create instance
-  //实例副本场景
-  var instance = new Instance(opts);  //用的是副本池的参数
+  //实例副本场景（实例时就已经启动了场景的计时器和instance.start()）
+  var instance = new Instance(opts);  //用的是生成的场景数据
 
   //将副本场景加入副本组中
   instances[id] = instance;
 
-  //启动该副本
+  //启动该副本（这个感觉是多余的）
   instance.start();
   return true;
 };
