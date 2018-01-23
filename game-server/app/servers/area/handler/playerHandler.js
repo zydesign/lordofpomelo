@@ -252,7 +252,7 @@ handler.addItem = function(msg, session, next) {
 };
 
 //Change area
-//客户端发起，玩家切换场景
+//客户端发起，玩家切换场景（或进入副本）
 handler.changeArea = function(msg, session, next) {
 	var playerId = session.get('playerId');
 	var areaId = msg.areaId;
@@ -282,11 +282,11 @@ handler.changeArea = function(msg, session, next) {
 	var isCaptain = player.isCaptain;
 
 	var req = {
-    areaId: areaId,
-    target: target,
-    uid: session.uid,
-    playerId: playerId,
-    frontendId: session.frontendId
+    areaId: areaId,                      //未知
+    target: target,                      //目标场景areaId
+    uid: session.uid,                    //user.id
+    playerId: playerId,                  //playerId
+    frontendId: session.frontendId       //frontendId
   };
 
 	utils.myPrint('teamId, isCaptain = ', teamId, isCaptain);
