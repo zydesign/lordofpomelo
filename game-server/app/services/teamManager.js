@@ -174,7 +174,8 @@ exp.acceptInviteJoinTeam = function(args) {
   return {result: result, teamName: teamName};
 };
 
-//更新队员信息。args为player生成的玩家数据。（管理服务器manager/remote/teamRemote.updateMemberInfo执行该函数）
+//更新队员信息。args为player生成的玩家数据。
+//（manager/remote/teamRemote.updateMemberInfo执行该函数）
 exp.updateMemberInfo = function(args) {
   var result = consts.TEAM.FAILED;
   //如果参数不存在
