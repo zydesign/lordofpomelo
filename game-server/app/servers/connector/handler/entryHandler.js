@@ -98,6 +98,7 @@ pro.entry = function(msg, session, next) {
 		console.log('entry success!!!!');
 
 //返回单条player信息给客户端（这个返回玩家数据，如果有角色返回 players[0]，如果没创建角色返回null）-----------------判断有没有角色
+//如果没有角色，客户端请求connector.roleHandler.createPlayer创建角色
 		next(null, {code: Code.OK, player: players ? players[0] : null});
 	});
 };
