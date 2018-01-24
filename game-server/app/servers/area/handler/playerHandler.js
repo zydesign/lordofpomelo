@@ -30,7 +30,7 @@ var handler = module.exports;
  * @api public
  */
 
-//进入场景  （客户端没有提供msg）
+//客户端发起，进入场景  （客户端没有提供msg）
 handler.enterScene = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -55,12 +55,12 @@ handler.enterScene = function(msg, session, next) {
 
       return;
     }
-    //player是数据库获取发玩家数据，有一部分数据新数据在切换场景时，存入到session中，修改部分角色信息为当前session信息--------
+    //player是数据库获取的玩家数据，有一部分数据新数据在切换场景时，存入到session中，修改部分角色信息为当前session信息--------
     player.serverId = session.frontendId;      //场景添加玩家实体的getChannel().add(e.userId, e.serverId)用到。
 		player.teamId = teamId;        //像队伍这类数据是临时的，不需要存数据库的，断开连接就没有了，每次登陆都要重新获取
-		player.isCaptain = isCaptain;
-		player.isInTeamInstance = isInTeamInstance;
-		player.instanceId = instanceId;
+		player.isCaptain = isCaptain;                 //是队员还是队长
+		player.isInTeamInstance = isInTeamInstance;   //是否在副本属性
+		player.instanceId = instanceId;               //添加副本id
 		areaId = player.areaId;
 		utils.myPrint("2 ~ GetPlayerAllInfo: player.instanceId = ", player.instanceId);
 
@@ -71,7 +71,7 @@ handler.enterScene = function(msg, session, next) {
 
     // temporary code
     //Reset the player's position if current pos is unreachable
-	  //如果玩家坐标不可走，在出生地附近重置玩家坐标
+	  //如果玩家坐标不可走，坐标设置在出生点
 		if(!map.isReachable(player.x, player.y)) {
     // {
 			//通过map游戏地图生成出生点
@@ -95,11 +95,10 @@ handler.enterScene = function(msg, session, next) {
         }
     };
 		// utils.myPrint("1.5 ~ GetPlayerAllInfo data = ", JSON.stringify(data));
-		next(null, data);     //将基础数据传输给客户端
+		next(null, data);     //将data传输给客户端
 
 		utils.myPrint("2 ~ GetPlayerAllInfo player.teamId = ", player.teamId);
 		utils.myPrint("2 ~ GetPlayerAllInfo player.isCaptain = ", player.isCaptain);
-	  //执行场景添加实体player
 	  //如果玩家添加到场景失败（player不存在或player已经加入场景），再次传输数据给客户端，错误码
 	  //执行场景添加玩家实体...........................................................................场景添加玩家实体
 		if (!area.addEntity(player)) {
@@ -112,13 +111,13 @@ handler.enterScene = function(msg, session, next) {
       return;    //如果场景不能加玩家，直接返回，不执行下面
     }
 
-	  //如果玩家有队伍，rpc到队伍服务器更新队伍信息
+	  //如果玩家有队伍，rpc到队伍服务器，让team更新该队伍信息
 		if (player.teamId > consts.TEAM.TEAM_ID_NONE) {
 			// send player's new info to the manager server(team manager)
-			var memberInfo = player.toJSON4TeamMember();             //生成玩家数据  
+			var memberInfo = player.toJSON4TeamMember();             //生成不完整队员信息  
 			//app.getServerId()在哪个服务器执行获取的就是那个服务器的id--------------------------------
-			memberInfo.backendServerId = pomelo.app.getServerId();    //玩家数据添加属性：后端id
-			//rpc到管理服务器，更新队伍信息
+			memberInfo.backendServerId = pomelo.app.getServerId();    //队员信息添加属性：后端id
+			//rpc到管理服务器，更新到所在team的队员信息中
 			pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
 				function(err, ret) {
 				});
