@@ -174,7 +174,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
 
           //角色进入验证
           if (!player || player.id <= 0) {
-            //如果没有角色，进入角色选择界面指向1号框
+            //如果没有角色，进入角色选择界面指向1号框，监听‘heroSelectBt’按钮，点击创建，就调用createPlayer()函数
             switchManager.selectView("heroSelectPanel");
           } else {
             //如果有角色，通过角色信息登录游戏
@@ -240,16 +240,20 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     // createPlayer
     // 创建角色
     function createPlayer() {
+      //如果登录占用，返回
       if (loading) {
         return;
       }
-      var roleId = heroSelectView.getRoleId();
-      var name = document.getElementById('gameUserName').value.trim();
+      var roleId = heroSelectView.getRoleId();                                //角色类型id
+      var name = document.getElementById('gameUserName').value.trim();        //角色名
       var pwd = "pwd";
 
+      
+      //如果没有角色名
       if (!name) {
         alert("Role name is required!");
         loading = false;
+       //如果角色名字符超过9个
       } else if (name.length > 9) {
         alert("Role name's length is too long!");
         loading = false;
@@ -263,8 +267,9 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
           }
 
           if (data.player.id <= 0) {
-            switchManager.selectView("loginPanel");
+            switchManager.selectView("loginPanel");  //显示创建角色面板
           } else {
+         //如果请求创建角色成功，加载资源后登录场景
             afterLogin(data);
           }
         });
@@ -290,17 +295,17 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       });
     }
 
-    //游戏预加载
+    //游戏剧情
     function gamePrelude() {
-      switchManager.selectView("gamePrelude");
+      switchManager.selectView("gamePrelude");   //显示剧情文字面板
       var entered = false;
-      $('#id_skipbnt').on('click', function() {
+      $('#id_skipbnt').on('click', function() {  //监听skip按钮，直接跳过剧情，进入场景
         if (!entered) {
           entered = true;
           enterScene();
         }
       });
-      setTimeout(function(){
+      setTimeout(function(){         //12秒后执行进入场景 enterScene()
         if (!entered) {
           entered = true;
           enterScene();
@@ -311,15 +316,20 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
 
     //加载资源
     function loadResource(opt, callback) {
-      switchManager.selectView("loadingPanel");
+      switchManager.selectView("loadingPanel");     //显示进度条面板
       var loader = new ResourceLoader(opt);
       var $percent = $('#id_loadPercent').html(0);
       var $bar = $('#id_loadRate').css('width', 0);
-      loader.on('loading', function(data) {
+      
+      //加载资源监听'loading'事件
+      //参数data：请求connector.entryHandler.entry返回的data 或 请求connector.roleHandler.createPlayer返回的data
+      loader.on('loading', function(data) {  
         var n = parseInt(data.loaded * 100 / data.total, 10);
         $bar.css('width', n + '%');
         $percent.html(n);
       });
+      
+      //加载资源监听'complete'事件
       loader.on('complete', function() {
         if (callback) {
           setTimeout(function(){
@@ -328,6 +338,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
         }
       });
 
+      //执行资源加载器的场景资源加载
       loader.loadAreaResource();
     }
 
