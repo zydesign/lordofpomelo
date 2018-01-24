@@ -1,4 +1,5 @@
 __resources__["/config.js"] = {meta: {mimetype: "application/javascript"}, data: function(exports, require, module, __filename, __dirname) {
+	//资源图片地址
 	module.exports = {
 		IMAGE_URL:'http://pomelo.netease.com/art/',
 		GATE_HOST: window.location.hostname,
