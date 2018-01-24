@@ -92,7 +92,7 @@ __resources__["/dataApi.js"] = {
       return result;
     };
 
-    //获取数据版本
+    //获取数据版本,开始没有就是{}
     exports.getVersion = function() {
       return JSON.parse(localStorage.getItem('version')) || {};
     };
