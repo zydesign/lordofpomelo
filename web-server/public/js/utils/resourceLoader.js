@@ -10,7 +10,7 @@ __resources__["/resourceLoader.js"] = {
     var imgURL = require('config').IMAGE_URL;                             //图片地址
     var EventEmitter = window.EventEmitter;                               //事件发射器
 		var EntityType = require('consts').EntityType;            //实体类型对象
-		var aniOrientation = require('consts').aniOrientation;    //角色朝向
+		var aniOrientation = require('consts').aniOrientation;    //角色初始朝向
 		var ObjectPoolFactory = require('objectPoolFactory');     //对象池工厂
 
 	  
@@ -71,20 +71,23 @@ __resources__["/resourceLoader.js"] = {
       });
     };
 	  
-    //加载场景资源
+    //加载场景资源---------------------------------------------------------------------------------【加载场景资源】
     pro.loadAreaResource = function() {
       var self = this;
+	    //请求场景资源加载，返回data为{players,mobs,npcs,items,equipments,mapName}各个数据表的id组
       pomelo.request('area.resourceHandler.loadAreaResource',  {},function(data) {
+	      //执行设置资源总数
         self.setTotalCount(1 + 1 + (data.players.length  + data.mobs.length) * 16 + data.npcs.length + data.items.length + data.equipments.length);
 
+	      //执行加载json资源
         self.loadJsonResource(function(){
-          self.setLoadedCount(self.loadedCount + 1);
-          self.loadMap(data.mapName);
-          self.loadCharacter(data.players);
-          self.loadCharacter(data.mobs);
-          self.loadNpc(data.npcs);
-          self.loadItem(data.items);
-          self.loadEquipment(data.equipments);
+          self.setLoadedCount(self.loadedCount + 1);     //执行设置已加载数
+          self.loadMap(data.mapName);                    //执行加载地图
+          self.loadCharacter(data.players);              //执行加载玩家
+          self.loadCharacter(data.mobs);                 //执行加载怪物
+          self.loadNpc(data.npcs);                       //执行加载NPC
+          self.loadItem(data.items);                     //执行加载道具
+          self.loadEquipment(data.equipments);           //执行加载装备
 					initObjectPools(data.mobs, EntityType.MOB);
 					initObjectPools(data.players, EntityType.PLAYER);
         });
@@ -96,17 +99,17 @@ __resources__["/resourceLoader.js"] = {
       var self = this;
       var img = new Image();
       img.onload = function() {
-        self.setLoadedCount(self.loadedCount + 1);
+        self.setLoadedCount(self.loadedCount + 1);  //加载了一张图片，已加载数+1
       };
 
       img.onerror = function() {
-        self.setLoadedCount(self.loadedCount + 1);
+        self.setLoadedCount(self.loadedCount + 1);  //加载错误，也是已加载数+1
       };
 
-      img.src = src;
+      img.src = src;      //图片地址
     };
 
-    //加载地图资源  
+    //加载地图资源  （参数name为图片名称）
     pro.loadMap = function(name) {
       this.loadImg(imgURL + 'map/' + name + ".jpg");
     };
