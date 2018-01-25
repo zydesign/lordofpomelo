@@ -107,6 +107,7 @@ handler.loadResource = function(msg, session, next) {
  * @param {Function} next
  * @api public
  */
+//客户端发起，地图资源加载
 handler.loadAreaResource = function(msg, session, next) {
   var entities = session.area.getAllEntities();
   var players = {}, mobs = {}, npcs = {}, items = {}, equips = {};
@@ -114,7 +115,7 @@ handler.loadAreaResource = function(msg, session, next) {
   for (i in entities) {
     e = entities[i];
     if (e.type === EntityType.PLAYER) {
-      if (!players[e.kindId]) {
+      if (!players[e.kindId]) {                //kindId是基类Entity的属性，读到数据表的id，不是数据库id
         players[e.kindId] = 1;
       }
     } else if(e.type === EntityType.MOB) {
@@ -137,12 +138,12 @@ handler.loadAreaResource = function(msg, session, next) {
   }
 
   next(null, {
-    players: Object.keys(players),
-    mobs: Object.keys(mobs),
-    npcs: Object.keys(npcs),
-    items: Object.keys(items),
-    equipments: Object.keys(equips),
-    mapName: session.area.map.name
+    players: Object.keys(players),          //所有player数据表id
+    mobs: Object.keys(mobs),                //所有mob数据表Id
+    npcs: Object.keys(npcs),                //所有npc数据表Id
+    items: Object.keys(items),              //所有item数据表Id
+    equipments: Object.keys(equips),        //所有equip数据表Id
+    mapName: session.area.map.name          //地图名称
   });
 
 };
