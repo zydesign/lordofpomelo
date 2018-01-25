@@ -281,21 +281,23 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       var playerData = data.player;
 
       var areaId = playerData.areaId;
-      var areas = {1: {map: {id: 'jiangnanyewai.png', width: 3200, height: 2400}, id: 1}};
+      var areas = {1: {map: {id: 'jiangnanyewai.png', width: 3200, height: 2400}, id: 1}};  //默认的登录场景数据
 
+      //将部分信息存到pomelo本地，类似于session--------------------------------------------------配置pomelo属性
       if (!!userData) {
         pomelo.uid = userData.id;
       }
       pomelo.playerId = playerData.id;
       pomelo.areaId = areaId;
       pomelo.player = playerData;
+      //加载资源，播放剧情，登录场景
       loadResource({jsonLoad: true}, function() {
         //enterScene();
         gamePrelude();
       });
     }
 
-    //游戏剧情
+    //显示游戏剧情，然后进入场景
     function gamePrelude() {
       switchManager.selectView("gamePrelude");   //显示剧情文字面板
       var entered = false;
@@ -305,7 +307,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
           enterScene();
         }
       });
-      setTimeout(function(){         //12秒后执行进入场景 enterScene()
+      setTimeout(function(){         //12秒后自动进入场景 enterScene()
         if (!entered) {
           entered = true;
           enterScene();
@@ -317,35 +319,35 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     //加载资源
     function loadResource(opt, callback) {
       switchManager.selectView("loadingPanel");     //显示进度条面板
-      var loader = new ResourceLoader(opt);
+      var loader = new ResourceLoader(opt);         //实例 资源加载器
       var $percent = $('#id_loadPercent').html(0);
       var $bar = $('#id_loadRate').css('width', 0);
       
       //加载资源监听'loading'事件
-      //参数data：请求connector.entryHandler.entry返回的data 或 请求connector.roleHandler.createPlayer返回的data
+      //参数data：发射'loading'时，提供的参数{total: this.totalCount, loaded: this.loadedCount}
       loader.on('loading', function(data) {  
-        var n = parseInt(data.loaded * 100 / data.total, 10);
+        var n = parseInt(data.loaded * 100 / data.total, 10);   //解析为十进制的整数，忽略小数
         $bar.css('width', n + '%');
         $percent.html(n);
       });
       
-      //加载资源监听'complete'事件
+      //加载资源监听'complete'事件，执行参数callback函数 ：function() { gamePrelude();}
       loader.on('complete', function() {
         if (callback) {
           setTimeout(function(){
-            callback();
+            callback();              //这个加载场景资源完成后才执行--02
           }, 500);
         }
       });
 
-      //执行资源加载器的场景资源加载
+      //执行资源加载器的场景资源加载----------------------这个先执行---01
       loader.loadAreaResource();
     }
 
     //进入场景
     function enterScene(){
       pomelo.request("area.playerHandler.enterScene", null, function(data){
-        app.init(data);
+        app.init(data);   //初始化数据。运行场景，开启聊天系统
       });
     }
 
