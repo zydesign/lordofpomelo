@@ -4,6 +4,7 @@ __resources__["/__builtin__/helper.js"] = {meta: {mimetype: "application/javascr
 //arguments.length == 2, width, height
 //arguments.length == 3, width, height, parent
 
+  //创建画布（public.js.app调用该函数）
 function createSketchpad(width, height, parent)
 {
   if (arguments.length == 1)
