@@ -10,7 +10,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	var helper = require("helper");
 	var pomelo = window.pomelo;
 
-	var inited = false;
+	var inited = false;     //是否已经初始化
 	var skch = null;
 	var gd = null;
 	var gv = null;
@@ -24,23 +24,26 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 * @param data {Object} The data for init area
 	 */
 	
-	//根据data数据初始化场景数据，切换场景
+	//根据data数据初始化场景数据，进入场景（clientManager的enterScene调用该函数）
+	//参数data：{entities: 玩家附近实体, curPlayer: player.getInfo(),  map: {}}
 	function init(data) {
 		var map = data.map;
-		pomelo.player = data.curPlayer;
-		switchManager.selectView('gamePanel');
+		pomelo.player = data.curPlayer;               //重新配置pomelo.player
+		switchManager.selectView('gamePanel');        //显示游戏面板
+		//如果已经执行过初始化
 		if(inited){
 			configData(data);
-			area = new Area(data, map);
+			area = new Area(data, map);     //实例场景
 		}else{
-			initColorBox();
-			configData(data);
-			area = new Area(data, map);
+		//如果未执行过初始化
+			initColorBox();                 //打开视图引擎
+			configData(data);               //给参数data添加引擎画布属性
+			area = new Area(data, map);     //使用配置过的data，实例场景
 
-			area.run();
-			chat.init();
+			area.run();                     //运行场景
+			chat.init();                    //聊天初始化
 
-			inited = true;
+			inited = true;   //改为已初始化
 		}
     ui.init();
 	}
@@ -51,15 +54,15 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 */
 	function initColorBox(){
 		if(!skch){
-			var width = parseInt(getComputedStyle(document.getElementById("m-main")).width);
-			var height = parseInt(getComputedStyle(document.getElementById("m-main")).height);
-			skch = helper.createSketchpad(width, height, document.getElementById("m-main"));
-			skch.cmpSprites = cmpSprites;
+			var width = parseInt(getComputedStyle(document.getElementById("m-main")).width);    //获取宽度
+			var height = parseInt(getComputedStyle(document.getElementById("m-main")).height);  //获取高度
+			skch = helper.createSketchpad(width, height, document.getElementById("m-main"));    //创建画布
+			skch.cmpSprites = cmpSprites;   //比较精灵
 		}
 
-		gv = new view.HonestView(skch);
-		gv.showUnloadedImage(false);
-		gd = director.director({
+		gv = new view.HonestView(skch);      //新建视图
+		gv.showUnloadedImage(false);         //不显示未加载图片
+		gd = director.director({             //导演开启游戏
 			view: gv
 		});
 	}
@@ -110,7 +113,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 * @param data {Object} The init data for area
 	 * @api private
 	 */
-	//配置数据信息
+	//配置数据，给参数添加属性------------------------------------------------------------------【配置数据】
 	function configData(data){
 		data.skch = skch;
 		data.gd = gd;
