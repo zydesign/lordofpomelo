@@ -16,21 +16,24 @@ var handler = module.exports;
  * @return {Number}
  * @api private
  */
+//获取文件版本号,返回修改时间（数值）
 var _getFileVersion = function(path) {
+  //mtime属性得到文件的"修改时间"日期字符串。
   return (new Date(fs.statSync(path).mtime)).getTime();
 };
 
+//所有类型数据表的版本（最新修改时间）
 var version = {
-  fightskill: _getFileVersion('./config/data/fightskill.json'),
-  equipment:  _getFileVersion('./config/data/equipment.json'),
-  item: _getFileVersion('./config/data/item.json'),
-  character: _getFileVersion('./config/data/character.json'),
-  npc: _getFileVersion('./config/data/npc.json'),
-  animation:  _getFileVersion('./config/animation_json'),
-  effect: _getFileVersion('./config/effect.json')
+  fightskill: _getFileVersion('./config/data/fightskill.json'),   //战斗技能版本
+  equipment:  _getFileVersion('./config/data/equipment.json'),    //装备版本
+  item: _getFileVersion('./config/data/item.json'),               //道具版本
+  character: _getFileVersion('./config/data/character.json'),     //怪物角色版本
+  npc: _getFileVersion('./config/data/npc.json'),                 //npc版本
+  animation:  _getFileVersion('./config/animation_json'),         //动画版本
+  effect: _getFileVersion('./config/effect.json')                 //特效版本
 };
 
-var animationFiles = [];
+var animationFiles = [];           //动画文件组
 
 /**
  * Get animation data with the given path.
@@ -39,9 +42,11 @@ var animationFiles = [];
  * @api public
  */
 
+//获取动画json对象
 var _getAnimationJson = function() {
   var path = '../../../../config/animation_json/';
   var data = {};
+  //如果动画组没有数据，读取动画文件，生成动画组，并生成data对象
   if (animationFiles.length === 0) {
     var dir = './config/animation_json';
     var name, reg = /\.json$/;
@@ -53,6 +58,7 @@ var _getAnimationJson = function() {
       }
     });
   } else {
+    //如果动画组有数据，通过动画组生成data对象
     animationFiles.forEach(function(name) {
       data[name] = require(path + name + '.json');
     });
@@ -69,8 +75,10 @@ var _getAnimationJson = function() {
  * @param {Function} next
  * @api public
  */
+//客户端发起，加载资源（客户端的resourceLoader.loadJsonResource发起请求）
 handler.loadResource = function(msg, session, next) {
   var data = {};
+  //如果参数的version与当前的最新数据表版本不一致，获取对应类型数据表的全部数据
   if (msg.version.fightskill !== version.fightskill) {
     data.fightskill = dataApi.fightskill.all();
   }
