@@ -7,8 +7,8 @@ __resources__["/dataApi.js"] = {
 
     //普通数据类-------------------------------------------------------------------------------------【普通数据类】
     function Data(key) {
-      this.key = key;
-      this.data = null;
+      this.key = key;    //key为数据类型（如：item）
+      this.data = null;  //对应类型的数据
     }
 
     //localStorage是IE的api。设置字段localStorage.setItem（key，value）
@@ -110,13 +110,14 @@ __resources__["/dataApi.js"] = {
     exports.animation = new AnimationData();        //实例动画数据
     exports.effect = new Effect();                  //实例特效数据
 
+    //(resourceLoader.loadJsonResource调用该函数设置数据)
     exports.setData = function(data) {              //给所有类型的数据类添加数据
       if (data) {
         var obj;
         for (var i in data) {
           obj = exports[i];   
           if (obj && obj.set) {
-            obj.set(data[i]);
+            obj.set(data[i]);    //给每一类填充数据
           }
         }
       }
