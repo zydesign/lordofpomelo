@@ -4,14 +4,15 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 * Module dependencies
 	 *
 	 */
-	var ObjectPool = require('objectPool');
-	var Animation = require('animation');
-	var getPoolName = require('utils').getPoolName;
-	var app = require('app');
+	var ObjectPool = require('objectPool');           //对象池类
+	var Animation = require('animation');             //动画类
+	var getPoolName = require('utils').getPoolName;   //获取对象池名
+	var app = require('app');                         //app脚本
 
 	/**
 	 * The factory of creating objectPool.
 	 */
+	//对象池工厂（resourceLoader的initObjectPools调用该函数）
 	var ObjectPoolFactory = function() {
 		this.name = ['LeftUpStand', 'RightUpStand', 'LeftUpWalk', 'RightUpWalk', 'LeftUpAttack', 'RightUpAttack', 'LeftUpDead', 'RightUpDead',
 			           'LeftDownStand', 'RightDownStand', 'LeftDownWalk', 'RightDownWalk', 'LeftDownAttack', 'RightDownAttack', 'LeftDownDead', 
@@ -27,14 +28,16 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 * @param {String} type
 	 * @api public
 	 */
+	//创建对象池（一个kindId设置了16个对象）
 	ObjectPoolFactory.prototype.createPools = function(kindId, type) {
 		var name = this.name;
 
+		//遍历每个动画名
 		for (var i = 0; i < name.length; i++) {
 				var animationName = name[i];
-				var objectPool = createPool(kindId, type, animationName);
-				var poolName = getPoolName(kindId, animationName);
-				app.getObjectPoolManager().addPool(poolName, objectPool);
+				var objectPool = createPool(kindId, type, animationName);  //一个对象名创建一个对象池
+				var poolName = getPoolName(kindId, animationName);         //获取池名
+				app.getObjectPoolManager().addPool(poolName, objectPool);  //对象池加入管理器的对象池组中
 		}
 	};
 		
@@ -44,6 +47,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 * @return {ObjectPool}
 	 * @api private
 	 */
+	//创建对象池（参数：种类id、类型、动画名、flipx）
 	var createPool = function(kindId, type, name, flipx) {
 		var getAniamtion = function() {
 			return new Animation({
