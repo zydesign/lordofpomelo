@@ -4,6 +4,7 @@ __resources__["/objectPool.js"] = {meta: {mimetype: "application/javascript"}, d
 	 * Initialize 'objectPool' with the given 'opts'
 	 * ObjectPool maintains a number of objects with the same information
 	 */
+	//对象池
 	var ObjectPool = function(opts) {
 		this.getNewObject = opts.getNewObject; //the callback function is called when new object is required
 		this.destoryObject = opts.destoryObject;// the callback function is called when object is disposed
