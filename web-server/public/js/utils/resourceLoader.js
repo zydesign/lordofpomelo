@@ -59,8 +59,9 @@ __resources__["/resourceLoader.js"] = {
       }
 	   //加载json资源------------------------------------------加载json资源 
 	    
-      var version = dataApi.getVersion();    //获取数据版本号，开始没有就是{}
+      var version = dataApi.getVersion();    //获取数据版本号，第一次请求没有version就是{}，第二次之后请求就有了（比如切换地图加载资源）
 	    //通过版本号，请求资源加载，然后设置数据，设置版本号
+	    //请求返回result：{data: data, version: version}
       pomelo.request('area.resourceHandler.loadResource', {version: version},  function(result) {
         dataApi.setData(result.data);           //设置数据
         dataApi.setVersion(result.version);     //设置版本号
@@ -76,16 +77,16 @@ __resources__["/resourceLoader.js"] = {
       var self = this;
 	    //请求场景资源加载，返回data为{players,mobs,npcs,items,equipments,mapName}各个数据表的id组
       pomelo.request('area.resourceHandler.loadAreaResource',  {},function(data) {
-	      //执行设置资源总数
+	      //执行设置资源总数（1+1为两次请求服务器)
         self.setTotalCount(1 + 1 + (data.players.length  + data.mobs.length) * 16 + data.npcs.length + data.items.length + data.equipments.length);
 
-	      //执行加载json资源
+	      //先执行加载json资源数据，有了数据再加载图片
         self.loadJsonResource(function(){
-          self.setLoadedCount(self.loadedCount + 1);     //执行设置已加载数
-          self.loadMap(data.mapName);                    //执行加载地图
-          self.loadCharacter(data.players);              //执行加载玩家
-          self.loadCharacter(data.mobs);                 //执行加载怪物
-          self.loadNpc(data.npcs);                       //执行加载NPC
+          self.setLoadedCount(self.loadedCount + 1);     //已加载数+1（loadJsonResource算一个）
+          self.loadMap(data.mapName);                    //执行加载地图（地图图片，已加载数+1）
+          self.loadCharacter(data.players);              //执行加载玩家（各类型角色，4个方位动画的帧图片，已加载数+N）
+          self.loadCharacter(data.mobs);                 //执行加载怪物（同上，已加载数+N）
+          self.loadNpc(data.npcs);                       //执行加载NPC（同上，已加载数+N）
           self.loadItem(data.items);                     //执行加载道具
           self.loadEquipment(data.equipments);           //执行加载装备
 					initObjectPools(data.mobs, EntityType.MOB);
@@ -97,7 +98,7 @@ __resources__["/resourceLoader.js"] = {
     //加载图片资源
     pro.loadImg = function(src) {
       var self = this;
-      var img = new Image();
+      var img = new Image();   //实例 web图片
       img.onload = function() {
         self.setLoadedCount(self.loadedCount + 1);  //加载了一张图片，已加载数+1
       };
@@ -116,11 +117,11 @@ __resources__["/resourceLoader.js"] = {
 
     //加载角色资源
     pro.loadCharacter = function(ids) {
-      var animation = ['Attack', 'Stand', 'Walk', 'Dead'];
+      var animation = ['Attack', 'Stand', 'Walk', 'Dead'];   //动画状态
       var self = this;
-      ids.forEach(function(id) {
-        animation.forEach(function(action) {
-					for (var key in aniOrientation) {
+      ids.forEach(function(id) {   //遍历每个类型角色
+        animation.forEach(function(action) {   //遍历每个动画状态
+					for (var key in aniOrientation) {   //遍历每个状态的方位
 						self.loadImg(imgURL + 'animation/' + id + '/' +aniOrientation[key] + action + '.png');
 					}
         });
