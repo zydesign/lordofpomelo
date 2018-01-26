@@ -46,7 +46,7 @@ __resources__["/resourceLoader.js"] = {
       }
     };
 
-    //加载json资源。
+    //加载json资源----------------------------------------------------------------------------【加载json资源】
     pro.loadJsonResource = function(callback) {
 	    //如果不加载json资源------------------------------------不加载json资源
       if (this.jsonLoad === false) {
@@ -72,7 +72,7 @@ __resources__["/resourceLoader.js"] = {
       });
     };
 	  
-    //加载场景资源---------------------------------------------------------------------------------【加载场景资源】
+    //加载场景资源---------------------------------------------------------------------------------------【加载场景资源】
     pro.loadAreaResource = function() {
       var self = this;
 	    //请求场景资源加载，返回data为{players,mobs,npcs,items,equipments,mapName}各个数据表的id组
@@ -84,25 +84,28 @@ __resources__["/resourceLoader.js"] = {
         self.loadJsonResource(function(){
           self.setLoadedCount(self.loadedCount + 1);     //已加载数+1（loadJsonResource算一个）
           self.loadMap(data.mapName);                    //执行加载地图（地图图片，已加载数+1）
-          self.loadCharacter(data.players);              //执行加载玩家（各类型角色，4个方位动画的帧图片，已加载数+N）
+          self.loadCharacter(data.players);              //执行加载玩家（各类型角色，4个动画状态，4个方位图片，已加载数+N）
           self.loadCharacter(data.mobs);                 //执行加载怪物（同上，已加载数+N）
-          self.loadNpc(data.npcs);                       //执行加载NPC（同上，已加载数+N）
-          self.loadItem(data.items);                     //执行加载道具
-          self.loadEquipment(data.equipments);           //执行加载装备
-					initObjectPools(data.mobs, EntityType.MOB);
-					initObjectPools(data.players, EntityType.PLAYER);
+          self.loadNpc(data.npcs);                       //执行加载NPC（各种类型npc一张图片，已加载数+N）
+          self.loadItem(data.items);                     //执行加载道具（各种类型道具一张图片，已加载数+N）
+          self.loadEquipment(data.equipments);           //执行加载装备（各种类型装备一张图片，已加载数+N）
+		
+	  initObjectPools(data.mobs, EntityType.MOB);         //初始化怪物对象池
+	  initObjectPools(data.players, EntityType.PLAYER);   //初始化玩家角色对象池
         });
       });
     };
 
-    //加载图片资源
+    //加载图片
     pro.loadImg = function(src) {
       var self = this;
-      var img = new Image();   //实例 web图片
+      var img = new Image();   //实例 Image对象（js的图片类）
+      //设置图片加载完毕事件
       img.onload = function() {
         self.setLoadedCount(self.loadedCount + 1);  //加载了一张图片，已加载数+1
       };
 
+      //设置图片加载错误事件
       img.onerror = function() {
         self.setLoadedCount(self.loadedCount + 1);  //加载错误，也是已加载数+1
       };
@@ -110,25 +113,26 @@ __resources__["/resourceLoader.js"] = {
       img.src = src;      //图片地址
     };
 
-    //加载地图资源  （参数name为图片名称）
+    //加载地图资源（参数name为图片名称）-----------------------------------------------------------------【加载地图资源】
     pro.loadMap = function(name) {
       this.loadImg(imgURL + 'map/' + name + ".jpg");
     };
 
-    //加载角色资源
+    //加载角色资源-------------------------------------------------------------------------------------【加载角色资源】
     pro.loadCharacter = function(ids) {
-      var animation = ['Attack', 'Stand', 'Walk', 'Dead'];   //动画状态
+      var animation = ['Attack', 'Stand', 'Walk', 'Dead'];      //动画状态
       var self = this;
-      ids.forEach(function(id) {   //遍历每个类型角色
-        animation.forEach(function(action) {   //遍历每个动画状态
+      ids.forEach(function(id) {                                            //遍历每个类型角色
+        animation.forEach(function(action) {                                //遍历每个动画状态
 					for (var key in aniOrientation) {   //遍历每个状态的方位
+						//给每个方位加载一张图片
 						self.loadImg(imgURL + 'animation/' + id + '/' +aniOrientation[key] + action + '.png');
 					}
         });
       });
     };
 
-    //加载NPC资源
+    //加载NPC资源-----------------------------------------------------------------------------------------【加载NPC资源】
     pro.loadNpc = function(ids) {
       var self = this;
       ids.forEach(function(id) {
@@ -136,24 +140,24 @@ __resources__["/resourceLoader.js"] = {
       });
     };
 
-    //加载道具资源
+    //加载道具资源-----------------------------------------------------------------------------------------【加载道具资源】
     pro.loadItem = function(ids) {
       if (ids.length > 0) {
         var self = this;
         var items = dataApi.item.all();
         ids.forEach(function(id) {
-          self.loadImg(imgURL + 'item/item_' + items[id].imgId + '.png');
+          self.loadImg(imgURL + 'item/item_' + items[id].imgId + '.png');   //从道具数据的imgId生成图片名
         });
       }
     };
 
-    //加载装备资源
+    //加载装备资源------------------------------------------------------------------------------------------【加载装备资源】
     pro.loadEquipment = function(ids) {
       if (ids.length > 0) {
         var self = this;
         var equipments = dataApi.equipment.all();
         ids.forEach(function(id) {
-          self.loadImg(imgURL + 'equipment/item_' + equipments[id].imgId + '.png');
+          self.loadImg(imgURL + 'equipment/item_' + equipments[id].imgId + '.png');   //从装备数据的imgId生成图片名
         });
       }
     };
@@ -161,16 +165,18 @@ __resources__["/resourceLoader.js"] = {
     /**
      * Initialize objectPool
      *
-		 * @param {Array} ids
-		 * @api private
-		 */
-		var initObjectPools = function(ids, type) {
-			var of = new ObjectPoolFactory();
-			for (var i = 0; i < ids.length; i ++) {
-				var kindId = ids[i];
-        of.createPools(kindId, type);	
-			}
-		};
+     * @param {Array} ids
+     * @api private
+     */
+     //初始化对象池------------------------------------------------------------------初始化对象池
+     var initObjectPools = function(ids, type) {
+	     var of = new ObjectPoolFactory();
+	     //遍历每个种类id，给每个种类创建对象池
+	     for (var i = 0; i < ids.length; i ++) {
+		     var kindId = ids[i];
+		     of.createPools(kindId, type);
+		     }
+	     };
 
     module.exports = ResourceLoader;
   }
