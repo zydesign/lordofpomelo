@@ -36,7 +36,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 		for (var i = 0; i < name.length; i++) {
 				var animationName = name[i];
 				var objectPool = createPool(kindId, type, animationName);  //一个对象名创建一个对象池
-				var poolName = getPoolName(kindId, animationName);         //获取池名
+				var poolName = getPoolName(kindId, animationName);         //生成对象池名（kindId+name）
 				app.getObjectPoolManager().addPool(poolName, objectPool);  //对象池加入管理器的对象池组中
 		}
 	};
@@ -47,8 +47,9 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 * @return {ObjectPool}
 	 * @api private
 	 */
-	//创建对象池（参数：种类id、类型、动画名、flipx）
+	//创建对象池（参数：种类id、类型、动画名、flipx）,返回结果是ObjectPool实例
 	var createPool = function(kindId, type, name, flipx) {
+		//获取动画对象，为帧动画实例
 		var getAniamtion = function() {
 			return new Animation({
 				kindId: kindId,
@@ -57,7 +58,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 				flipx: flipx
 			}).create(); 
 		};
-		return new ObjectPool({
+		return new ObjectPool({              //通过帧动画对象生成对象池
 			getNewObject: getAniamtion
 		});	
 	};
