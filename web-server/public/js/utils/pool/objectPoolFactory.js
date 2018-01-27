@@ -28,7 +28,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 * @param {String} type
 	 * @api public
 	 */
-	//创建对象池（一个kindId设置了16个对象）
+	//创建对象池（一份kindId数据有16份帧动画数据，可以创建16个对象池）
 	ObjectPoolFactory.prototype.createPools = function(kindId, type) {
 		var name = this.name;
 
