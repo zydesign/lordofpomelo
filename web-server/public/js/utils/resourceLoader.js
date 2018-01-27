@@ -61,7 +61,7 @@ __resources__["/resourceLoader.js"] = {
 	    
       var version = dataApi.getVersion();    //获取数据版本号，第一次请求没有version就是{}，第二次之后请求就有了（比如切换地图加载资源）
 	    //通过版本号，请求资源加载，然后设置数据，设置版本号
-	    //请求返回result：{data: data, version: version}
+	    //请求返回result：{data: data, version: version} 各类型的总数据 和 各类型的最新版本
       pomelo.request('area.resourceHandler.loadResource', {version: version},  function(result) {
         dataApi.setData(result.data);           //设置数据
         dataApi.setVersion(result.version);     //设置版本号
