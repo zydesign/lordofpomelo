@@ -6,15 +6,15 @@ __resources__["/objectPool.js"] = {meta: {mimetype: "application/javascript"}, d
 	 */
 	//对象池
 	var ObjectPool = function(opts) {
-		this.getNewObject = opts.getNewObject; //the callback function is called when new object is required
-		this.destoryObject = opts.destoryObject;// the callback function is called when object is disposed
-		this.initCount = opts.initCount || 5;
-		this.enlargeCount = opts.enlargeCount || 2;
-		this.index = 0;
-		this.maxCount = 15;
-		this.pool = [];//contains all the objects
+		this.getNewObject = opts.getNewObject;          //从参数中获取对象（动画实例）
+		this.destoryObject = opts.destoryObject;        //部分破坏
+		this.initCount = opts.initCount || 5;           //初始数量
+		this.enlargeCount = opts.enlargeCount || 2;     //扩展数量
+		this.index = 0;                                 //标签
+		this.maxCount = 15;                             //最大数量
+		this.pool = [];                                 //对象数组
 
-		this._initialize();
+		this._initialize();                             //立即执行初始化
 	};
 
 	/**
