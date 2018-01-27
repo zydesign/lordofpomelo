@@ -42,7 +42,7 @@ var animationFiles = [];           //动画文件组
  * @api public
  */
 
-//获取动画json对象
+//获取或创建 动画json对象
 var _getAnimationJson = function() {
   var path = '../../../../config/animation_json/';
   var data = {};
@@ -50,9 +50,9 @@ var _getAnimationJson = function() {
   if (animationFiles.length === 0) {
     var dir = './config/animation_json';
     var name, reg = /\.json$/;
-    fs.readdirSync(dir).forEach(function(file) {
+    fs.readdirSync(dir).forEach(function(file) {    //每一个动画文件为一份数据
       if (reg.test(file)) {
-        name = file.replace(reg, '');
+        name = file.replace(reg, '');            //文件名作为单份数据的key
         animationFiles.push(name);
         data[name] = require(path + file);
       }
@@ -76,9 +76,10 @@ var _getAnimationJson = function() {
  * @api public
  */
 //客户端发起，加载资源（客户端的resourceLoader.loadJsonResource发起请求）
+//返回cb给客户端：{data: data,version: version} 各类型的总数据 和 各类型的最新版本
 handler.loadResource = function(msg, session, next) {
   var data = {};
-  //如果参数的version与当前的最新数据表版本不一致，获取对应类型数据表的全部数据
+  //如果参数的version与当前的最新数据表版本不一致，获取对应类型数据表的全部数据（动画数据和特效数据单独获取）
   if (msg.version.fightskill !== version.fightskill) {
     data.fightskill = dataApi.fightskill.all();
   }
@@ -95,10 +96,10 @@ handler.loadResource = function(msg, session, next) {
     data.npc = dataApi.npc.all();
   }
   if (msg.version.animation !== version.animation) {
-    data.animation = _getAnimationJson();
+    data.animation = _getAnimationJson();                       //获取动画数据
   }
   if (msg.version.effect !== version.effect) {
-    data.effect = require('../../../../config/effect.json');
+    data.effect = require('../../../../config/effect.json');    //获取特效数据
   }
 
   next(null, {
