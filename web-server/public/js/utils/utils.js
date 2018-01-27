@@ -1,9 +1,12 @@
 
 __resources__["/utils.js"] = {meta: {mimetype: "application/javascript"}, data: function(exports, require, module, __filename, __dirname) {
 
+	//工具模块
+	
   var aniOrientation = require('consts').aniOrientation;
   var dataApi = require('dataApi');
 
+	//计算两点距离
   module.exports.distance = function(sx, sy, ex, ey) {
     var dx = ex - sx;
     var dy = ey - sy;
@@ -11,7 +14,8 @@ __resources__["/utils.js"] = {meta: {mimetype: "application/javascript"}, data: 
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-	module.exports.totalDistance = function(path) {
+        //计算路径的总距离
+   module.exports.totalDistance = function(path) {
     if(!path || path.length < 2) {
       return 0;
     }
@@ -29,9 +33,10 @@ __resources__["/utils.js"] = {meta: {mimetype: "application/javascript"}, data: 
    * @param {Object} path   the path of addressing
    * @return {Object} path the path modified
    */
-	module.exports.pathAmend = function(sprite, path) {
-		var position = sprite.getPosition();
-		path[0] = {
+	//修订路径（就是去掉路径的起点坐标，使用精灵坐标为起点）
+   module.exports.pathAmend = function(sprite, path) {
+		var position = sprite.getPosition();   //精灵的坐标
+		path[0] = {                            //路径的起点（起点是就是对象的原点）
 			x: position.x,
 			y: position.y
 		};
@@ -41,10 +46,12 @@ __resources__["/utils.js"] = {meta: {mimetype: "application/javascript"}, data: 
 		return path;
 	};
 
-	module.exports.getPoolName = function(kindId, name) {
+	//获取池名（种类id+name）
+   module.exports.getPoolName = function(kindId, name) {
 		return kindId + '_' + name;
 	};
 
+	//继承cb，可以使用cb的属性
   module.exports.invokeCallback = function(cb) {
     if(cb && typeof cb === 'function') {
       cb.apply(null, Array.prototype.slice.call(arguments, 1));
