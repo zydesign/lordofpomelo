@@ -4,10 +4,10 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 * Module dependencies
 	 */
 
-	var FrameAnimation = require('frameanimation').FrameAnimation
-		, imgAndJsonUrl = require('config').IMAGE_URL
-		, dataApi = require('dataApi')
-		, app = require('app');
+	var FrameAnimation = require('frameanimation').FrameAnimation    //引入帧动画
+		, imgAndJsonUrl = require('config').IMAGE_URL            //引入图片网址
+		, dataApi = require('dataApi')                           //数据api
+		, app = require('app');                                  //app脚本
 
 	/**
 	 * Initialize a new 'Animation' with the given 'opts'
@@ -16,10 +16,11 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 * @api public
 	 */
 
+	//动画工厂
 	var Animation = function(opts) {
-		this.kindId = opts.kindId;
-		this.type = opts.type;
-		this.name = opts.name;
+		this.kindId = opts.kindId;     //种类id
+		this.type = opts.type;         //类型
+		this.name = opts.name;         //帧动画名（如：LeftDownAttack）
 	};
 
 	/**
@@ -28,13 +29,14 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 *
 	 * @api public
 	 */
+	//创建帧动画 实例
 	Animation.prototype.create = function() {
-		var animationData = this.getJsonData();
-		var width = parseInt(animationData.width);
-		var height = parseInt(animationData.height);
-		var totalFrames = parseInt(animationData.totalFrame);
-		var img = this.getImage(), ani;
-		ani = new FrameAnimation({
+		var animationData = this.getJsonData();                      //获取一份动画数据的帧数据
+		var width = parseInt(animationData.width);                   //动画宽度 
+		var height = parseInt(animationData.height);                 //动画高度
+		var totalFrames = parseInt(animationData.totalFrame);        //动画总帧数 
+		var img = this.getImage(), ani;                              //指定动画名的gif图片
+		ani = new FrameAnimation({               //通过gif图片及帧数据，生成帧动画实例
 			image: img,
 			w: width - 5,
 			h: height - 5,
@@ -43,7 +45,7 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 			HSpan: width,
 			VSpan: height
 		});
-		ani.name = this.name;
+		ani.name = this.name;                    //帧动画名
 		return ani;
 	};
 
@@ -52,9 +54,10 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 *
 	 * @api public
 	 */
+	//获取一份动画数据的某帧数据
 	Animation.prototype.getJsonData= function() {
 		var id = this.kindId, type = this.type, name = this.name, data;
-		data = dataApi.animation.get(id)[name];
+		data = dataApi.animation.get(id)[name];    //通过种类id得到一份动画数据，然后获取指定帧动画名（如：LeftDownAttack）的帧数据
 		if (!!data) {
 			return data;
 		} else {
@@ -67,12 +70,13 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 *
 	 * @api public
 	 */
+	//通过kindId、type、name，从指定网址中获取gif图片
 	Animation.prototype.getImage = function() {
 		var id = this.kindId, type = this.type, name = this.name;
 		var aniIamgeUrl;
-		aniIamgeUrl = imgAndJsonUrl + 'animationPs3/' + id + '/' + name + '.gif';
+		aniIamgeUrl = imgAndJsonUrl + 'animationPs3/' + id + '/' + name + '.gif';  
 		var ResMgr = app.getResMgr();
-		var img = ResMgr.loadImage(aniIamgeUrl);
+		var img = ResMgr.loadImage(aniIamgeUrl);  //加载帧动画图片
 		if(!!img) {
 			return img;
 		}else {
