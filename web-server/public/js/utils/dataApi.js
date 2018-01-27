@@ -56,7 +56,7 @@ __resources__["/dataApi.js"] = {
     //通过id获取动画数据
     AnimationData.prototype.get = function(id) {
       var ani  = this.data[id];
-      //如果获取不到知道id动作数据，会从本地获取，或返回空对象{}
+      //如果获取不到id动画数据，id名改为ani_id后再获取，或返回空对象{}
       if (!ani) {
         ani =  JSON.parse(localStorage.getItem('ani_' + id)) || {};
       }
