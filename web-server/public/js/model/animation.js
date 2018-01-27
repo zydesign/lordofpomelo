@@ -19,7 +19,7 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	//动画工厂
 	var Animation = function(opts) {
 		this.kindId = opts.kindId;     //种类id
-		this.type = opts.type;         //类型
+		this.type = opts.type;         //类型   （如：player、mob）
 		this.name = opts.name;         //帧动画名（如：LeftDownAttack）
 	};
 
@@ -56,6 +56,7 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 */
 	//获取一份动画数据的某帧数据
 	Animation.prototype.getJsonData= function() {
+		//没有用上type属性
 		var id = this.kindId, type = this.type, name = this.name, data;
 		data = dataApi.animation.get(id)[name];    //通过种类id得到一份动画数据，然后获取指定帧动画名（如：LeftDownAttack）的帧数据
 		if (!!data) {
@@ -72,6 +73,7 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 */
 	//通过kindId、type、name，从指定网址中获取gif图片
 	Animation.prototype.getImage = function() {
+		//没有用上type属性
 		var id = this.kindId, type = this.type, name = this.name;
 		var aniIamgeUrl;
 		aniIamgeUrl = imgAndJsonUrl + 'animationPs3/' + id + '/' + name + '.gif';  
