@@ -238,7 +238,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     }
 
     // createPlayer
-    // 创建角色
+    // 创建角色---------------------------------------------------------------------------------------------【创建角色】
     function createPlayer() {
       //如果登录占用，返回
       if (loading) {
@@ -276,6 +276,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       }
     }
 
+    //稍后登录。先加载场景资源，然后播放剧情动画，最后进入场景
     function afterLogin(data) {
       var userData = data.user;
       var playerData = data.player;
@@ -297,7 +298,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       });
     }
 
-    //显示游戏剧情，然后进入场景
+    //显示游戏剧情，然后进入场景---------------------------------------------------------------------【显示游戏剧情】
     function gamePrelude() {
       switchManager.selectView("gamePrelude");   //显示剧情文字面板
       var entered = false;
@@ -316,7 +317,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
     }
 
 
-    //加载资源
+    //加载资源--------------------------------------------------------------------------------------【加载资源】
     function loadResource(opt, callback) {
       switchManager.selectView("loadingPanel");     //显示进度条面板
       var loader = new ResourceLoader(opt);         //实例 资源加载器
@@ -344,10 +345,11 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
       loader.loadAreaResource();
     }
 
-    //进入场景
+    //进入场景--------------------------------------------------------------------------------------【进入场景】
+    //请求进入场景返回cb：{entities,curPlayer,map} 附近实体、玩家状态信息、地图基础信息（PS：entities是包括自己在内的实体）
     function enterScene(){
       pomelo.request("area.playerHandler.enterScene", null, function(data){
-        app.init(data);   //初始化数据。运行场景，开启聊天系统
+        app.init(data);   //初始化数据。实例场景new area，运行场景area.run，开启聊天系统chat.init
       });
     }
 
