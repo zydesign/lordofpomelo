@@ -4,7 +4,7 @@ __resources__["/objectPool.js"] = {meta: {mimetype: "application/javascript"}, d
 	 * Initialize 'objectPool' with the given 'opts'
 	 * ObjectPool maintains a number of objects with the same information
 	 */
-	//对象池
+	//对象池。主要管理动画对象实例（初始化生成对象、使用对象、回收对象）
 	var ObjectPool = function(opts) {
 		this.getNewObject = opts.getNewObject;          //从参数中获取对象（动画实例）
 		this.destoryObject = opts.destoryObject;        //部分破坏
@@ -14,7 +14,7 @@ __resources__["/objectPool.js"] = {meta: {mimetype: "application/javascript"}, d
 		this.maxCount = 15;                             //最大数量
 		this.pool = [];                                 //对象数组
 
-		this._initialize();                             //立即执行初始化
+		this._initialize();                             //立即执行初始化。实例N个动画对象存入pool中
 	};
 
 	/**
