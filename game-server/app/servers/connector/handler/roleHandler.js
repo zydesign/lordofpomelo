@@ -16,16 +16,20 @@ var Handler = function(app) {
 	this.app = app;
 };
 
+//客户端发起，创建角色（参数msg：{name: name, roleId: roleId}）
 Handler.prototype.createPlayer = function(msg, session, next) {
 	var uid = session.uid, roleId = msg.roleId, name = msg.name;
 	var self = this;
 
+	//线通过角色名获取玩家数据，如果有，说明角色名已经被使用，返回code
 	userDao.getPlayerByName(name, function(err, player) {
+		
 		if (player) {
 			next(null, {code: consts.MESSAGE.ERR});
 			return;
 		}
 
+		//验证可以创建角色数据后，数据库创建玩家数据，返回player实体
 		userDao.createPlayer(uid, name, roleId, function(err, player){
 			if(err) {
 				logger.error('[register] fail to invoke createPlayer for ' + err.stack);
