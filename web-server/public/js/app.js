@@ -25,7 +25,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 */
 	
 	//根据data数据初始化场景数据，进入场景（clientManager的enterScene调用该函数）
-	//参数data：{entities: 玩家附近实体, curPlayer: player.getInfo(),  map: {}}
+	//参数data：{entities: 玩家附近实体, curPlayer: player.getInfo(),  map: {}} （PS：entities是包括自己在内的实体）
 	function init(data) {
 		var map = data.map;
 		pomelo.player = data.curPlayer;               //重新配置pomelo.player
