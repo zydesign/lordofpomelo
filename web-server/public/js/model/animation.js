@@ -54,7 +54,7 @@ __resources__["/animation.js"] = {meta: {mimetype: "application/javascript"}, da
 	 *
 	 * @api public
 	 */
-	//获取一份动画数据的某帧数据
+	//获取一份动画数据的某帧数据（通过kindId、name从‘动画数据’获取指定的‘帧数据’）
 	Animation.prototype.getJsonData= function() {
 		//没有用上type属性
 		var id = this.kindId, type = this.type, name = this.name, data;
