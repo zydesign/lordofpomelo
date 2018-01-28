@@ -32,7 +32,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	ObjectPoolFactory.prototype.createPools = function(kindId, type) {
 		var name = this.name;
 
-		//遍历每个动画名
+		//遍历每个动画名，生成动画对象池，将对象池加入对象池组中
 		for (var i = 0; i < name.length; i++) {
 				var animationName = name[i];
 				var objectPool = createPool(kindId, type, animationName);  //一个对象名创建一个对象池
@@ -49,7 +49,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	 */
 	//创建对象池（参数：种类id、类型、动画名、flipx）,返回结果是ObjectPool实例
 	var createPool = function(kindId, type, name, flipx) {
-		//获取动画对象，为帧动画实例
+		//生成动画对象，为帧动画实例
 		var getAniamtion = function() {
 			return new Animation({
 				kindId: kindId,
