@@ -12,7 +12,7 @@ __resources__["/objectPoolFactory.js"] = {meta: {mimetype: "application/javascri
 	/**
 	 * The factory of creating objectPool.
 	 */
-	//对象池工厂。主要用于生产动画对象（resourceLoader的initObjectPools调用该函数）
+	//对象池工厂。主要用于生产对象池（resourceLoader的initObjectPools调用该函数）
 	var ObjectPoolFactory = function() {
 		this.name = ['LeftUpStand', 'RightUpStand', 'LeftUpWalk', 'RightUpWalk', 'LeftUpAttack', 'RightUpAttack', 'LeftUpDead', 'RightUpDead',
 			           'LeftDownStand', 'RightDownStand', 'LeftDownWalk', 'RightDownWalk', 'LeftDownAttack', 'RightDownAttack', 'LeftDownDead', 
