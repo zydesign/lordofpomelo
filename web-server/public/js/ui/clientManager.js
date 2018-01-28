@@ -259,6 +259,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
         loading = false;
       } else {
         //如果角色名字合法，连接前端服务器创建角色
+        //返回cb：{code: consts.MESSAGE.RES, user: user, player: player} player为玩家实体
         pomelo.request("connector.roleHandler.createPlayer", {name: name, roleId: roleId}, function(data) {
           loading = false;
           if (data.code == 500) {
@@ -266,6 +267,7 @@ https://github.com/zydesign/lordofpomelo/tree/master/web-server__resources__["/c
             return;
           }
 
+          //playerId为0，说明角色没创建成功
           if (data.player.id <= 0) {
             switchManager.selectView("loginPanel");  //显示创建角色面板
           } else {
