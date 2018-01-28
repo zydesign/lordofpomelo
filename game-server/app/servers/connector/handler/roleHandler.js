@@ -36,15 +36,19 @@ Handler.prototype.createPlayer = function(msg, session, next) {
 				next(null, {code: consts.MESSAGE.ERR, error:err});
 				return;
 			}else{
+				//并行
 				async.parallel([
-				function(callback) {
-					equipDao.createEquipments(player.id, callback);
+				function(callback) {  
+					//数据库创建指定playerId的装备数据cb：Equipments
+					equipDao.createEquipments(player.id, callback);  
 				},
 				function(callback) {
-					bagDao.createBag(player.id, callback);
+					//数据库创建指定playerId的背包数据cb：Bag
+					bagDao.createBag(player.id, callback);          
 				},
 				function(callback) {
-					player.learnSkill(1, callback);
+					//会调用fightskillDao.add(fightSkill, callback)让数据库创建指定playerId技能数据。cb：fightSkill
+					player.learnSkill(1, callback);                 
 				}],
 				function(err, results) {
 					if (err) {
