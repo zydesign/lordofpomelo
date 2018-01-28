@@ -89,7 +89,7 @@ __resources__["/resourceLoader.js"] = {
           self.loadNpc(data.npcs);                       //执行加载NPC（各种类型npc一张图片，已加载数+N）
           self.loadItem(data.items);                     //执行加载道具（各种类型道具一张图片，已加载数+N）
           self.loadEquipment(data.equipments);           //执行加载装备（各种类型装备一张图片，已加载数+N）
-		
+	
 	  initObjectPools(data.mobs, EntityType.MOB);         //初始化怪物对象池    （怪物kindId对应animation的kindId）
 	  initObjectPools(data.players, EntityType.PLAYER);   //初始化玩家角色对象池 （玩家kindId对应animation的kindId）
         });
@@ -122,10 +122,10 @@ __resources__["/resourceLoader.js"] = {
     pro.loadCharacter = function(ids) {
       var animation = ['Attack', 'Stand', 'Walk', 'Dead'];      //动画状态
       var self = this;
-      ids.forEach(function(id) {                                            //遍历每个类型角色
+      ids.forEach(function(id) {                                            //遍历每个种类角色
         animation.forEach(function(action) {                                //遍历每个动画状态
 					for (var key in aniOrientation) {   //遍历每个状态的方位
-						//给每个方位加载一张图片
+						//给每个方位加载一张图片（为何不是gif？）
 						self.loadImg(imgURL + 'animation/' + id + '/' +aniOrientation[key] + action + '.png');
 					}
         });
