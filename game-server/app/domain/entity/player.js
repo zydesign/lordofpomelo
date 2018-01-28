@@ -224,7 +224,7 @@ Player.prototype.useItem = function(index) {
  * @return {Blooean}
  * @api public
  */
-//玩家学习技能
+//玩家学习技能。（connector/handler/roleHandler.createPlayer调用该函数）
 Player.prototype.learnSkill = function(skillId, callback) {
   //技能id获取技能数据
   var skillData = dataApi.fightskill.findById(skillId);
