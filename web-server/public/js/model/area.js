@@ -16,6 +16,7 @@ __resources__["/area.js"] = {meta: {mimetype: "application/javascript"}, data: f
 	var pomelo = window.pomelo;
 	var isStopped = false;
 
+	//动画播放方式
 	var requestAnimFrame = (function() {
 		return window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
@@ -27,16 +28,18 @@ __resources__["/area.js"] = {meta: {mimetype: "application/javascript"}, data: f
 		};
 	})();
 
+	//定时执行cb
 	var logicTickHandler = function(callback) {
 		setTimeout(callback, 1000/60);
 	};
 
+	//场景工厂
 	var Area = function(opts, map){
-		this.playerId = opts.curPlayer.id;
-		this.entities = {};
-		this.players = {};
-		this.map = null;
-		this.componentAdder = new ComponentAdder({area: this});
+		this.playerId = opts.curPlayer.id;      //playerId
+		this.entities = {};                     //实体组
+		this.players = {};                      //玩家id组
+		this.map = null;                        //游戏地图
+		this.componentAdder = new ComponentAdder({area: this});    //组件添加器
 
 		//this.scene;
 		this.skch = opts.skch;
@@ -44,7 +47,7 @@ __resources__["/area.js"] = {meta: {mimetype: "application/javascript"}, data: f
 		this.gv = opts.gv;
 
 		this.isStopped = false;
-		this.init(opts, map);
+		this.init(opts, map);         //执行初始化
 	};
 
 	var pro = Area.prototype;
