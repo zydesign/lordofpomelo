@@ -213,7 +213,7 @@ util.inherits(CommonAttackSkill, AttackSkill);
  * @api public
  */
 //创建技能，通过参数技能的type属性，实例对应类型的技能
-//（Player.learnSkill函数，玩家学习技能执行该函数，生成实例）
+//（Player.learnSkill函数，玩家学习技能，数据库fightskillDao.add添加新技能数据，并调用该函数生成技能实例）
 //参数skill：{skillId: skillId, level: 1, playerId: this.id, type:'attack'}
 var create = function(skill) {
 	var curBuff = buff.create(skill);  //生成buff实例
