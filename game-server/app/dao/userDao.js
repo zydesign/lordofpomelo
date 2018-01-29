@@ -12,7 +12,7 @@ var async = require('async');
 var utils = require('../util/utils');
 var consts = require('../consts/consts');
 
-//用户数据库传输。（PS：增insert、删delete、改update 返回对象； 查select 返回数组）
+//用户数据库传输。（PS：增insert、删delete、改update 返回对象； 查select 返回数组，cb需要res[0]提取对象）
 var userDao = module.exports;
 
 /**
@@ -136,7 +136,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 				if(!!err || !player) {
 					logger.error('Get user for userDao failed! ' + err.stack);
 				}
-				callback(err,player);  //得到玩家数据player
+				callback(err,player);  //得到player实体
 			});
 		},
 		function(callback) {
