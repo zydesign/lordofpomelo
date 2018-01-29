@@ -128,6 +128,7 @@ userDao.getPlayerByName = function(name, cb){
  */
 
 //获取玩家所有数据-------------------------------------------------------------------------------【通过playerId获取PlayerAllInfo】
+//（area/handler/playerHandler.enterScene调用该函数）
 userDao.getPlayerAllInfo = function (playerId, cb) {
 	//并行执行，各个函数的结果传给最后的results数组中
 	async.parallel([
@@ -279,7 +280,7 @@ userDao.deleteByName = function (username, cb){
 
 //先从数据库生成user数据，然后通过返回的数据生成user实例-------------------------------------------------------【生成user实例】
 //（如果没有user表，会自动生成表，第一个用户id为1）
-//在user表中，插入一条数据，id自增
+//在user表中，插入一条user数据，id自增。然后cb为生成user 实例
 userDao.createUser = function (username, password, from, cb){
 	var sql = 'insert into User (name,password,`from`,loginCount,lastLoginTime) values(?,?,?,?,?)';
 	var loginTime = Date.now();
@@ -305,7 +306,7 @@ userDao.createUser = function (username, password, from, cb){
  */
 
 //先数据库生成player数据，然后通过返回的数据对象生成player实体----------------------------------------------------【生成player实体】
-//（如果没有player表，会自动生成表，第一个角色id为1）
+//在player表，插入一条player数据，id自增，然后cb为生成player实体
 userDao.createPlayer = function (uid, name, roleId,cb){
 	var sql = 'insert into Player (userId, kindId, kindName, name, country, rank, level, experience, attackValue, defenceValue, hitRate, dodgeRate, walkSpeed, attackSpeed, hp, mp, maxHp, maxMp, areaId, x, y, skillPoint) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 	//var role = dataApi.role.findById(roleId);
