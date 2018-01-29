@@ -145,7 +145,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 				if(!!err || !equipments) {
 					logger.error('Get equipments for eqipmentDao failed! ' + err.stack);
 				}
-				callback(err,equipments);  //得到equipments 装备实例组
+				callback(err,equipments);  //得到equipments 装备实例
 			});
 		},
 		function(callback) {
