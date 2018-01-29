@@ -12,6 +12,7 @@ var equipmentsDao = module.exports;
  * @param {Number} playerId Player id. 
  * @param {function} cb Callback function
  */
+//在Equipments表中插入一条Equipments数据，并cb生成Equipments 实例
 equipmentsDao.createEquipments = function (playerId, cb) {
 	var sql = 'insert into Equipments (playerId) values (?)';
 	var args = [playerId];
@@ -33,6 +34,7 @@ equipmentsDao.createEquipments = function (playerId, cb) {
  * @param {Number} playerId 
  * @param {funciton} cb 
  */
+//通过playerId，在Equipments表获取装备数据，然后cb生成Equipments 实例
 equipmentsDao.getEquipmentsByPlayerId = function(playerId, cb) {
 	var sql = 'select * from Equipments where playerId = ?';
 	var args = [playerId];
@@ -59,8 +61,9 @@ equipmentsDao.getEquipmentsByPlayerId = function(playerId, cb) {
  * @param {Object} val Update params, in a object.
  * @param {function} cb
  */
+//通过Equipments.id更新指定的Equipments数据
 equipmentsDao.update = function(val, cb) {
-	var sql = 'update Equipments set weapon = ?, armor = ?, helmet = ?, necklace = ?, ring = ?, belt = ?, amulet = ?, legguard = ?, shoes = ?	where id = ?';
+	var sql = 'update Equipments set weapon = ?, armor = ?, helmet = ?, necklace = ?, ring = ?, belt = ?, amulet = ?, legguard = ?, shoes = ? where id = ?';
 	var args = [val.weapon, val.armor, val.helmet, val.necklace, val.ring, val.belt, val.amulet, val.legguard, val.shoes, val.id];
 
 	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
@@ -74,6 +77,7 @@ equipmentsDao.update = function(val, cb) {
  * @param {number} playerId
  * @param {function} cb
  */
+//在Equipments表中，删除指定playerId的Equipments数据
 equipmentsDao.destroy = function(playerId, cb) {
 	var sql = 'delete from Equipments where playerId = ?';
 	var args = [playerId];
