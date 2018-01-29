@@ -83,7 +83,7 @@ pro.entry = function(msg, session, next) {
 			session.set('serverId', self.app.get('areaIdMap')[player.areaId]);  //绑定后端id，rpc处理逻辑使用
 			session.set('playername', player.name);
 			session.set('playerId', player.id);
-			session.on('closed', onUserLeave.bind(null, self.app));  //监听客户端掉线的
+			session.on('closed', onUserLeave.bind(null, self.app));  //监听客户端掉线的，这里bind只传递必须的实参self.app
 			session.pushAll(cb);
 		},
         function(cb) {
