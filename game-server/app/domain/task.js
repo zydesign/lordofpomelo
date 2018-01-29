@@ -27,7 +27,7 @@ var Task = function(opts) {
 
 	this._initTaskInfo();                          //读取任务表单获取对应id的任务，执行初始化任务信息
 };
-util.inherits(Task, Persistent);
+util.inherits(Task, Persistent);   //继承Persistent的原型链
 
 /**
  * Expose 'Task' constructor
