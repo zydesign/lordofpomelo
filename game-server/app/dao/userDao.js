@@ -144,7 +144,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 				if(!!err || !equipments) {
 					logger.error('Get equipments for eqipmentDao failed! ' + err.stack);
 				}
-				callback(err,equipments);  //得到装备数据equipments
+				callback(err,equipments);  //得到equipments 装备实例组
 			});
 		},
 		function(callback) {
@@ -152,7 +152,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 				if(!!err || !bag) {
 					logger.error('Get bag for bagDao failed! ' + err.stack);
 				}
-				callback(err,bag);  //得到背包信息bag
+				callback(err,bag);  //得到bag 背包实例
 			});
 		},
 		function(callback) {
@@ -160,7 +160,7 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 				if(!!err || !fightSkills){
 					logger.error('Get skills for skillDao failed! ' + err.stack);
 				}
-				callback(err, fightSkills);  //得到战斗技能信息fightSkills
+				callback(err, fightSkills);  //得到fightSkills 技能实例组
 			});
 		},
 		function(callback){
