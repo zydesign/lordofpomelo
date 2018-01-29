@@ -11,6 +11,8 @@ var bagDao = module.exports;
  * @param {Number} playerId Player Id
  * @param {function} cb Call back function
  */
+//在bag表插入一条bag数据，然后cb生成bag实例-------------------------------------------------------【插入新bag数据，创建bag实例】
+//（connector/handler/roleHandler..createPlayer，创建角色调用该函数创建背包）
 bagDao.createBag = function(playerId, cb) {
 	var sql = 'insert into Bag (playerId, items, itemCount) values (?, ?, ?)';
 	var args = [playerId, '{}', 20];
@@ -33,6 +35,7 @@ bagDao.createBag = function(playerId, cb) {
  * @param {Number} playerId Player id.
  * @param {function} cb Call back function.
  */
+//通过playerId获取背包数据，然后cb生成bag 实例
 bagDao.getBagByPlayerId = function(playerId, cb) {
 	var sql = 'select * from Bag where playerId = ?';
 	var args = [playerId];
@@ -59,6 +62,7 @@ bagDao.getBagByPlayerId = function(playerId, cb) {
  * @param {Object} bag Bag object.
  * @param {function} cb Call back function.
  */
+//更新指定bag.id的bag数据
 bagDao.update = function(bag, cb) {
 	var sql = 'update Bag set items = ? where id = ?';
 	var items = bag.items;
@@ -83,6 +87,7 @@ bagDao.update = function(bag, cb) {
  * @param {number} playerId
  * @param {function} cb
  */
+//删除指定playerId的bag数据，cb为被删除的bag数据
 bagDao.destroy = function(playerId, cb) {
 	var sql = 'delete from Bag where playerId = ?';
 	var args = [playerId];
