@@ -43,7 +43,7 @@ handler.enterScene = function(msg, session, next) {
 	utils.myPrint("1 ~ EnterScene: playerId = ", playerId);
 	utils.myPrint("1 ~ EnterScene: teamId = ", teamId);
 
-	//通过玩家id，在数据库中获取角色信息全部信息-----------------------------------------------数据库获取player信息
+	//通过玩家id，在数据库中获取player实体完整数据（包含：背包、装备、技能、任务）----------------------------数据库获取player完整实体
   userDao.getPlayerAllInfo(playerId, function(err, player) {
 	  //如果发生错误或获取不到角色信息
     if (err || !player) {
@@ -55,9 +55,9 @@ handler.enterScene = function(msg, session, next) {
 
       return;
     }
-    //player是数据库获取的玩家数据，有一部分数据新数据在切换场景时，存入到session中，修改部分角色信息为当前session信息--------
+    //给数据库获取的player实体，登录前添加更多属性
     player.serverId = session.frontendId;      //场景添加玩家实体的getChannel().add(e.userId, e.serverId)用到。
-		player.teamId = teamId;        //像队伍这类数据是临时的，不需要存数据库的，断开连接就没有了，每次登陆都要重新获取
+		player.teamId = teamId;        //像队伍这类数据是临时的，不需要存数据库的，断开连接就没有了，每次登陆都要重新添加
 		player.isCaptain = isCaptain;                 //是队员还是队长
 		player.isInTeamInstance = isInTeamInstance;   //是否在副本属性
 		player.instanceId = instanceId;               //添加副本id
