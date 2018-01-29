@@ -279,7 +279,7 @@ userDao.deleteByName = function (username, cb){
 
 //先从数据库生成user数据，然后通过返回的数据生成user实例-------------------------------------------------------【生成user实例】
 //（如果没有user表，会自动生成表，第一个用户id为1）
-//innsert插入数据，返回是数据对象，不是数组
+//在user表中，插入一条数据，id自增
 userDao.createUser = function (username, password, from, cb){
 	var sql = 'insert into User (name,password,`from`,loginCount,lastLoginTime) values(?,?,?,?,?)';
 	var loginTime = Date.now();
