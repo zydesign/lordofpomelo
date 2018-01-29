@@ -11,6 +11,7 @@ var fightskillDao = module.exports;
  * @param {Number} playerId 
  * @param {function} cb 
  */
+//在FightSkill表插入一条技能数据，然后cb生成对应的 fightSkill 实例 （Player.learnSkill玩家学习技能调用该函数）
 fightskillDao.add = function(skill, cb) {
 	var sql = 'insert into FightSkill (playerId, skillId, level, type ) values (?, ?, ?, ?)';
 	var args = [skill.playerId, skill.skillId, skill.level, skill.type];
@@ -21,7 +22,7 @@ fightskillDao.add = function(skill, cb) {
 			utils.invokeCallback(cb, err);
 		} else {
 			skill.id = res.insertId;
-			var fightSkill = fightskill.create(skill);
+			var fightSkill = fightskill.create(skill);   //创建fightskill 实例
 			utils.invokeCallback(cb, null, fightSkill);
 		}
 	});
@@ -31,6 +32,7 @@ fightskillDao.add = function(skill, cb) {
  * Update fight skill
  * @param val {Object} Update params, contains level and skill id
  */
+//通过技能id，更新id的技能数据
 fightskillDao.update = function(val, cb) {
 	var sql = 'update FightSkill set level = ? where id = ?';
 	var args = [val.level, val.id];
@@ -51,6 +53,7 @@ fightskillDao.update = function(val, cb) {
  * @param {Number} playerId 
  * @param {function} cb 
  */
+//通过playerId获取FightSkill数据组，然后每一条技能数据生成FightSkill 实例，cb为fightSkills 实例组
 fightskillDao.getFightSkillsByPlayerId = function(playerId, cb) {
 	var sql = 'select * from FightSkill where playerId = ?';
 	var args = [playerId];
