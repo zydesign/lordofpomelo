@@ -235,7 +235,7 @@ Player.prototype.learnSkill = function(skillId, callback) {
   //生成战斗技能实例
   var fightSkill = fightskill.create({skillId: skillId, level: 1, playerId: this.id, type:'attack'});
   this.fightSkills[skillId] = fightSkill;      //加入战斗技能组
-  fightskillDao.add(fightSkill, callback);    //新技能添加到数据库
+  fightskillDao.add(fightSkill, callback);    //插入新技能到数据库fightSkill表，返回cb是fightSkill 实例
   return true;
 };
 
