@@ -14,6 +14,7 @@ var utils = require('../util/utils');
  * @param {Number} playerId
  * @param {Function} cb
  */
+
 taskDao.getTaskByPlayId = function(playerId, cb) {
 	var sql = 'select * from Task where playerId = ?';
 	var args = [playerId];
@@ -108,7 +109,8 @@ taskDao.getTaskByIds = function(playerId, kindId, cb) {
  * @param {Number} kindId Task's kindId.
  * @param {Function} cb
  */
-//该函数由场景服务器的taskHandler脚本调用
+//在task表中插入一条task任务数据，cb生成task 实例
+//（area/handler/taskHandler.startTask调用该函数）
 taskDao.createTask = function(playerId, kindId, cb) {
 	var sql = 'insert into Task (playerId, kindId) values (?, ?)';
 	var args = [playerId, kindId];
@@ -120,10 +122,10 @@ taskDao.createTask = function(playerId, kindId, cb) {
 			var taskData = {
 				id: res.insertId,     //数据库的任务id
 				playerId: playerId,   //玩家id
-				kindId: kindId        //任务表的任务id
+				kindId: kindId        //任务表的种类id
 			};
 			var task = createNewTask(taskData);
-			utils.invokeCallback(cb, null, task);  //将task返回给场景服务器的taskHandler
+			utils.invokeCallback(cb, null, task);  
 		}
 	});
 };
@@ -181,11 +183,12 @@ taskDao.destroy = function(playerId, cb) {
  * @param {Object} taskInfo
  * @return {Object} task
  */
+//实例新任务，并让该新任务监听save事件，最后返回task实例
 var createNewTask = function(taskInfo) {
 	var task = new Task(taskInfo);
 	var app = pomelo.app;
 	task.on('save', function() {
-		app.get('sync').exec('taskSync.updateTask', task.id, task);	
+		app.get('sync').exec('taskSync.updateTask', task.id, task);	//task.id对应task实例，只触发指定实例的task数据更新
 	});
 	return task;
 };
