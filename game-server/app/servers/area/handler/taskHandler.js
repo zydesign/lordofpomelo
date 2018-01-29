@@ -25,16 +25,18 @@ var handler = module.exports;
  * @param {Function} next
  * @api public
  */
-
+//客户端发起，接取任务
 handler.startTask = function(msg, session, next) {
-	var playerId = msg.playerId, taskId = msg.taskId;
-	var player = session.area.getPlayer(playerId);
+	var playerId = msg.playerId, taskId = msg.taskId;   //这个taskId是任务表的种类id
+	var player = session.area.getPlayer(playerId);      //从session中可以获取场景area，可以场景获取player实体
 	var curTasks = player.curTasks;
 	//check out the curTasks, if curTasks exist, return.
+	//遍历player的所有任务，如果存在指定taskId种类的任务，不需接取，直接返回
 	for (var _ in curTasks) {
 		if (!!curTasks[taskId])
 		return;
 	}
+	//数据库插入新任务，并监听该任务的save事件，返回cb为task实例
 	taskDao.createTask(playerId, taskId, function(err,task) {
 		if (!!err) {
 			logger.error('createTask failed');
