@@ -14,7 +14,7 @@ var utils = require('../util/utils');
  * @param {Number} playerId
  * @param {Function} cb
  */
-
+//通过playerId，在task表中获取指定task数据组，生成task实例，并监听每一个实例的save事件，cb为tasks实例数组
 taskDao.getTaskByPlayId = function(playerId, cb) {
 	var sql = 'select * from Task where playerId = ?';
 	var args = [playerId];
@@ -24,7 +24,8 @@ taskDao.getTaskByPlayId = function(playerId, cb) {
 			utils.invokeCallback(cb, err);
 		} else {
 			var length = res.length;
-			var tasks = [];
+			var tasks = [];           //数组
+			//遍历task数据组，生成task实例，监听每一实例save事件，
 			for (var i = 0; i < length; i ++) {
 				var task = createNewTask(res[i]);
 				tasks.push(task);
@@ -39,6 +40,7 @@ taskDao.getTaskByPlayId = function(playerId, cb) {
  * @param {Number} playerId
  * @param {Function} cb
  */
+//通过playerId，在task表中获取指定task数据组，生成task实例，并监听每一个实例的save事件，cb为tasks实例组（对象组）
 taskDao.getCurTasksByPlayId = function(playerId, cb) {
 	var sql = 'select * from Task where playerId = ?';
 	var args = [playerId];
@@ -48,7 +50,7 @@ taskDao.getCurTasksByPlayId = function(playerId, cb) {
 			utils.invokeCallback(cb, err);
 		} else {
 			var length = res.length;
-			var tasks = {};
+			var tasks = {};              //对象组
 			for (var i = 0; i < length; i ++) {
 				var task = createNewTask(res[i]);
 				if (task.taskState === consts.TaskState.NOT_COMPLETED || task.taskState === consts.TaskState.COMPLETED_NOT_DELIVERY){
@@ -79,6 +81,7 @@ var checkTasks = function(tasks, playerId, res, cb) {
  * @param {Number} kindId Task's kindId.
  * @param {Function} cb
  */
+//获取指定playerId和kindId的task数据组，生成task实例，并监听每一个实例的save事件，cb为tasks实例 数组
 taskDao.getTaskByIds = function(playerId, kindId, cb) {
 	var sql = 'select * from Task where playerId = ? and kindId = ?';
 	var args = [playerId, kindId];
@@ -109,7 +112,7 @@ taskDao.getTaskByIds = function(playerId, kindId, cb) {
  * @param {Number} kindId Task's kindId.
  * @param {Function} cb
  */
-//在task表中插入一条task任务数据，cb生成task 实例
+//在task表中插入一条task任务数据，生成task实例，并监听该实例的save事件，cb生成task 实例
 //（area/handler/taskHandler.startTask调用该函数）
 taskDao.createTask = function(playerId, kindId, cb) {
 	var sql = 'insert into Task (playerId, kindId) values (?, ?)';
@@ -131,6 +134,7 @@ taskDao.createTask = function(playerId, kindId, cb) {
 };
 
 // save the player's task data immediately
+//更新一组task数据到数据库
 taskDao.tasksUpdate = function(tasks) {
   for (var id in tasks) {
     var task = tasks[id];
@@ -143,6 +147,7 @@ taskDao.tasksUpdate = function(tasks) {
  * @param {Object} val The update parameters
  * @param {Function} cb
  */
+//通过task.id更新一条task数据
 taskDao.update = function(val, cb) {
 	var sql = 'update Task set taskState = ?, startTime = ?, taskData = ? where id = ?';
 	var taskData = val.taskData;
@@ -165,6 +170,7 @@ taskDao.update = function(val, cb) {
  * @param {Number} playerId
  * @param {function} cb
  */
+//删除指定playerId的task数据 组
 taskDao.destroy = function(playerId, cb) {
 	var sql = 'delete from Task where playerId = ?';
 	var args = [playerId];
