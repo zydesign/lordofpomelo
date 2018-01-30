@@ -40,7 +40,7 @@ var Player = function(opts) {
     this.nextLevelExp = 999999999;   //如果拿不到角色经验值，下一级所需为极大
   }
   this.roleData = dataApi.role.findById(this.kindId);   //角色数据
-  this.curTasks = opts.curTasks;   //角色当前任务
+  this.curTasks = opts.curTasks;   //角色已接任务（PS：接新任务时会遍历已接任务，使得已接任务都是不同kindId的任务）
   this.range = opts.range || 2;     //角色视野范围，单位瓦片
   // player's team id, default 0(not in any team).
   this.teamId = consts.TEAM.TEAM_ID_NONE;    //团队ID。初始的TEAM_ID_NONE就是没有队伍
