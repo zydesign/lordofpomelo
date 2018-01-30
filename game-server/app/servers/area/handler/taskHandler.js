@@ -29,11 +29,12 @@ var handler = module.exports;
 handler.startTask = function(msg, session, next) {
 	var playerId = msg.playerId, taskId = msg.taskId;   //这个taskId是任务表的种类id
 	var player = session.area.getPlayer(playerId);      //从session中可以获取场景area，可以场景获取player实体
-	var curTasks = player.curTasks;
+	var curTasks = player.curTasks;                     //获取玩家当前已经接取的任务
 	//check out the curTasks, if curTasks exist, return.
-	//遍历player的所有任务，如果存在指定taskId种类的任务，不需接取，直接返回
+	//遍历player的已接任务，如果已经接取过taskId种类的任务，直接返回
+	//PS：通过这里检验，player.curTasks中已接任务必然是不同kindId的任务
 	for (var _ in curTasks) {
-		if (!!curTasks[taskId])
+		if (!!curTasks[taskId])    //因为是遍历的，可以用task的kindId作为key
 		return;
 	}
 	//数据库插入新任务，并监听该任务的save事件，返回cb为task实例
@@ -41,7 +42,7 @@ handler.startTask = function(msg, session, next) {
 		if (!!err) {
 			logger.error('createTask failed');
 		} else {
-		player.startTask(task);
+		player.startTask(task);  //玩家开始该任务，同步任务属性到数据库，并添加到curTasks已接任务组中
 		var taskData = {
 			acceptTalk: task.acceptTalk,
 			workTalk: task.workTalk,
@@ -57,7 +58,7 @@ handler.startTask = function(msg, session, next) {
 		};
 		next(null, {
 			code: consts.MESSAGE.RES,
-			taskData: taskData
+			taskData: taskData     //发给客户端接取的任务信息
 		});
 		}
 	});
@@ -74,22 +75,27 @@ handler.startTask = function(msg, session, next) {
  * @api public
  */
 
+//客户端发起，完成任务
 handler.handoverTask = function(msg, session, next) {
 	var playerId = msg.playerId;
 	var player = session.area.getPlayer(playerId);
 	var tasks = player.curTasks;
-	var taskIds = [];
+	var taskIds = [];   //已完成的task.id组
+	//获取玩家已接任务中，状态为完成未发送的task.id，存入kaskIds数组
 	for (var id in tasks) {
 		var task = tasks[id];
+		//任务状态为：完成但未发送
 		if (task.taskState === consts.TaskState.COMPLETED_NOT_DELIVERY) {
 			taskIds.push(id);
 		}
 	}
+	//执行任务奖励的奖赏函数，奖励装备物品掉落场景中，奖励经验---------------------------------------【任务奖励发放】
 	taskReward.reward(session.area, player, taskIds);
+	//执行玩家完成任务函数
 	player.handOverTask(taskIds);
 	next(null, {
 		code: consts.MESSAGE.RES,
-		ids: taskIds
+		ids: taskIds             //发给客户端已经完成任务的kaskIds数组
 	});
 };
 
