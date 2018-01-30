@@ -15,8 +15,8 @@ var taskData = require('../util/dataApi').task;             //从表里获取任
  * @api public
  */
 
-//带事件监听器的任务模块。。玩家接受任务时先写入数据库，然后taskDao生成参数opt，通过参数实例task，
-//之后场景服务器调用Player.startTask,提供task属性taskState、startTime、taskData
+//（dao/taskDao的createNewTask调用该函数）玩家接取任务，就会在数据库插入新任务数据，并实例 task
+//area/handler/taskHandler.startTask会调用Player.startTask,提供task属性taskState、startTime、taskData，并同步到数据库
 //参数opts为：{id: res.insertId,playerId: playerId,kindId: kindId}
 var Task = function(opts) {
 	this.id = opts.id;                                    //数据库的任务id，作为管理类任务组的key
