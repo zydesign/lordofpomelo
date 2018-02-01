@@ -20,7 +20,8 @@ var channelUtil = require('../../util/channelUtil');
  * @api public
  */
 //场景类，主要把一些小类实例到属性中，为之提供参数opt，并调用这些小类的原型函数进行各种操作。
-//场景入口为scene，参数opt为一份场景数据
+//在任何一个开启的area服务器中，通过app.areaManager.getArea获取【在该场景服务器】的area实例
+//场景入口为scene，参数opt为一份场景数据.
 
 var Instance = function(opts){
   this.areaId = opts.id;
